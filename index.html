@@ -3,118 +3,603 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meine Synchronisierte App</title>
+    <title>Gartenarchiv Pro</title>
+    <!-- Font Awesome für die Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Supabase JS Client einbinden -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; padding: 0 1rem; }
-        textarea { width: 100%; height: 150px; font-size: 16px; padding: 10px; }
-        button { margin-top: 10px; padding: 10px 20px; font-size: 16px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; }
-        button:disabled { background: #ccc; cursor: not-allowed; }
-        #status { margin-top: 10px; font-weight: bold; }
-        .loading { color: orange; }
-        .success { color: green; }
-        .error { color: red; }
+        body { display: flex; font-family: 'Segoe UI', sans-serif; margin: 0; color: #2d3436; height: 100vh; background: #fafafa; }
+        .sidebar { width: 220px; background: #e8f5e9; padding: 25px; border-right: 2px solid #c8e6c9; flex-shrink: 0; }
+        .sidebar h1 { color: #2e7d32; font-size: 1.4rem; margin-bottom: 30px; }
+        .nav-item { cursor: pointer; padding: 12px 15px; margin-bottom: 5px; border-radius: 8px; transition: 0.3s; font-weight: 500; }
+        .nav-item:hover { background: #c8e6c9; color: #2e7d32; }
+
+        .content { padding: 40px; flex-grow: 1; overflow-y: auto; scroll-behavior: smooth; }
+        h2 { color: #388e3c; border-bottom: 2px solid #a5d6a7; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        
+        #entryForm { background: #fff; padding: 25px; border-radius: 12px; border: 1px solid #c8e6c9; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.85rem; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        select[multiple] { height: 120px; padding: 5px; }
+        .full-width { grid-column: span 2; }
+
+        .search-box { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #c8e6c9; border-radius: 8px; }
+        .filter-bar, .sub-filter-bar { margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+        .filter-label { font-size: 0.8rem; font-weight: bold; color: #666; min-width: 100px; }
+        
+        .filter-btn { padding: 6px 15px; border: 1px solid #e0e0e0; background: #e0e0e0; border-radius: 20px; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
+        .filter-btn.active { background: #4caf50; color: white; border-color: #4caf50; }
+        .sub-btn-origin { background: #fff; border: 1px solid #add8e6; color: #555; }
+        .sub-btn-origin.active { background: #add8e6; color: #000; }
+
+        .entry-count { font-size: 0.9rem; color: #666; margin-bottom: 0; font-style: italic; }
+
+        .entry-item { background: white; margin-bottom: 15px; border-radius: 10px; border-left: 8px solid #81c784; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; overflow: hidden; min-height: 110px; position: relative; }
+        .entry-item[data-category="fauna"] { border-left-color: #ffb74d; }
+        .entry-item[data-category="fauna"] .entry-title { color: #ffb74d; }
+
+        .entry-main { padding: 12px 15px; flex-grow: 1; position: relative; }
+        .entry-image { width: 110px; flex-shrink: 0; background: #eee; }
+        .entry-image img { width: 100%; height: 100%; object-fit: cover; }
+
+        .entry-title { font-weight: bold; font-size: 1.05rem; color: #2e7d32; margin-right: 70px; }
+        .entry-meta { font-size: 0.7rem; color: #666; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .entry-details { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 15px; font-size: 0.75rem; margin-top: 5px; }
+        .entry-desc { font-size: 0.75rem; color: #444; margin-top: 5px; font-style: italic; }
+
+        .action-btns { position: absolute; top: 12px; right: 15px; display: flex; gap: 5px; z-index: 10; }
+        .icon-btn { width: 26px; height: 26px; border-radius: 6px; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 0.85rem; color: white; transition: 0.2s; }
+        .btn-edit { background: #bdc3c7; } 
+        .btn-edit:hover { background: #95a5a6; }
+        .btn-delete { background: #ff7675; } 
+        .btn-delete:hover { background: #d63031; }
+
+        .toxicity-icons { position: absolute; top: 45px; right: 15px; display: flex; gap: 2px; }
+        .toxicity-icons i { font-size: 0.8rem; }
+
+        .feature-badges { position: absolute; top: 72px; right: 15px; display: flex; gap: 4px; }
+        .feature-badge { width: 24px; height: 24px; border-radius: 6px; display: flex; justify-content: center; align-items: center; font-size: 0.8rem; border: 1px solid transparent; }
+        .badge-pro { background: #e8f5e9; color: #2e7d32; border-color: #c8e6c9; }
+        .badge-con { background: #ffebee; color: #ff7675; border-color: #ffccd2; }
+
+        .btn-load-images {
+            background: #fff;
+            border: 1px solid #ddd;
+            color: #777;
+            padding: 4px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-load-images:hover {
+            background: #f5f5f5;
+            color: #333;
+            border-color: #ccc;
+        }
     </style>
 </head>
 <body>
 
-    <h1>Meine Synchronisierten Daten</h1>
-    <p>Daten werden live mit der Cloud synchronisiert.</p>
+<div class="sidebar">
+    <h1>Gartenarchiv</h1>
+    <div class="nav-item" onclick="showSection('home')">Home</div>
+    <div class="nav-item" onclick="showSection('archiv')">Archiv</div>
+</div>
 
-    <textarea id="notizInput" placeholder="Tippe hier deine Notiz ein..."></textarea>
-    <br>
-    <button id="saveBtn">Speichern & Synchronisieren</button>
-    
-    <div id="status"></div>
+<div class="content" id="scrollContainer">
+    <div id="home">
+        <h2>Willkommen im Garten!</h2>
+        <p>Deine persönliche Dokumentation der Natur direkt vor der Tür.</p>
+    </div>
 
-    <script>
-        // --- KONFIGURATION EINFÜGEN ---
-        const SUPABASE_URL = 'https://dbblynmsqweqdknygfjp.supabase.co'; 
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiYmx5bm1zcXdlcWRrbnlnZmpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTk4NDMsImV4cCI6MjEwMzEzNTg0M30.wXeb6kThdYkv7puNkUY-wNbigVfhYKtz1X5RwM-g9dw'; 
-        // ------------------------------
+    <div id="archiv" style="display:none;">
+        <h2>Archiv <button class="filter-btn active" style="background:#2e7d32; color:white;" onclick="prepareNewEntry()">+ Neu</button></h2>
+        
+        <div id="entryForm" style="display:none;">
+            <h3 id="formTitle">Neuer Eintrag</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Typ</label>
+                    <select id="categoryInput" onchange="updateFormDynamics()">
+                        <option value="flora">Flora</option>
+                        <option value="fauna">Fauna</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Unterkategorie</label>
+                    <input type="text" id="subInput" list="subcategoryOptions" placeholder="Vorschläge...">
+                    <datalist id="subcategoryOptions"></datalist>
+                </div>
+                <div class="form-group"><label>Name</label><input type="text" id="titleInput"></div>
+                <div class="form-group"><label>Wiss. Name</label><input type="text" id="scienceInput"></div>
+                
+                <div class="form-group" id="originGroup">
+                    <label>Wuchs-Status</label>
+                    <input type="text" id="originInput" list="originOptions" placeholder="Vorschläge..." oninput="updateFormDynamics()">
+                    <datalist id="originOptions"></datalist>
+                </div>
 
-        const input = document.getElementById('notizInput');
-        const btn = document.getElementById('saveBtn');
-        const status = document.getElementById('status');
+                <div class="form-group" id="freqGroup">
+                    <label>Häufigkeit</label>
+                    <select id="freqInput"></select>
+                </div>
 
-        // Funktion: Daten von Supabase laden
-        async function ladeDaten() {
-            status.textContent = "Lade Daten...";
-            status.className = "loading";
-            
-            try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/daten?order=updated_at.desc&limit=1`, {
-                    headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                        'Content-Type': 'application/json'
-                    }
+                <div class="form-group"><label>Sicherheit</label><select id="confInput"><option value="Sicher">Sicher</option><option value="Unsicher">Unsicher</option></select></div>
+                
+                <div class="form-group">
+                    <label>Ort</label>
+                    <input type="text" id="locInput" list="locationOptions" placeholder="Vorschläge...">
+                    <datalist id="locationOptions"></datalist>
+                </div>
+
+                <div class="form-group" id="toxicGroup">
+                    <label>Giftigkeit</label>
+                    <select id="toxicInput">
+                        <optgroup label="Giftigkeitsstufen">
+                            <option value="1">1: Ungiftig / Essbar</option>
+                            <option value="2">2: Leicht giftig / bedingt essbar</option>
+                            <option value="3">3: Giftig (mäßig bis stark)</option>
+                            <option value="4">4: Sehr giftig</option>
+                            <option value="5">5: Extrem giftig</option>
+                        </optgroup>
+                        <optgroup label="Sonstiges">
+                            <option value="Unsicher" selected>Unsicher</option>
+                        </optgroup>
+                    </select>
+                </div>
+                
+                <div class="form-group full-width" id="proConGroup" style="display:none;">
+                    <label>Eigenschaften (Vorteile & Nachteile)</label>
+                    <div style="display:flex; gap:20px; background:#fafafa; padding:15px; border-radius:10px; border:1px solid #c8e6c9;">
+                        <div style="flex:1;">
+                            <strong style="font-size:0.85rem; color:#2e7d32; display:block; margin-bottom:8px;">Vorteile</strong>
+                            <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; margin-bottom:8px; font-weight:normal; cursor:pointer;">
+                                <input type="checkbox" id="benefitTee"> <i class="fas fa-mug-hot" style="color:#2e7d32;"></i> Tee / Heilpflanze
+                            </label>
+                            <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; font-weight:normal; cursor:pointer;">
+                                <input type="checkbox" id="benefitNahrung"> <i class="fas fa-utensils" style="color:#2e7d32;"></i> Nahrung / Essbar
+                            </label>
+                        </div>
+                        <div style="flex:1; border-left:1px solid #c8e6c9; padding-left:20px;">
+                            <strong style="font-size:0.85rem; color:#ff7675; display:block; margin-bottom:8px;">Nachteile (Symptome)</strong>
+                            <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; margin-bottom:8px; font-weight:normal; cursor:pointer;">
+                                <input type="checkbox" id="harmHautkontakt"> <i class="fas fa-hand" style="color:#ff7675;"></i> Hautkontakt-Reizung
+                            </label>
+                            <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; font-weight:normal; cursor:pointer;">
+                                <input type="checkbox" id="harmMagen"> <i class="fas fa-capsules" style="color:#ff7675;"></i> Magen-Darm-Beschwerden
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group full-width" id="timeBlock" style="display:none;">
+                    <label id="timeLabel">Zeitraum</label>
+                    <div id="faunaTimeWrapper">
+                        <small style="display:block; margin-bottom:5px; color:#666;">(Strg + Klick für mehrere)</small>
+                        <select id="timeSelect" multiple>
+                            <optgroup label="Allgemein">
+                                <option value="Ganzjährig">Ganzjährig</option>
+                                <option value="Frühling">Frühling</option>
+                                <option value="Sommer">Sommer</option>
+                                <option value="Herbst">Herbst</option>
+                                <option value="Winter">Winter</option>
+                            </optgroup>
+                            <optgroup label="Monate">
+                                <option value="Januar">Januar</option><option value="Februar">Februar</option>
+                                <option value="März">März</option><option value="April">April</option>
+                                <option value="Mai">Mai</option><option value="Juni">Juni</option>
+                                <option value="Juli">Juli</option><option value="August">August</option>
+                                <option value="September">September</option><option value="Oktober">Oktober</option>
+                                <option value="November">November</option><option value="Dezember">Dezember</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group full-width"><label>Bild-URL</label><input type="text" id="imgInput"></div>
+                <div class="form-group full-width"><label>Notiz</label><textarea id="descInput" rows="2"></textarea></div>
+            </div>
+            <button class="filter-btn active" style="background:#2e7d32; color:white; margin-top:10px;" onclick="saveEntry()">Speichern</button>
+            <button class="btn-link" onclick="toggleForm()">Abbrechen</button>
+        </div>
+
+        <input type="text" id="searchInput" class="search-box" placeholder="Suche..." oninput="renderEntries()">
+        
+        <div class="filter-bar" id="mainFilterBar">
+            <span class="filter-label">Hauptfilter:</span>
+            <button class="filter-btn active" onclick="setMainFilter('all', this)">Alle</button>
+            <button class="filter-btn" onclick="setMainFilter('flora', this)">Flora</button>
+            <button class="filter-btn" onclick="setMainFilter('fauna', this)">Fauna</button>
+        </div>
+        <div class="sub-filter-bar" id="categoryFilterBar"></div>
+        <div class="sub-filter-bar" id="originFilterBar"></div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <div class="entry-count" id="entryCountText"></div>
+            <button id="loadImagesBtn" class="btn-load-images" onclick="toggleImages()">
+                <i class="fas fa-image"></i> Bilder laden
+            </button>
+        </div>
+
+        <div id="entryList"></div>
+    </div>
+</div>
+
+<script>
+    // Supabase Konfiguration
+    const { createClient } = window.supabase;
+    const supabaseUrl = 'https://dbblynmsqweqdknygfjp.supabase.co'; // Ersetze dies mit deiner Supabase-Projekt-URL
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiYmx5bm1zcXdlcWRrbnlnZmpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTk4NDMsImV4cCI6MjEwMzEzNTg0M30.wXeb6kThdYkv7puNkUY-wNbigVfhYKtz1X5RwM-g9dw'; // Ersetze dies mit deinem Anon-Key
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    let entries = []; // Wird nun dynamisch aus Supabase befüllt
+    let mainFilter = 'all';
+    let selectedSubcategories = [];
+    let selectedOrigins = [];
+    let editId = null;
+    let imagesLoaded = false;
+
+    const freqFauna = ["Einzelfund", "Sehr selten", "Selten", "Gelegentlich", "Häufig", "Sehr häufig"];
+    const freqFlora = ["Sehr selten", "Selten", "Gelegentlich", "Häufig", "Sehr häufig"];
+
+    // Funktion, um alle Einträge frisch aus Supabase zu laden
+    async function fetchEntries() {
+        try {
+            const { data, error } = await supabase
+                .from('garten_archiv')
+                .select('*');
+            if (error) throw error;
+            entries = data || [];
+            renderEntries();
+        } catch (err) {
+            console.error("Fehler beim Laden der Cloud-Daten:", err);
+            alert("Fehler beim Abrufen der Einträge aus der Datenbank.");
+        }
+    }
+
+    function showSection(id) {
+        document.getElementById('home').style.display = (id === 'home') ? 'block' : 'none';
+        document.getElementById('archiv').style.display = (id === 'archiv') ? 'block' : 'none';
+        if(id === 'archiv') fetchEntries(); // Lädt Daten bei Klick frisch aus der Cloud
+    }
+
+    function toggleForm() {
+        const f = document.getElementById('entryForm');
+        f.style.display = (f.style.display === 'none') ? 'block' : 'none';
+    }
+
+    function prepareNewEntry() {
+        editId = null;
+        document.getElementById('formTitle').innerText = "Neuer Eintrag";
+        ['titleInput', 'scienceInput', 'subInput', 'locInput', 'imgInput', 'descInput', 'originInput'].forEach(i => {
+            document.getElementById(i).value = "";
+        });
+        document.getElementById('toxicInput').value = "Unsicher";
+        document.getElementById('benefitTee').checked = false;
+        document.getElementById('benefitNahrung').checked = false;
+        document.getElementById('harmHautkontakt').checked = false;
+        document.getElementById('harmMagen').checked = false;
+        Array.from(document.getElementById('timeSelect').options).forEach(opt => opt.selected = false);
+        updateFormDynamics();
+        toggleForm();
+    }
+
+    function updateFormDynamics() {
+        const cat = document.getElementById('categoryInput').value;
+        const origin = document.getElementById('originInput').value;
+        const freqGroup = document.getElementById('freqGroup');
+        const freqSelect = document.getElementById('freqInput');
+        const originGroup = document.getElementById('originGroup');
+        const toxicGroup = document.getElementById('toxicGroup');
+        const timeBlock = document.getElementById('timeBlock');
+        const proConGroup = document.getElementById('proConGroup');
+        
+        freqSelect.innerHTML = '<option value="">-- Keine Angabe --</option>';
+        const options = (cat === 'fauna') ? freqFauna : freqFlora;
+        options.forEach(opt => {
+            const o = document.createElement('option'); o.value = opt; o.innerText = opt; freqSelect.appendChild(o);
+        });
+
+        if (cat === 'flora') {
+            originGroup.style.display = 'block';
+            toxicGroup.style.display = 'block';
+            timeBlock.style.display = 'none';
+            proConGroup.style.display = 'block';
+            if (origin === 'Angebaut' || origin === 'Wildwuchs') freqGroup.style.display = 'none';
+            else freqGroup.style.display = 'block';
+        } else {
+            originGroup.style.display = 'none';
+            toxicGroup.style.display = 'none';
+            freqGroup.style.display = 'block';
+            timeBlock.style.display = 'block';
+            proConGroup.style.display = 'none';
+        }
+        updateDatalists(cat);
+    }
+
+    function updateDatalists(cat) {
+        const subDataList = document.getElementById('subcategoryOptions');
+        subDataList.innerHTML = "";
+        const existingSubs = [...new Set(entries.filter(e => e.category === cat).map(e => e.subcategory))];
+        existingSubs.sort().forEach(sub => {
+            const o = document.createElement('option'); o.value = sub; subDataList.appendChild(o);
+        });
+        const locDataList = document.getElementById('locationOptions');
+        locDataList.innerHTML = "";
+        const existingLocs = [...new Set(entries.map(e => e.location))].filter(l => l && l !== '-');
+        existingLocs.sort().forEach(loc => {
+            const o = document.createElement('option'); o.value = loc; locDataList.appendChild(o);
+        });
+        const originDataList = document.getElementById('originOptions');
+        originDataList.innerHTML = '<option value="Angebaut"><option value="Wildwuchs"><option value="Keine Angabe">';
+    }
+
+    // async Funktion, um Einträge in Supabase zu speichern
+    async function saveEntry() {
+        const cat = document.getElementById('categoryInput').value;
+        const origin = document.getElementById('originInput').value;
+        const imgVal = document.getElementById('imgInput').value;
+        const descVal = document.getElementById('descInput').value;
+        
+        let timeDisplay = "";
+        if(cat === 'fauna') {
+            const selectedOptions = Array.from(document.getElementById('timeSelect').selectedOptions);
+            timeDisplay = selectedOptions.map(opt => opt.value).join(', ') || "-";
+        }
+
+        const entry = {
+            category: cat,
+            subcategory: document.getElementById('subInput').value || 'Unsortiert',
+            title: document.getElementById('titleInput').value,
+            science: document.getElementById('scienceInput').value,
+            frequency: (cat === 'flora' && (origin === 'Angebaut' || origin === 'Wildwuchs')) ? '-' : (document.getElementById('freqInput').value || '-'),
+            origin: cat === 'flora' ? (origin || '-') : '',
+            toxic: cat === 'flora' ? document.getElementById('toxicInput').value : '',
+            confidence: document.getElementById('confInput').value,
+            location: document.getElementById('locInput').value || '-',
+            timeValue: timeDisplay,
+            img: imgVal || 'https://via.placeholder.com/150?text=Kein+Bild',
+            description: descVal ? descVal.trim() : "", // Nutzt 'description' statt 'desc' für SQL-Konformität
+            benefits: cat === 'flora' ? {
+                tee: document.getElementById('benefitTee').checked,
+                nahrung: document.getElementById('benefitNahrung').checked
+            } : { tee: false, nahrung: false },
+            harms: cat === 'flora' ? {
+                hautkontakt: document.getElementById('harmHautkontakt').checked,
+                magen: document.getElementById('harmMagen').checked
+            } : { hautkontakt: false, magen: false }
+        };
+
+        if(!entry.title) return alert("Bitte Namen eingeben!");
+
+        try {
+            if (editId) {
+                // Update in der Cloud
+                const { error } = await supabase
+                    .from('garten_archiv')
+                    .update(entry)
+                    .eq('id', editId);
+                if (error) throw error;
+            } else {
+                // Neuer Insert in die Cloud mit ID
+                entry.id = Date.now();
+                const { error } = await supabase
+                    .from('garten_archiv')
+                    .insert([entry]);
+                if (error) throw error;
+            }
+            toggleForm();
+            await fetchEntries(); // Aktualisiert die lokale Liste
+        } catch (err) {
+            console.error("Fehler beim Speichern in Supabase:", err);
+            alert("Eintrag konnte nicht in der Cloud gespeichert werden.");
+        }
+    }
+
+    function setMainFilter(f, btn) {
+        mainFilter = f; selectedSubcategories = []; selectedOrigins = [];
+        document.querySelectorAll('#mainFilterBar .filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderEntries();
+    }
+
+    function toggleSubFilter(value, type) {
+        let list = (type === 'cat') ? selectedSubcategories : selectedOrigins;
+        const index = list.indexOf(value);
+        if (index > -1) list.splice(index, 1); else list.push(value);
+        renderEntries();
+    }
+
+    function toggleImages() {
+        imagesLoaded = !imagesLoaded;
+        const btn = document.getElementById('loadImagesBtn');
+        btn.innerHTML = imagesLoaded 
+            ? '<i class="fas fa-eye-slash"></i> Bilder ausblenden' 
+            : '<i class="fas fa-image"></i> Bilder laden';
+        renderEntries();
+    }
+
+    function getToxicityHTML(level) {
+        if (!level || level === 'Unsicher') {
+            return `<div class="toxicity-icons" title="Giftigkeit: Unsicher">
+                        <i class="fas fa-skull" style="color: #ddd;"></i>
+                        <span style="font-size: 0.65rem; color: #666; margin-left: 2px;">?</span>
+                    </div>`;
+        }
+        const count = parseInt(level);
+        let skulls = '';
+        for (let i = 1; i <= 5; i++) {
+            skulls += `<i class="fas fa-skull" style="color: ${i <= count ? '#e74c3c' : '#ddd'};"></i>`;
+        }
+        return `<div class="toxicity-icons" title="Giftigkeitsstufe ${level}">${skulls}</div>`;
+    }
+
+    function getFeatureBadgesHTML(e) {
+        if (e.category !== 'flora') return "";
+        let badges = "";
+        
+        const hasTee = e.benefits && e.benefits.tee;
+        const hasNahrung = e.benefits && e.benefits.nahrung;
+        const hasHautkontakt = e.harms && e.harms.hautkontakt;
+        const hasMagen = e.harms && e.harms.magen;
+
+        if (hasTee) {
+            badges += `<div class="feature-badge badge-pro" title="Als Tee / Heilpflanze verwendbar"><i class="fas fa-mug-hot"></i></div>`;
+        }
+        if (hasNahrung) {
+            badges += `<div class="feature-badge badge-pro" title="Essbar / Nahrungspflege"><i class="fas fa-utensils"></i></div>`;
+        }
+        if (hasHautkontakt) {
+            badges += `<div class="feature-badge badge-con" title="Gefahr bei Hautkontakt (Reizung)"><i class="fas fa-hand"></i></div>`;
+        }
+        if (hasMagen) {
+            badges += `<div class="feature-badge badge-con" title="Verursacht Magen-Darm-Beschwerden"><i class="fas fa-capsules"></i></div>`;
+        }
+
+        if (!badges) return "";
+        return `<div class="feature-badges">${badges}</div>`;
+    }
+
+    function renderEntries() {
+        const list = document.getElementById('entryList');
+        const catBar = document.getElementById('categoryFilterBar');
+        const originBar = document.getElementById('originFilterBar');
+        const countText = document.getElementById('entryCountText');
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        
+        catBar.innerHTML = ""; originBar.innerHTML = "";
+        if (mainFilter !== 'all') {
+            const availableCats = [...new Set(entries.filter(e => e.category === mainFilter).map(e => e.subcategory))].sort();
+            if (availableCats.length > 0) {
+                catBar.innerHTML = '<span class="filter-label">Kategorien:</span>';
+                availableCats.forEach(cat => {
+                    const btn = document.createElement('button');
+                    btn.className = `filter-btn ${selectedSubcategories.includes(cat) ? 'active' : ''}`;
+                    btn.innerText = cat; btn.onclick = () => toggleSubFilter(cat, 'cat'); catBar.appendChild(btn);
                 });
-
-                if (!response.ok) throw new Error('Netzwerkfehler');
-                
-                const data = await response.json();
-                
-                if (data.length > 0) {
-                    input.value = data[0].inhalt;
-                    status.textContent = "Daten geladen.";
-                    status.className = "success";
-                } else {
-                    status.textContent = "Keine Daten gefunden. Starte neu.";
-                    status.className = "";
+            }
+            if (mainFilter === 'flora') {
+                const availableOrigins = [...new Set(entries.filter(e => e.category === 'flora').map(e => e.origin))].filter(o => o && o !== '-').sort();
+                if (availableOrigins.length > 0) {
+                    originBar.innerHTML = '<span class="filter-label">Wuchsstatus:</span>';
+                    availableOrigins.forEach(orig => {
+                        const btn = document.createElement('button');
+                        btn.className = `filter-btn sub-btn-origin ${selectedOrigins.includes(orig) ? 'active' : ''}`;
+                        btn.innerText = orig; btn.onclick = () => toggleSubFilter(orig, 'orig'); originBar.appendChild(btn);
+                    });
                 }
-            } catch (err) {
-                console.error(err);
-                status.textContent = "Fehler beim Laden: " + err.message;
-                status.className = "error";
             }
         }
 
-        // Funktion: Daten nach Supabase senden
-        async function speichereDaten() {
-            const text = input.value;
-            if (!text.trim()) return;
+        let filtered = entries.filter(e => {
+            const matchesMain = mainFilter === 'all' || e.category === mainFilter;
+            const matchesSearch = e.title.toLowerCase().includes(search) || e.science.toLowerCase().includes(search);
+            const matchesSub = selectedSubcategories.length === 0 || selectedSubcategories.includes(e.subcategory);
+            const matchesOrigin = selectedOrigins.length === 0 || selectedOrigins.includes(e.origin);
+            return matchesMain && matchesSearch && matchesSub && matchesOrigin;
+        }).sort((a, b) => b.id - a.id);
 
-            btn.disabled = true;
-            status.textContent = "Speichere...";
-            status.className = "loading";
+        countText.innerText = `${filtered.length} Eintrag/Einträge gefunden`;
+        list.innerHTML = "";
+        filtered.forEach(e => {
+            const div = document.createElement('div');
+            div.className = 'entry-item';
+            div.setAttribute('data-category', e.category);
+            const statusLabel = e.origin && e.origin !== '-' ? ` | ${e.origin}` : '';
+            
+            const freqHTML = (e.category === 'flora' && (e.origin === 'Angebaut' || e.origin === 'Wildwuchs')) 
+                ? "" 
+                : `<div><strong>Häufigkeit:</strong> ${e.frequency}</div>`;
 
+            const timeHTML = (e.category === 'fauna')
+                ? `<div><strong>Zeitraum:</strong> ${e.timeValue}</div>`
+                : "";
+
+            const toxicIcons = (e.category === 'flora') ? getToxicityHTML(e.toxic) : "";
+            const featureBadgesHTML = getFeatureBadgesHTML(e);
+
+            const currentImgSrc = imagesLoaded 
+                ? e.img 
+                : 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
+            div.innerHTML = `
+                <div class="entry-main">
+                    <div class="action-btns">
+                        <button class="icon-btn btn-edit" title="Bearbeiten" onclick="editEntry(${e.id})"><i class="fas fa-cog"></i></button>
+                        <button class="icon-btn btn-delete" title="Löschen" onclick="deleteEntry(${e.id})"><i class="fas fa-trash"></i></button>
+                    </div>
+                    ${toxicIcons}
+                    ${featureBadgesHTML}
+                    <div class="entry-meta">${e.category.toUpperCase()} | ${e.subcategory}${statusLabel}</div>
+                    <div class="entry-title">${e.title} <span style="font-style:italic; font-size:0.75rem; color:#666;">${e.science}</span></div>
+                    <div class="entry-details">
+                        ${freqHTML}
+                        <div><strong>Ort:</strong> ${e.location}</div>
+                        ${timeHTML}
+                    </div>
+                    <div class="entry-desc">${e.description || ""}</div>
+                </div>
+                <div class="entry-image"><img src="${currentImgSrc}"></div>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    function editEntry(id) {
+        const e = entries.find(x => x.id === id); editId = id;
+        document.getElementById('formTitle').innerText = "Bearbeiten";
+        document.getElementById('categoryInput').value = e.category;
+        document.getElementById('originInput').value = e.origin || "";
+        updateFormDynamics();
+        document.getElementById('scrollContainer').scrollTo({ top: 0, behavior: 'smooth' });
+        document.getElementById('subInput').value = e.subcategory;
+        document.getElementById('titleInput').value = e.title;
+        document.getElementById('scienceInput').value = e.science;
+        document.getElementById('freqInput').value = (e.frequency === '-') ? "" : e.frequency;
+        if(e.toxic) document.getElementById('toxicInput').value = e.toxic;
+        document.getElementById('confInput').value = e.confidence;
+        document.getElementById('locInput').value = (e.location === '-') ? "" : e.location;
+        
+        if (e.category === 'fauna') {
+            const savedTimes = e.timeValue.split(', ');
+            Array.from(document.getElementById('timeSelect').options).forEach(opt => opt.selected = savedTimes.includes(opt.value));
+        }
+        document.getElementById('imgInput').value = (e.img && !e.img.includes('placeholder')) ? e.img : "";
+        document.getElementById('descInput').value = e.description || "";
+        
+        document.getElementById('benefitTee').checked = (e.benefits && e.benefits.tee) || false;
+        document.getElementById('benefitNahrung').checked = (e.benefits && e.benefits.nahrung) || false;
+        document.getElementById('harmHautkontakt').checked = (e.harms && e.harms.hautkontakt) || false;
+        document.getElementById('harmMagen').checked = (e.harms && e.harms.magen) || false;
+
+        if(document.getElementById('entryForm').style.display === 'none') toggleForm();
+    }
+
+    // async Funktion, um Einträge aus Supabase zu löschen
+    async function deleteEntry(id) { 
+        if(confirm("Eintrag löschen?")) { 
             try {
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/daten`, {
-                    method: 'POST',
-                    headers: {
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                        'Content-Type': 'application/json',
-                        'Prefer': 'return=representation' // Gibt die neue Zeile zurück
-                    },
-                    body: JSON.stringify({ inhalt: text })
-                });
-
-                if (!response.ok) throw new Error('Fehler beim Speichern');
-                
-                status.textContent = "Erfolgreich gespeichert!";
-                status.className = "success";
-                btn.disabled = false;
-                
-                // Optional: Nach 2 Sekunden Status zurücksetzen
-                setTimeout(() => { status.textContent = ""; }, 3000);
-
+                const { error } = await supabase
+                    .from('garten_archiv')
+                    .delete()
+                    .eq('id', id);
+                if (error) throw error;
+                await fetchEntries(); // Aktualisiert die lokale Liste aus der Cloud
             } catch (err) {
-                console.error(err);
-                status.textContent = "Fehler: " + err.message;
-                status.className = "error";
-                btn.disabled = false;
+                console.error("Fehler beim Löschen in Supabase:", err);
+                alert("Eintrag konnte nicht gelöscht werden.");
             }
-        }
-
-        // Event Listener
-        btn.addEventListener('click', speichereDaten);
-
-        // Beim Laden der Seite Daten abrufen
-        window.addEventListener('load', ladeDaten);
-
-        // Automatisch laden, wenn man die Seite neu öffnet (Optional: Polling)
-        // Hinweis: In echten Apps nutzt man oft WebSocket-Listen, aber für einfache Nutzung reicht Reload.
-    </script>
+        } 
+    }
+    
+    // Initialer Abruf beim Start
+    fetchEntries();
+</script>
 </body>
 </html>
