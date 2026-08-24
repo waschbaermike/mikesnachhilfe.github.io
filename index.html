@@ -498,15 +498,25 @@
         }
 
         let filtered = entries.filter(e => {
+            // Falls ein Eintrag in der DB komplett leer/beschädigt ist
+            if (!e) return false; 
+
             const matchesMain = mainFilter === 'all' || e.category === mainFilter;
-            // Falls title oder science leer (null) sind, wird stattdessen ein leerer String "" durchsucht
-            const matchesSearch = (e.title || "").toLowerCase().includes(search) || 
-                                  (e.science || "").toLowerCase().includes(search);
-            const matchesSub = selectedSubcategories.length === 0 || selectedSubcategories.includes(e.subcategory || 'Unsortiert');
-            const matchesOrigin = selectedOrigins.length === 0 || selectedOrigins.includes(e.origin || '-');
+            
+            // Absolut sichere Konvertierung für Title und Science
+            const titleText = (e.title || "").toString().toLowerCase();
+            const scienceText = (e.science || "").toString().toLowerCase();
+            
+            const matchesSearch = titleText.includes(search) || scienceText.includes(search);
+            
+            const matchesSub = selectedSubcategories.length === 0 || 
+                               selectedSubcategories.includes(e.subcategory || 'Unsortiert');
+                               
+            const matchesOrigin = selectedOrigins.length === 0 || 
+                                 selectedOrigins.includes(e.origin || '-');
+                                 
             return matchesMain && matchesSearch && matchesSub && matchesOrigin;
         }).sort((a, b) => b.id - a.id);
-
         countText.innerText = `${filtered.length} Eintrag/Einträge gefunden`;
         list.innerHTML = "";
         filtered.forEach(e => {
