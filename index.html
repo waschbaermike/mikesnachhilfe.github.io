@@ -252,7 +252,7 @@
     async function fetchEntries() {
         try {
             const { data, error } = await db
-                .from('daten')
+                .from('garten_archiv')
                 .select('*');
             if (error) throw error;
             entries = data || [];
@@ -382,7 +382,7 @@
             if (editId) {
                 // Update in der Cloud
                 const { error } = await db
-                    .from('daten')
+                    .from('garten_archiv')
                     .update(entry)
                     .eq('id', editId);
                 if (error) throw error;
@@ -390,7 +390,7 @@
                 // Neuer Insert in die Cloud mit ID
                 entry.id = Date.now();
                 const { error } = await db
-                    .from('daten')
+                    .from('garten_archiv')
                     .insert([entry]);
                 if (error) throw error;
             }
@@ -598,7 +598,7 @@
         if(confirm("Eintrag löschen?")) { 
             try {
                 const { error } = await db
-                    .from('daten')
+                    .from('garten_archiv')
                     .delete()
                     .eq('id', id);
                 if (error) throw error;
