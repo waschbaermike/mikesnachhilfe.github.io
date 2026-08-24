@@ -363,7 +363,7 @@
             toxic: cat === 'flora' ? document.getElementById('toxicInput').value : '',
             confidence: document.getElementById('confInput').value,
             location: document.getElementById('locInput').value || '-',
-            timeValue: timeDisplay,
+            timevalue: timeDisplay,
             img: imgVal || 'https://via.placeholder.com/150?text=Kein+Bild',
             description: descVal ? descVal.trim() : "", // Nutzt 'description' statt 'desc' für SQL-Konformität
             benefits: cat === 'flora' ? {
@@ -530,7 +530,7 @@
                 : `<div><strong>Häufigkeit:</strong> ${e.frequency}</div>`;
 
             const timeHTML = (e.category === 'fauna')
-                ? `<div><strong>Zeitraum:</strong> ${e.timeValue}</div>`
+                ? `<div><strong>Zeitraum:</strong> ${e.timevalue}</div>`
                 : "";
 
             const toxicIcons = (e.category === 'flora') ? getToxicityHTML(e.toxic) : "";
@@ -579,7 +579,7 @@
         document.getElementById('locInput').value = (e.location === '-') ? "" : e.location;
         
         if (e.category === 'fauna') {
-            const savedTimes = e.timeValue.split(', ');
+            const savedTimes = e.timevalue.split(', ');
             Array.from(document.getElementById('timeSelect').options).forEach(opt => opt.selected = savedTimes.includes(opt.value));
         }
         document.getElementById('imgInput').value = (e.img && !e.img.includes('placeholder')) ? e.img : "";
