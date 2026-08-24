@@ -236,7 +236,7 @@
     const { createClient } = window.supabase;
     const supabaseUrl = 'https://dbblynmsqweqdknygfjp.supabase.co'; // Ersetze dies mit deiner Supabase-Projekt-URL
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiYmx5bm1zcXdlcWRrbnlnZmpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTk4NDMsImV4cCI6MjEwMzEzNTg0M30.wXeb6kThdYkv7puNkUY-wNbigVfhYKtz1X5RwM-g9dw'; // Ersetze dies mit deinem Anon-Key
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const db = createClient(supabaseUrl, supabaseKey);
 
     let entries = []; // Wird nun dynamisch aus Supabase befüllt
     let mainFilter = 'all';
@@ -251,7 +251,7 @@
     // Funktion, um alle Einträge frisch aus Supabase zu laden
     async function fetchEntries() {
         try {
-            const { data, error } = await supabase
+            const { data, error } = await db
                 .from('daten')
                 .select('*');
             if (error) throw error;
@@ -381,7 +381,7 @@
         try {
             if (editId) {
                 // Update in der Cloud
-                const { error } = await supabase
+                const { error } = await db
                     .from('daten')
                     .update(entry)
                     .eq('id', editId);
@@ -389,7 +389,7 @@
             } else {
                 // Neuer Insert in die Cloud mit ID
                 entry.id = Date.now();
-                const { error } = await supabase
+                const { error } = await db
                     .from('daten')
                     .insert([entry]);
                 if (error) throw error;
@@ -585,7 +585,7 @@
     async function deleteEntry(id) { 
         if(confirm("Eintrag löschen?")) { 
             try {
-                const { error } = await supabase
+                const { error } = await db
                     .from('daten')
                     .delete()
                     .eq('id', id);
