@@ -36,7 +36,8 @@
 
         .entry-count { font-size: 0.9rem; color: #666; margin-bottom: 0; font-style: italic; }
 
-        .entry-item { background: white; margin-bottom: 15px; border-radius: 10px; border-left: 8px solid #81c784; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; overflow: hidden; min-height: 110px; position: relative; }
+        .entry-item { background: white; margin-bottom: 15px; border-radius: 10px; border-left: 8px solid #81c784; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; flex-direction: column; overflow: hidden; transition: box-shadow 0.2s, transform 0.2s; cursor: pointer; }
+        .entry-item:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .entry-item[data-category="fauna"] { border-left-color: #ffb74d; }
         .entry-item[data-category="fauna"] .entry-title { color: #ffb74d; }
 
@@ -81,6 +82,26 @@
             background: #f5f5f5;
             color: #333;
             border-color: #ccc;
+        }
+
+        /* Styling für den aufklappbaren Detailbereich */
+        .entry-expanded-details {
+            background: #fdfdfd;
+            border-top: 1px dashed #c8e6c9;
+            padding: 15px 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .part-row {
+            display: grid;
+            grid-template-columns: 180px 200px 1fr;
+            gap: 15px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f1f1;
+            align-items: center;
+        }
+        .part-row:last-child {
+            border-bottom: none;
         }
     </style>
 </head>
@@ -139,7 +160,7 @@
                 </div>
 
                 <div class="form-group" id="toxicGroup">
-                    <label>Giftigkeit</label>
+                    <label>Giftigkeit (gesamt)</label>
                     <select id="toxicInput">
                         <optgroup label="Giftigkeitsstufen">
                             <option value="1">1: Ungiftig / Essbar</option>
@@ -154,8 +175,9 @@
                     </select>
                 </div>
                 
+                <!-- Vor- und Nachteile allgemein -->
                 <div class="form-group full-width" id="proConGroup" style="display:none;">
-                    <label>Eigenschaften (Vorteile & Nachteile)</label>
+                    <label>Eigenschaften allgemein (Vorteile & Nachteile)</label>
                     <div style="display:flex; gap:20px; background:#fafafa; padding:15px; border-radius:10px; border:1px solid #c8e6c9;">
                         <div style="flex:1;">
                             <strong style="font-size:0.85rem; color:#2e7d32; display:block; margin-bottom:8px;">Vorteile</strong>
@@ -167,7 +189,7 @@
                             </label>
                         </div>
                         <div style="flex:1; border-left:1px solid #c8e6c9; padding-left:20px;">
-                            <strong style="font-size:0.85rem; color:#ff7675; display:block; margin-bottom:8px;">Nachteile (Symptome)</strong>
+                            <strong style="font-size:0.85rem; color:#ff7675; display:block; margin-bottom:8px;">Nachteile</strong>
                             <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; margin-bottom:8px; font-weight:normal; cursor:pointer;">
                                 <input type="checkbox" id="harmHautkontakt"> <i class="fas fa-hand" style="color:#ff7675;"></i> Hautkontakt-Reizung
                             </label>
@@ -175,6 +197,16 @@
                                 <input type="checkbox" id="harmMagen"> <i class="fas fa-capsules" style="color:#ff7675;"></i> Magen-Darm-Beschwerden
                             </label>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Spezifische Pflanzenteile-Anatomie -->
+                <div class="form-group full-width" id="partsGroup" style="display:none; margin-top:10px;">
+                    <strong style="display:block; margin-bottom:10px; font-size:0.9rem; color:#2e7d32; border-bottom:1px solid #c8e6c9; padding-bottom:5px;">
+                        Analyse der einzelnen Pflanzenteile (Anatomie)
+                    </strong>
+                    <div style="display:flex; flex-direction:column; gap:10px;" id="partsFormContainer">
+                        <!-- Wird per JS befüllt oder ist fest definiert -->
                     </div>
                 </div>
 
@@ -232,13 +264,13 @@
 </div>
 
 <script>
-    // Supabase Konfiguration
+    // Supabase Konfiguration (Nutzt 'db' um globale Namenskonflikte zu vermeiden)
     const { createClient } = window.supabase;
-    const supabaseUrl = 'https://dbblynmsqweqdknygfjp.supabase.co'; // Ersetze dies mit deiner Supabase-Projekt-URL
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiYmx5bm1zcXdlcWRrbnlnZmpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTk4NDMsImV4cCI6MjEwMzEzNTg0M30.wXeb6kThdYkv7puNkUY-wNbigVfhYKtz1X5RwM-g9dw'; // Ersetze dies mit deinem Anon-Key
+    const supabaseUrl = 'DEINE_SUPABASE_URL'; 
+    const supabaseKey = 'DEIN_SUPABASE_ANON_KEY'; 
     const db = createClient(supabaseUrl, supabaseKey);
 
-    let entries = []; // Wird nun dynamisch aus Supabase befüllt
+    let entries = []; 
     let mainFilter = 'all';
     let selectedSubcategories = [];
     let selectedOrigins = [];
@@ -248,7 +280,58 @@
     const freqFauna = ["Einzelfund", "Sehr selten", "Selten", "Gelegentlich", "Häufig", "Sehr häufig"];
     const freqFlora = ["Sehr selten", "Selten", "Gelegentlich", "Häufig", "Sehr häufig"];
 
-    // Funktion, um alle Einträge frisch aus Supabase zu laden
+    // Definition der anatomischen Teile
+    const plantParts = {
+        wurzel: "Wurzel / Knolle",
+        sprossachse: "Sprossachse / Stamm",
+        blaetter: "Blätter",
+        blueten: "Blüten",
+        fruechte: "Früchte",
+        samen: "Samen"
+    };
+
+    // Erstelle die Formularfelder für die Pflanzenteile dynamisch
+    function generatePartsFormFields() {
+        const container = document.getElementById('partsFormContainer');
+        container.innerHTML = "";
+        
+        Object.entries(plantParts).forEach(([key, label]) => {
+            const row = document.createElement('div');
+            row.style.cssText = "display: grid; grid-template-columns: 140px 160px 1fr; gap: 10px; align-items: center; background: #fafafa; padding: 10px; border-radius: 8px; border: 1px solid #e0e0e0;";
+            
+            row.innerHTML = `
+                <strong style="font-size:0.85rem; color:#444;">${label}</strong>
+                <select id="part_toxic_${key}" style="padding:5px; font-size:0.8rem; border-radius:4px; border:1px solid #ddd;">
+                    <option value="">-- Keine Angabe --</option>
+                    <option value="1">1: Ungiftig</option>
+                    <option value="2">2: Leicht giftig</option>
+                    <option value="3">3: Giftig</option>
+                    <option value="4">4: Sehr giftig</option>
+                    <option value="5">5: Extrem giftig</option>
+                    <option value="Unsicher">Unsicher</option>
+                </select>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                    <label style="font-size:0.75rem; font-weight:normal; display:flex; align-items:center; gap:4px; cursor:pointer;">
+                        <input type="checkbox" id="part_tee_${key}"> <i class="fas fa-mug-hot" style="color:#2e7d32;"></i> Tee
+                    </label>
+                    <label style="font-size:0.75rem; font-weight:normal; display:flex; align-items:center; gap:4px; cursor:pointer;">
+                        <input type="checkbox" id="part_nahrung_${key}"> <i class="fas fa-utensils" style="color:#2e7d32;"></i> Nahrung
+                    </label>
+                    <label style="font-size:0.75rem; font-weight:normal; display:flex; align-items:center; gap:4px; cursor:pointer;">
+                        <input type="checkbox" id="part_haut_${key}"> <i class="fas fa-hand" style="color:#ff7675;"></i> Haut
+                    </label>
+                    <label style="font-size:0.75rem; font-weight:normal; display:flex; align-items:center; gap:4px; cursor:pointer;">
+                        <input type="checkbox" id="part_magen_${key}"> <i class="fas fa-capsules" style="color:#ff7675;"></i> Magen
+                    </label>
+                </div>
+            `;
+            container.appendChild(row);
+        });
+    }
+
+    // Initialisiere die Formularfelder
+    generatePartsFormFields();
+
     async function fetchEntries() {
         try {
             const { data, error } = await db
@@ -266,7 +349,7 @@
     function showSection(id) {
         document.getElementById('home').style.display = (id === 'home') ? 'block' : 'none';
         document.getElementById('archiv').style.display = (id === 'archiv') ? 'block' : 'none';
-        if(id === 'archiv') fetchEntries(); // Lädt Daten bei Klick frisch aus der Cloud
+        if(id === 'archiv') fetchEntries();
     }
 
     function toggleForm() {
@@ -285,6 +368,16 @@
         document.getElementById('benefitNahrung').checked = false;
         document.getElementById('harmHautkontakt').checked = false;
         document.getElementById('harmMagen').checked = false;
+        
+        // Pflanzenteile zurücksetzen
+        Object.keys(plantParts).forEach(key => {
+            document.getElementById(`part_toxic_${key}`).value = "";
+            document.getElementById(`part_tee_${key}`).checked = false;
+            document.getElementById(`part_nahrung_${key}`).checked = false;
+            document.getElementById(`part_haut_${key}`).checked = false;
+            document.getElementById(`part_magen_${key}`).checked = false;
+        });
+
         Array.from(document.getElementById('timeSelect').options).forEach(opt => opt.selected = false);
         updateFormDynamics();
         toggleForm();
@@ -299,6 +392,7 @@
         const toxicGroup = document.getElementById('toxicGroup');
         const timeBlock = document.getElementById('timeBlock');
         const proConGroup = document.getElementById('proConGroup');
+        const partsGroup = document.getElementById('partsGroup');
         
         freqSelect.innerHTML = '<option value="">-- Keine Angabe --</option>';
         const options = (cat === 'fauna') ? freqFauna : freqFlora;
@@ -311,6 +405,7 @@
             toxicGroup.style.display = 'block';
             timeBlock.style.display = 'none';
             proConGroup.style.display = 'block';
+            partsGroup.style.display = 'block'; // Zeige Pflanzenteile-Analyse bei Flora
             if (origin === 'Angebaut' || origin === 'Wildwuchs') freqGroup.style.display = 'none';
             else freqGroup.style.display = 'block';
         } else {
@@ -319,6 +414,7 @@
             freqGroup.style.display = 'block';
             timeBlock.style.display = 'block';
             proConGroup.style.display = 'none';
+            partsGroup.style.display = 'none'; // Verbergen bei Fauna
         }
         updateDatalists(cat);
     }
@@ -326,13 +422,13 @@
     function updateDatalists(cat) {
         const subDataList = document.getElementById('subcategoryOptions');
         subDataList.innerHTML = "";
-        const existingSubs = [...new Set(entries.filter(e => e.category === cat).map(e => e.subcategory))];
+        const existingSubs = [...new Set(entries.filter(e => e && e.category === cat).map(e => e.subcategory))];
         existingSubs.sort().forEach(sub => {
             const o = document.createElement('option'); o.value = sub; subDataList.appendChild(o);
         });
         const locDataList = document.getElementById('locationOptions');
         locDataList.innerHTML = "";
-        const existingLocs = [...new Set(entries.map(e => e.location))].filter(l => l && l !== '-');
+        const existingLocs = [...new Set(entries.map(e => e ? e.location : null))].filter(l => l && l !== '-');
         existingLocs.sort().forEach(loc => {
             const o = document.createElement('option'); o.value = loc; locDataList.appendChild(o);
         });
@@ -340,7 +436,6 @@
         originDataList.innerHTML = '<option value="Angebaut"><option value="Wildwuchs"><option value="Keine Angabe">';
     }
 
-    // async Funktion, um Einträge in Supabase zu speichern
     async function saveEntry() {
         const cat = document.getElementById('categoryInput').value;
         const origin = document.getElementById('originInput').value;
@@ -351,6 +446,20 @@
         if(cat === 'fauna') {
             const selectedOptions = Array.from(document.getElementById('timeSelect').selectedOptions);
             timeDisplay = selectedOptions.map(opt => opt.value).join(', ') || "-";
+        }
+
+        // Sammle Pflanzenteile-Daten
+        const partsData = {};
+        if (cat === 'flora') {
+            Object.keys(plantParts).forEach(key => {
+                partsData[key] = {
+                    toxic: document.getElementById(`part_toxic_${key}`).value,
+                    tee: document.getElementById(`part_tee_${key}`).checked,
+                    nahrung: document.getElementById(`part_nahrung_${key}`).checked,
+                    hautkontakt: document.getElementById(`part_haut_${key}`).checked,
+                    magen: document.getElementById(`part_magen_${key}`).checked
+                };
+            });
         }
 
         const entry = {
@@ -365,7 +474,7 @@
             location: document.getElementById('locInput').value || '-',
             timevalue: timeDisplay,
             img: imgVal || 'https://via.placeholder.com/150?text=Kein+Bild',
-            description: descVal ? descVal.trim() : "", // Nutzt 'description' statt 'desc' für SQL-Konformität
+            description: descVal ? descVal.trim() : "",
             benefits: cat === 'flora' ? {
                 tee: document.getElementById('benefitTee').checked,
                 nahrung: document.getElementById('benefitNahrung').checked
@@ -373,21 +482,20 @@
             harms: cat === 'flora' ? {
                 hautkontakt: document.getElementById('harmHautkontakt').checked,
                 magen: document.getElementById('harmMagen').checked
-            } : { hautkontakt: false, magen: false }
+            } : { hautkontakt: false, magen: false },
+            parts_data: cat === 'flora' ? partsData : null
         };
 
         if(!entry.title) return alert("Bitte Namen eingeben!");
 
         try {
             if (editId) {
-                // Update in der Cloud
                 const { error } = await db
                     .from('garten_archiv')
                     .update(entry)
                     .eq('id', editId);
                 if (error) throw error;
             } else {
-                // Neuer Insert in die Cloud mit ID
                 entry.id = Date.now();
                 const { error } = await db
                     .from('garten_archiv')
@@ -395,7 +503,7 @@
                 if (error) throw error;
             }
             toggleForm();
-            await fetchEntries(); // Aktualisiert die lokale Liste
+            await fetchEntries();
         } catch (err) {
             console.error("Fehler beim Speichern in Supabase:", err);
             alert("Eintrag konnte nicht in der Cloud gespeichert werden.");
@@ -423,6 +531,26 @@
             ? '<i class="fas fa-eye-slash"></i> Bilder ausblenden' 
             : '<i class="fas fa-image"></i> Bilder laden';
         renderEntries();
+    }
+
+    // Toggelt den aufklappbaren anatomischen Bereich im Eintrag-Div
+    function toggleCardExpand(id, element, event) {
+        if (event.target.closest('.action-btns') || event.target.closest('.icon-btn')) {
+            return; // Verhindert Aufklappen beim Klick auf Ändern/Löschen
+        }
+        const detailsDiv = document.getElementById(`expanded-${id}`);
+        if (detailsDiv) {
+            const isCurrentlyHidden = detailsDiv.style.display === 'none';
+            detailsDiv.style.display = isCurrentlyHidden ? 'block' : 'none';
+            element.classList.toggle('expanded', isCurrentlyHidden);
+            
+            const indicator = element.querySelector(`.expand-indicator-${id}`);
+            if (indicator) {
+                indicator.innerHTML = isCurrentlyHidden 
+                    ? '<i class="fas fa-chevron-up"></i> Details ausblenden' 
+                    : '<i class="fas fa-chevron-down"></i> Details einblenden';
+            }
+        }
     }
 
     function getToxicityHTML(level) {
@@ -466,6 +594,66 @@
         return `<div class="feature-badges">${badges}</div>`;
     }
 
+    // Generiert die HTML-Tabelle der einzelnen Pflanzenteile für den ausgeklappten Bereich (dauerhaft farbig!)
+    function getPartsDetailsHTML(e) {
+        if (e.category !== 'flora') return "";
+        
+        const parts = e.parts_data || {};
+        let rowsHTML = "";
+
+        // Festgelegte Farb- und Textdefinitionen für die anatomischen Giftebenen
+        const toxicConfig = {
+            "1": { bg: "#e8f5e9", text: "#2e7d32", label: "Ungiftig / Essbar", icon: "fa-smile" },
+            "2": { bg: "#fff3e0", text: "#e65100", label: "Leicht giftig", icon: "fa-exclamation-triangle" },
+            "3": { bg: "#ffe0b2", text: "#f57c00", label: "Mäßig giftig", icon: "fa-skull-crossbones" },
+            "4": { bg: "#ffcdd2", text: "#c62828", label: "Sehr giftig", icon: "fa-skull" },
+            "5": { bg: "#f3e5f5", text: "#4a148c", label: "Extrem giftig", icon: "fa-skull" },
+            "Unsicher": { bg: "#eceff1", text: "#37474f", label: "Unsicher", icon: "fa-question-circle" }
+        };
+
+        Object.entries(plantParts).forEach(([key, label]) => {
+            const part = parts[key] || { toxic: "", tee: false, nahrung: false, hautkontakt: false, magen: false };
+            
+            // 1. Giftigkeits-Badge bestimmen
+            let toxicBadge = `<span style="color: #bbb; font-style: italic; font-size: 0.75rem;">Keine Angabe</span>`;
+            if (part.toxic && toxicConfig[part.toxic]) {
+                const cfg = toxicConfig[part.toxic];
+                toxicBadge = `
+                    <span style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; background: ${cfg.bg}; color: ${cfg.text};">
+                        <i class="fas ${cfg.icon}"></i> ${cfg.label}
+                    </span>
+                `;
+            }
+
+            // 2. Eigenschaften-Badges bestimmen
+            let badgesHTML = "";
+            if (part.tee) badgesHTML += `<div class="feature-badge badge-pro" style="display:inline-flex;" title="Tee / Heilpflanze"><i class="fas fa-mug-hot"></i></div>`;
+            if (part.nahrung) badgesHTML += `<div class="feature-badge badge-pro" style="display:inline-flex;" title="Essbar / Nahrungspflege"><i class="fas fa-utensils"></i></div>`;
+            if (part.hautkontakt) badgesHTML += `<div class="feature-badge badge-con" style="display:inline-flex;" title="Hautkontakt-Reizung"><i class="fas fa-hand"></i></div>`;
+            if (part.magen) badgesHTML += `<div class="feature-badge badge-con" style="display:inline-flex;" title="Verursacht Magen-Darm-Beschwerden"><i class="fas fa-capsules"></i></div>`;
+
+            rowsHTML += `
+                <div class="part-row">
+                    <span style="font-size:0.8rem; font-weight:bold; color:#555;">${label}</span>
+                    <div>${toxicBadge}</div>
+                    <div style="display:flex; gap:4px;">${badgesHTML || '<span style="color:#ddd; font-size:0.75rem;">-</span>'}</div>
+                </div>
+            `;
+        });
+
+        return `
+            <div style="margin-top: 10px; border-top: 2px dashed #c8e6c9; padding-top: 12px;">
+                <strong style="display:block; font-size:0.85rem; color:#2e7d32; margin-bottom:10px;">Botanische Detail-Analyse (Anatomie):</strong>
+                <div style="display:grid; grid-template-columns: 180px 200px 1fr; gap:15px; padding-bottom:5px; border-bottom:2px solid #e8f5e9; font-size:0.75rem; font-weight:bold; color:#888;">
+                    <span>Pflanzenteil</span>
+                    <span>Giftigkeit</span>
+                    <span>Eigenschaften / Symptome</span>
+                </div>
+                ${rowsHTML}
+            </div>
+        `;
+    }
+
     function renderEntries() {
         const list = document.getElementById('entryList');
         const catBar = document.getElementById('categoryFilterBar');
@@ -475,7 +663,7 @@
         
         catBar.innerHTML = ""; originBar.innerHTML = "";
         if (mainFilter !== 'all') {
-            const availableCats = [...new Set(entries.filter(e => e.category === mainFilter).map(e => e.subcategory))].sort();
+            const availableCats = [...new Set(entries.filter(e => e && e.category === mainFilter).map(e => e.subcategory))].sort();
             if (availableCats.length > 0) {
                 catBar.innerHTML = '<span class="filter-label">Kategorien:</span>';
                 availableCats.forEach(cat => {
@@ -485,7 +673,7 @@
                 });
             }
             if (mainFilter === 'flora') {
-                const availableOrigins = [...new Set(entries.filter(e => e.category === 'flora').map(e => e.origin))].filter(o => o && o !== '-').sort();
+                const availableOrigins = [...new Set(entries.filter(e => e && e.category === 'flora').map(e => e.origin))].filter(o => o && o !== '-').sort();
                 if (availableOrigins.length > 0) {
                     originBar.innerHTML = '<span class="filter-label">Wuchsstatus:</span>';
                     availableOrigins.forEach(orig => {
@@ -498,66 +686,82 @@
         }
 
         let filtered = entries.filter(e => {
-            // Falls ein Eintrag in der DB komplett leer/beschädigt ist
-            if (!e) return false; 
-
+            if (!e) return false;
             const matchesMain = mainFilter === 'all' || e.category === mainFilter;
-            
-            // Absolut sichere Konvertierung für Title und Science
-            const titleText = (e.title || "").toString().toLowerCase();
-            const scienceText = (e.science || "").toString().toLowerCase();
-            
-            const matchesSearch = titleText.includes(search) || scienceText.includes(search);
-            
-            const matchesSub = selectedSubcategories.length === 0 || 
-                               selectedSubcategories.includes(e.subcategory || 'Unsortiert');
-                               
-            const matchesOrigin = selectedOrigins.length === 0 || 
-                                 selectedOrigins.includes(e.origin || '-');
-                                 
+            const titleValue = e.title || "";
+            const scienceValue = e.science || "";
+            const matchesSearch = titleValue.toLowerCase().includes(search) || scienceValue.toLowerCase().includes(search);
+            const matchesSub = selectedSubcategories.length === 0 || selectedSubcategories.includes(e.subcategory || 'Unsortiert');
+            const matchesOrigin = selectedOrigins.length === 0 || selectedOrigins.includes(e.origin || '-');
             return matchesMain && matchesSearch && matchesSub && matchesOrigin;
         }).sort((a, b) => b.id - a.id);
+
         countText.innerText = `${filtered.length} Eintrag/Einträge gefunden`;
         list.innerHTML = "";
+        
         filtered.forEach(e => {
             const div = document.createElement('div');
             div.className = 'entry-item';
-            div.setAttribute('data-category', e.category);
-            const statusLabel = e.origin && e.origin !== '-' ? ` | ${e.origin}` : '';
+            div.setAttribute('data-category', e.category || 'flora');
+            div.setAttribute('onclick', `toggleCardExpand(${e.id}, this, event)`);
             
-            const freqHTML = (e.category === 'flora' && (e.origin === 'Angebaut' || e.origin === 'Wildwuchs')) 
+            const originVal = e.origin || '-';
+            const statusLabel = originVal !== '-' ? ` | ${originVal}` : '';
+            
+            const freqHTML = (e.category === 'flora' && (originVal === 'Angebaut' || originVal === 'Wildwuchs')) 
                 ? "" 
-                : `<div><strong>Häufigkeit:</strong> ${e.frequency}</div>`;
+                : `<div><strong>Häufigkeit:</strong> ${e.frequency || '-'}</div>`;
 
             const timeHTML = (e.category === 'fauna')
-                ? `<div><strong>Zeitraum:</strong> ${e.timevalue}</div>`
+                ? `<div><strong>Zeitraum:</strong> ${e.timevalue || '-'}</div>`
                 : "";
 
             const toxicIcons = (e.category === 'flora') ? getToxicityHTML(e.toxic) : "";
             const featureBadgesHTML = getFeatureBadgesHTML(e);
+            
+            // Generiere den HTML-Code für die anatomischen Pflanzenteile
+            const partsDetailsHTML = getPartsDetailsHTML(e);
 
             const currentImgSrc = imagesLoaded 
-                ? e.img 
+                ? (e.img || 'https://via.placeholder.com/150?text=Kein+Bild') 
                 : 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
+            const expandTriggerHTML = e.category === 'flora'
+                ? `<span class="expand-indicator-${e.id}" style="font-size:0.7rem; color:#2e7d32; font-weight:bold; cursor:pointer;">
+                     <i class="fas fa-chevron-down"></i> Details einblenden
+                   </span>`
+                : "";
+
             div.innerHTML = `
-                <div class="entry-main">
-                    <div class="action-btns">
-                        <button class="icon-btn btn-edit" title="Bearbeiten" onclick="editEntry(${e.id})"><i class="fas fa-cog"></i></button>
-                        <button class="icon-btn btn-delete" title="Löschen" onclick="deleteEntry(${e.id})"><i class="fas fa-trash"></i></button>
+                <div style="display:flex; flex-direction:column; width:100%;">
+                    <!-- Haupt-Eintrag (Header-Bereich) -->
+                    <div style="display:flex; min-height:110px; width:100%;">
+                        <div class="entry-main">
+                            <div class="action-btns">
+                                <button class="icon-btn btn-edit" title="Bearbeiten" onclick="editEntry(${e.id})"><i class="fas fa-cog"></i></button>
+                                <button class="icon-btn btn-delete" title="Löschen" onclick="deleteEntry(${e.id})"><i class="fas fa-trash"></i></button>
+                            </div>
+                            ${toxicIcons}
+                            ${featureBadgesHTML}
+                            <div class="entry-meta">
+                                <span>${(e.category || 'flora').toUpperCase()} | ${e.subcategory || 'Unsortiert'}${statusLabel}</span>
+                                ${expandTriggerHTML}
+                            </div>
+                            <div class="entry-title">${e.title || 'Unbekannt'} <span style="font-style:italic; font-size:0.75rem; color:#666;">${e.science || ''}</span></div>
+                            <div class="entry-details">
+                                ${freqHTML}
+                                <div><strong>Ort:</strong> ${e.location || '-'}</div>
+                                ${timeHTML}
+                            </div>
+                            <div class="entry-desc">${e.description || ""}</div>
+                        </div>
+                        <div class="entry-image"><img src="${currentImgSrc}"></div>
                     </div>
-                    ${toxicIcons}
-                    ${featureBadgesHTML}
-                    <div class="entry-meta">${e.category.toUpperCase()} | ${e.subcategory}${statusLabel}</div>
-                    <div class="entry-title">${e.title} <span style="font-style:italic; font-size:0.75rem; color:#666;">${e.science}</span></div>
-                    <div class="entry-details">
-                        ${freqHTML}
-                        <div><strong>Ort:</strong> ${e.location}</div>
-                        ${timeHTML}
+                    <!-- Aufklappbare Pflanzen-Anatomie-Details -->
+                    <div class="entry-expanded-details" id="expanded-${e.id}" style="display:none;">
+                        ${partsDetailsHTML}
                     </div>
-                    <div class="entry-desc">${e.description || ""}</div>
                 </div>
-                <div class="entry-image"><img src="${currentImgSrc}"></div>
             `;
             list.appendChild(div);
         });
@@ -579,21 +783,32 @@
         document.getElementById('locInput').value = (e.location === '-') ? "" : e.location;
         
         if (e.category === 'fauna') {
-            const savedTimes = e.timevalue.split(', ');
+            const savedTimes = (e.timevalue || "").split(', ');
             Array.from(document.getElementById('timeSelect').options).forEach(opt => opt.selected = savedTimes.includes(opt.value));
         }
         document.getElementById('imgInput').value = (e.img && !e.img.includes('placeholder')) ? e.img : "";
         document.getElementById('descInput').value = e.description || "";
         
+        // Checkboxen allgemein laden
         document.getElementById('benefitTee').checked = (e.benefits && e.benefits.tee) || false;
         document.getElementById('benefitNahrung').checked = (e.benefits && e.benefits.nahrung) || false;
         document.getElementById('harmHautkontakt').checked = (e.harms && e.harms.hautkontakt) || false;
         document.getElementById('harmMagen').checked = (e.harms && e.harms.magen) || false;
 
+        // Pflanzenteile im Bearbeitungsformular laden
+        const pData = e.parts_data || {};
+        Object.keys(plantParts).forEach(key => {
+            const part = pData[key] || { toxic: "", tee: false, nahrung: false, hautkontakt: false, magen: false };
+            document.getElementById(`part_toxic_${key}`).value = part.toxic || "";
+            document.getElementById(`part_tee_${key}`).checked = !!part.tee;
+            document.getElementById(`part_nahrung_${key}`).checked = !!part.nahrung;
+            document.getElementById(`part_haut_${key}`).checked = !!part.hautkontakt;
+            document.getElementById(`part_magen_${key}`).checked = !!part.magen;
+        });
+
         if(document.getElementById('entryForm').style.display === 'none') toggleForm();
     }
 
-    // async Funktion, um Einträge aus Supabase zu löschen
     async function deleteEntry(id) { 
         if(confirm("Eintrag löschen?")) { 
             try {
@@ -602,7 +817,7 @@
                     .delete()
                     .eq('id', id);
                 if (error) throw error;
-                await fetchEntries(); // Aktualisiert die lokale Liste aus der Cloud
+                await fetchEntries();
             } catch (err) {
                 console.error("Fehler beim Löschen in Supabase:", err);
                 alert("Eintrag konnte nicht gelöscht werden.");
@@ -610,7 +825,6 @@
         } 
     }
     
-    // Initialer Abruf beim Start
     fetchEntries();
 </script>
 </body>
