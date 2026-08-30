@@ -363,7 +363,7 @@
     async function fetchEntries() {
         try {
             const { data, error } = await db
-                .from('garten_archive')
+                .from('garten_archiv')
                 .select('*');
             if (error) throw error;
             entries = data || [];
@@ -538,14 +538,14 @@
         try {
             if (editId) {
                 const { error } = await db
-                    .from('garten_archive')
+                    .from('garten_archiv')
                     .update(entry)
                     .eq('id', editId);
                 if (error) throw error;
             } else {
                 entry.id = Date.now();
                 const { error } = await db
-                    .from('garten_archive')
+                    .from('garten_archiv')
                     .insert([entry]);
                 if (error) throw error;
             }
@@ -923,7 +923,7 @@
         if(confirm("Eintrag löschen?")) { 
             try {
                 const { error } = await db
-                    .from('garten_archive')
+                    .from('garten_archiv')
                     .delete()
                     .eq('id', id);
                 if (error) throw error;
