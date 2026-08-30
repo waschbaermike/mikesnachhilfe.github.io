@@ -60,7 +60,7 @@
         .toxicity-icons { position: absolute; top: 45px; right: 15px; display: flex; gap: 2px; }
         .toxicity-icons i { font-size: 0.8rem; }
 
-        .feature-badges { position: absolute; top: 72px; right: 15px; display: flex; gap: 4px; }
+        .feature-badges { position: absolute; top: 72px; right: 15px; display: flex; gap: 4px; max-width: 150px; flex-wrap: wrap; justify-content: flex-end; }
         .feature-badge { width: 24px; height: 24px; border-radius: 6px; display: flex; justify-content: center; align-items: center; font-size: 0.8rem; border: 1px solid transparent; }
         .badge-pro { background: #e8f5e9; color: #2e7d32; border-color: #c8e6c9; }
         .badge-con { background: #ffebee; color: #ff7675; border-color: #ffccd2; }
@@ -84,7 +84,6 @@
             border-color: #ccc;
         }
 
-        /* Styling für den aufklappbaren Detailbereich */
         .entry-expanded-details {
             background: #fdfdfd;
             border-top: 1px dashed #c8e6c9;
@@ -163,11 +162,12 @@
                     <label>Giftigkeit (gesamt)</label>
                     <select id="toxicInput">
                         <optgroup label="Giftigkeitsstufen">
-                            <option value="1">1: Ungiftig / Essbar</option>
+                            <option value="0">0: Absolut ungiftig / Universell harmlos</option>
+                            <option value="1">1: Ungiftig / Essbar (mit Einschränkungen)</option>
                             <option value="2">2: Leicht giftig / bedingt essbar</option>
                             <option value="3">3: Giftig (mäßig bis stark)</option>
-                            <option value="4">4: Sehr giftig</option>
-                            <option value="5">5: Extrem giftig</option>
+                            <option value="4">4: Sehr giftig / Lebensgefährlich</option>
+                            <option value="5">5: Extrem giftig / Tödlich</option>
                         </optgroup>
                         <optgroup label="Sonstiges">
                             <option value="Unsicher" selected>Unsicher</option>
@@ -175,27 +175,60 @@
                     </select>
                 </div>
                 
-                <!-- Vor- und Nachteile allgemein -->
+                <!-- Erweitertes Vor- und Nachteile Panel allgemein -->
                 <div class="form-group full-width" id="proConGroup" style="display:none;">
                     <label>Eigenschaften allgemein (Vorteile & Nachteile)</label>
                     <div style="display:flex; gap:20px; background:#fafafa; padding:15px; border-radius:10px; border:1px solid #c8e6c9;">
+                        <!-- Vorteile Spalte -->
                         <div style="flex:1;">
                             <strong style="font-size:0.85rem; color:#2e7d32; display:block; margin-bottom:8px;">Vorteile</strong>
-                            <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; margin-bottom:8px; font-weight:normal; cursor:pointer;">
-                                <input type="checkbox" id="benefitTee"> <i class="fas fa-mug-hot" style="color:#2e7d32;"></i> Tee / Heilpflanze
-                            </label>
-                            <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; font-weight:normal; cursor:pointer;">
-                                <input type="checkbox" id="benefitNahrung"> <i class="fas fa-utensils" style="color:#2e7d32;"></i> Nahrung / Essbar
-                            </label>
+                            <div style="display:grid; grid-template-columns: 1fr; gap:8px;">
+                                <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; font-weight:normal; cursor:pointer;">
+                                    <input type="checkbox" id="benefitTee"> <i class="fas fa-mug-hot" style="color:#2e7d32; width:16px;"></i> Tee / Heilpflanze
+                                </label>
+                                <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; font-weight:normal; cursor:pointer;">
+                                    <input type="checkbox" id="benefitNahrung"> <i class="fas fa-utensils" style="color:#2e7d32; width:16px;"></i> Nahrung / Essbar
+                                </label>
+                                <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; font-weight:normal; cursor:pointer;">
+                                    <input type="checkbox" id="benefitBienen"> <i class="fas fa-bug" style="color:#fbc02d; width:16px;"></i> Bienen- & Insektenweide
+                                </label>
+                                <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; font-weight:normal; cursor:pointer;">
+                                    <input type="checkbox" id="benefitVoegel"> <i class="fas fa-crow" style="color:#1e88e5; width:16px;"></i> Vogelschutz / Vogelfutter
+                                </label>
+                                <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; font-weight:normal; cursor:pointer;">
+                                    <input type="checkbox" id="benefitRobust"> <i class="fas fa-hand-holding-heart" style="color:#6d4c41; width:16px;"></i> Pflegeleicht / Robust
+                                </label>
+                            </div>
                         </div>
+                        <!-- Nachteile Spalte -->
                         <div style="flex:1; border-left:1px solid #c8e6c9; padding-left:20px;">
-                            <strong style="font-size:0.85rem; color:#ff7675; display:block; margin-bottom:8px;">Nachteile</strong>
-                            <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; margin-bottom:8px; font-weight:normal; cursor:pointer;">
-                                <input type="checkbox" id="harmHautkontakt"> <i class="fas fa-hand" style="color:#ff7675;"></i> Hautkontakt-Reizung
-                            </label>
-                            <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; font-weight:normal; cursor:pointer;">
-                                <input type="checkbox" id="harmMagen"> <i class="fas fa-capsules" style="color:#ff7675;"></i> Magen-Darm-Beschwerden
-                            </label>
+                            <strong style="font-size:0.85rem; color:#ff7675; display:block; margin-bottom:8px;">Nachteile (Symptome & Risiken)</strong>
+                            <div style="display:grid; grid-template-columns: 1fr; gap:8px;">
+                                <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; font-weight:normal; cursor:pointer;">
+                                    <input type="checkbox" id="harmHautkontakt"> <i class="fas fa-hand" style="color:#ff7675; width:16px;"></i> Hautkontakt-Reizung
+                                </label>
+                                <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; font-weight:normal; cursor:pointer;">
+                                    <input type="checkbox" id="harmMagen"> <i class="fas fa-capsules" style="color:#ff7675; width:16px;"></i> Magen-Darm-Beschwerden
+                                </label>
+                                <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; font-weight:normal; cursor:pointer;">
+                                    <input type="checkbox" id="harmGeruch"> <i class="fas fa-wind" style="color:#78909c; width:16px;"></i> Unangenehmer Geruch
+                                </label>
+                                <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; font-weight:normal; cursor:pointer;">
+                                    <input type="checkbox" id="harmAtmen"> <i class="fas fa-lungs" style="color:#ff7675; width:16px;"></i> Atembeschwerden
+                                </label>
+                                <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; font-weight:normal; cursor:pointer;">
+                                    <input type="checkbox" id="harmKreislauf"> <i class="fas fa-heartbeat" style="color:#ff7675; width:16px;"></i> Kreislaufbeschwerden
+                                </label>
+                                <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; font-weight:normal; cursor:pointer;">
+                                    <input type="checkbox" id="harmUebelkeit"> <i class="fas fa-frown" style="color:#ff7675; width:16px;"></i> Übelkeit / Erbrechen
+                                </label>
+                                <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; font-weight:normal; cursor:pointer;">
+                                    <input type="checkbox" id="harmTiere"> <i class="fas fa-paw" style="color:#fb8c00; width:16px;"></i> Gefahr für Haustiere
+                                </label>
+                                <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; font-weight:normal; cursor:pointer;">
+                                    <input type="checkbox" id="harmInvasiv"> <i class="fas fa-expand-arrows-alt" style="color:#5d4037; width:16px;"></i> Invasiv / Wuchernd
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -205,9 +238,7 @@
                     <strong style="display:block; margin-bottom:10px; font-size:0.9rem; color:#2e7d32; border-bottom:1px solid #c8e6c9; padding-bottom:5px;">
                         Analyse der einzelnen Pflanzenteile (Anatomie)
                     </strong>
-                    <div style="display:flex; flex-direction:column; gap:10px;" id="partsFormContainer">
-                        <!-- Wird per JS befüllt oder ist fest definiert -->
-                    </div>
+                    <div style="display:flex; flex-direction:column; gap:10px;" id="partsFormContainer"></div>
                 </div>
 
                 <div class="form-group full-width" id="timeBlock" style="display:none;">
@@ -264,7 +295,6 @@
 </div>
 
 <script>
-    // Supabase Konfiguration (Nutzt 'db' um globale Namenskonflikte zu vermeiden)
     const { createClient } = window.supabase;
     const supabaseUrl = 'https://dbblynmsqweqdknygfjp.supabase.co'; 
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiYmx5bm1zcXdlcWRrbnlnZmpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTk4NDMsImV4cCI6MjEwMzEzNTg0M30.wXeb6kThdYkv7puNkUY-wNbigVfhYKtz1X5RwM-g9dw'; 
@@ -280,7 +310,6 @@
     const freqFauna = ["Einzelfund", "Sehr selten", "Selten", "Gelegentlich", "Häufig", "Sehr häufig"];
     const freqFlora = ["Sehr selten", "Selten", "Gelegentlich", "Häufig", "Sehr häufig"];
 
-    // Definition der anatomischen Teile
     const plantParts = {
         wurzel: "Wurzel / Knolle",
         sprossachse: "Sprossachse / Stamm",
@@ -290,7 +319,6 @@
         samen: "Samen"
     };
 
-    // Erstelle die Formularfelder für die Pflanzenteile dynamisch
     function generatePartsFormFields() {
         const container = document.getElementById('partsFormContainer');
         container.innerHTML = "";
@@ -303,7 +331,8 @@
                 <strong style="font-size:0.85rem; color:#444;">${label}</strong>
                 <select id="part_toxic_${key}" style="padding:5px; font-size:0.8rem; border-radius:4px; border:1px solid #ddd;">
                     <option value="">-- Keine Angabe --</option>
-                    <option value="1">1: Ungiftig</option>
+                    <option value="0">0: Absolut ungiftig</option>
+                    <option value="1">1: Ungiftig / Essbar</option>
                     <option value="2">2: Leicht giftig</option>
                     <option value="3">3: Giftig</option>
                     <option value="4">4: Sehr giftig</option>
@@ -329,13 +358,12 @@
         });
     }
 
-    // Initialisiere die Formularfelder
     generatePartsFormFields();
 
     async function fetchEntries() {
         try {
             const { data, error } = await db
-                .from('garten_archiv')
+                .from('garten_archive')
                 .select('*');
             if (error) throw error;
             entries = data || [];
@@ -364,12 +392,23 @@
             document.getElementById(i).value = "";
         });
         document.getElementById('toxicInput').value = "Unsicher";
+        
+        // Alle Checkboxen im Formular zurücksetzen
         document.getElementById('benefitTee').checked = false;
         document.getElementById('benefitNahrung').checked = false;
+        document.getElementById('benefitBienen').checked = false;
+        document.getElementById('benefitVoegel').checked = false;
+        document.getElementById('benefitRobust').checked = false;
+        
         document.getElementById('harmHautkontakt').checked = false;
         document.getElementById('harmMagen').checked = false;
+        document.getElementById('harmGeruch').checked = false;
+        document.getElementById('harmAtmen').checked = false;
+        document.getElementById('harmKreislauf').checked = false;
+        document.getElementById('harmUebelkeit').checked = false;
+        document.getElementById('harmTiere').checked = false;
+        document.getElementById('harmInvasiv').checked = false;
         
-        // Pflanzenteile zurücksetzen
         Object.keys(plantParts).forEach(key => {
             document.getElementById(`part_toxic_${key}`).value = "";
             document.getElementById(`part_tee_${key}`).checked = false;
@@ -405,7 +444,7 @@
             toxicGroup.style.display = 'block';
             timeBlock.style.display = 'none';
             proConGroup.style.display = 'block';
-            partsGroup.style.display = 'block'; // Zeige Pflanzenteile-Analyse bei Flora
+            partsGroup.style.display = 'block';
             if (origin === 'Angebaut' || origin === 'Wildwuchs') freqGroup.style.display = 'none';
             else freqGroup.style.display = 'block';
         } else {
@@ -414,7 +453,7 @@
             freqGroup.style.display = 'block';
             timeBlock.style.display = 'block';
             proConGroup.style.display = 'none';
-            partsGroup.style.display = 'none'; // Verbergen bei Fauna
+            partsGroup.style.display = 'none';
         }
         updateDatalists(cat);
     }
@@ -448,7 +487,6 @@
             timeDisplay = selectedOptions.map(opt => opt.value).join(', ') || "-";
         }
 
-        // Sammle Pflanzenteile-Daten
         const partsData = {};
         if (cat === 'flora') {
             Object.keys(plantParts).forEach(key => {
@@ -477,12 +515,21 @@
             description: descVal ? descVal.trim() : "",
             benefits: cat === 'flora' ? {
                 tee: document.getElementById('benefitTee').checked,
-                nahrung: document.getElementById('benefitNahrung').checked
-            } : { tee: false, nahrung: false },
+                nahrung: document.getElementById('benefitNahrung').checked,
+                bienen: document.getElementById('benefitBienen').checked,
+                voegel: document.getElementById('benefitVoegel').checked,
+                robust: document.getElementById('benefitRobust').checked
+            } : { tee: false, nahrung: false, bienen: false, voegel: false, robust: false },
             harms: cat === 'flora' ? {
                 hautkontakt: document.getElementById('harmHautkontakt').checked,
-                magen: document.getElementById('harmMagen').checked
-            } : { hautkontakt: false, magen: false },
+                magen: document.getElementById('harmMagen').checked,
+                geruch: document.getElementById('harmGeruch').checked,
+                atmen: document.getElementById('harmAtmen').checked,
+                kreislauf: document.getElementById('harmKreislauf').checked,
+                uebelkeit: document.getElementById('harmUebelkeit').checked,
+                tiere: document.getElementById('harmTiere').checked,
+                invasiv: document.getElementById('harmInvasiv').checked
+            } : { hautkontakt: false, magen: false, geruch: false, atmen: false, kreislauf: false, uebelkeit: false, tiere: false, invasiv: false },
             parts_data: cat === 'flora' ? partsData : null
         };
 
@@ -491,14 +538,14 @@
         try {
             if (editId) {
                 const { error } = await db
-                    .from('garten_archiv')
+                    .from('garten_archive')
                     .update(entry)
                     .eq('id', editId);
                 if (error) throw error;
             } else {
                 entry.id = Date.now();
                 const { error } = await db
-                    .from('garten_archiv')
+                    .from('garten_archive')
                     .insert([entry]);
                 if (error) throw error;
             }
@@ -533,10 +580,9 @@
         renderEntries();
     }
 
-    // Toggelt den aufklappbaren anatomischen Bereich im Eintrag-Div
     function toggleCardExpand(id, element, event) {
         if (event.target.closest('.action-btns') || event.target.closest('.icon-btn')) {
-            return; // Verhindert Aufklappen beim Klick auf Ändern/Löschen
+            return; 
         }
         const detailsDiv = document.getElementById(`expanded-${id}`);
         if (detailsDiv) {
@@ -553,68 +599,124 @@
         }
     }
 
+    // Liefert die dynamische Border-Farbe je nach Giftigkeit
+    function getCardBorderColor(e) {
+        if (e.category === 'fauna') return '#ffb74d'; 
+        
+        const toxic = e.toxic;
+        switch (toxic) {
+            case '0': return '#2ecc71'; // Absolut ungiftig (Smaragdgrün)
+            case '1': return '#81c784'; // Ungiftig (Naturgrün)
+            case '2': return '#ffd166'; // Leicht giftig (Warmes Gelb)
+            case '3': return '#f57c00'; // Giftig (Kräftiges Orange)
+            case '4': return '#e74c3c'; // Sehr giftig (Signalrot)
+            case '5': return '#8e44ad'; // Extrem giftig (Giftviolett)
+            default: return '#bdc3c7';  // Unsicher (Neutrales Grau)
+        }
+    }
+
+    // Generiert die optischen Blausäure/Totenkopf-Icons
     function getToxicityHTML(level) {
-        if (!level || level === 'Unsicher') {
+        if (level === undefined || level === null || level === '' || level === 'Unsicher') {
             return `<div class="toxicity-icons" title="Giftigkeit: Unsicher">
-                        <i class="fas fa-skull" style="color: #ddd;"></i>
+                        <i class="fas fa-question-circle" style="color: #bdc3c7;"></i>
                         <span style="font-size: 0.65rem; color: #666; margin-left: 2px;">?</span>
                     </div>`;
         }
+        
+        if (level === '0') {
+            return `<div class="toxicity-icons" title="Stufe 0: Absolut ungiftig / Universell harmlos" style="display: flex; align-items: center; gap: 4px; background: #e8f5e9; padding: 2px 6px; border-radius: 4px; border: 1px solid #c8e6c9;">
+                        <i class="fas fa-leaf" style="color: #2ecc71;"></i>
+                        <span style="font-size: 0.65rem; color: #2e7d32; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Ungiftig</span>
+                    </div>`;
+        }
+
         const count = parseInt(level);
         let skulls = '';
         for (let i = 1; i <= 5; i++) {
             skulls += `<i class="fas fa-skull" style="color: ${i <= count ? '#e74c3c' : '#ddd'};"></i>`;
         }
+        
+        let labelText = `Stufe ${level}`;
+        if (level === '5') labelText = 'TÖDLICH';
+        
         return `<div class="toxicity-icons" title="Giftigkeitsstufe ${level}">${skulls}</div>`;
     }
 
+    // Rendert die erweiterten Vor- und Nachteile auf den Übersichtskarten
     function getFeatureBadgesHTML(e) {
         if (e.category !== 'flora') return "";
         let badges = "";
         
-        const hasTee = e.benefits && e.benefits.tee;
-        const hasNahrung = e.benefits && e.benefits.nahrung;
-        const hasHautkontakt = e.harms && e.harms.hautkontakt;
-        const hasMagen = e.harms && e.harms.magen;
+        const b = e.benefits || {};
+        const h = e.harms || {};
 
-        if (hasTee) {
+        // Vorteile
+        if (b.tee) {
             badges += `<div class="feature-badge badge-pro" title="Als Tee / Heilpflanze verwendbar"><i class="fas fa-mug-hot"></i></div>`;
         }
-        if (hasNahrung) {
+        if (b.nahrung) {
             badges += `<div class="feature-badge badge-pro" title="Essbar / Nahrungspflege"><i class="fas fa-utensils"></i></div>`;
         }
-        if (hasHautkontakt) {
+        if (b.bienen) {
+            badges += `<div class="feature-badge badge-pro" title="Bienen- & Insektenfreundliche Weide" style="background:#fffde7; color:#fbc02d; border-color:#fff9c4;"><i class="fas fa-bug"></i></div>`;
+        }
+        if (b.voegel) {
+            badges += `<div class="feature-badge badge-pro" title="Vogelfutter / Vogelschutz" style="background:#e3f2fd; color:#1e88e5; border-color:#bbdefb;"><i class="fas fa-crow"></i></div>`;
+        }
+        if (b.robust) {
+            badges += `<div class="feature-badge badge-pro" title="Sehr pflegeleicht & robust" style="background:#efebe9; color:#6d4c41; border-color:#d7ccc8;"><i class="fas fa-hand-holding-heart"></i></div>`;
+        }
+
+        // Nachteile
+        if (h.hautkontakt) {
             badges += `<div class="feature-badge badge-con" title="Gefahr bei Hautkontakt (Reizung)"><i class="fas fa-hand"></i></div>`;
         }
-        if (hasMagen) {
+        if (h.magen) {
             badges += `<div class="feature-badge badge-con" title="Verursacht Magen-Darm-Beschwerden"><i class="fas fa-capsules"></i></div>`;
+        }
+        if (h.geruch) {
+            badges += `<div class="feature-badge badge-con" title="Unangenehmer Geruch" style="background:#eceff1; color:#546e7a; border-color:#cfd8dc;"><i class="fas fa-wind"></i></div>`;
+        }
+        if (h.atmen) {
+            badges += `<div class="feature-badge badge-con" title="Kann Atembeschwerden verursachen"><i class="fas fa-lungs"></i></div>`;
+        }
+        if (h.kreislauf) {
+            badges += `<div class="feature-badge badge-con" title="Kann Kreislaufbeschwerden / Herzrhythmusstörungen verursachen"><i class="fas fa-heartbeat"></i></div>`;
+        }
+        if (h.uebelkeit) {
+            badges += `<div class="feature-badge badge-con" title="Kann Übelkeit / Erbrechen verursachen"><i class="fas fa-frown"></i></div>`;
+        }
+        if (h.tiere) {
+            badges += `<div class="feature-badge badge-con" title="Gefahr für Haustiere (Hunde, Katzen, Kaninchen)" style="background:#fff3e0; color:#fb8c00; border-color:#ffe0b2;"><i class="fas fa-paw"></i></div>`;
+        }
+        if (h.invasiv) {
+            badges += `<div class="feature-badge badge-con" title="Invasive / Stark wuchernde Art" style="background:#efebe9; color:#5d4037; border-color:#d7ccc8;"><i class="fas fa-expand-arrows-alt"></i></div>`;
         }
 
         if (!badges) return "";
         return `<div class="feature-badges">${badges}</div>`;
     }
 
-    // Generiert die HTML-Tabelle der einzelnen Pflanzenteile für den ausgeklappten Bereich (dauerhaft farbig!)
     function getPartsDetailsHTML(e) {
         if (e.category !== 'flora') return "";
         
         const parts = e.parts_data || {};
         let rowsHTML = "";
 
-        // Festgelegte Farb- und Textdefinitionen für die anatomischen Giftebenen
         const toxicConfig = {
-            "1": { bg: "#e8f5e9", text: "#2e7d32", label: "Ungiftig / Essbar", icon: "fa-smile" },
-            "2": { bg: "#fff3e0", text: "#e65100", label: "Leicht giftig", icon: "fa-exclamation-triangle" },
-            "3": { bg: "#ffe0b2", text: "#f57c00", label: "Mäßig giftig", icon: "fa-skull-crossbones" },
-            "4": { bg: "#ffcdd2", text: "#c62828", label: "Sehr giftig", icon: "fa-skull" },
-            "5": { bg: "#f3e5f5", text: "#4a148c", label: "Extrem giftig", icon: "fa-skull" },
+            "0": { bg: "#e8f5e9", text: "#2e7d32", label: "0: Absolut ungiftig", icon: "fa-leaf" },
+            "1": { bg: "#e8f5e9", text: "#2e7d32", label: "1: Ungiftig / Essbar", icon: "fa-smile" },
+            "2": { bg: "#fff3e0", text: "#e65100", label: "2: Leicht giftig", icon: "fa-exclamation-triangle" },
+            "3": { bg: "#ffe0b2", text: "#f57c00", label: "3: Mäßig giftig", icon: "fa-skull-crossbones" },
+            "4": { bg: "#ffcdd2", text: "#c62828", label: "4: Sehr giftig", icon: "fa-skull" },
+            "5": { bg: "#f3e5f5", text: "#4a148c", label: "5: Extrem giftig", icon: "fa-skull" },
             "Unsicher": { bg: "#eceff1", text: "#37474f", label: "Unsicher", icon: "fa-question-circle" }
         };
 
         Object.entries(plantParts).forEach(([key, label]) => {
             const part = parts[key] || { toxic: "", tee: false, nahrung: false, hautkontakt: false, magen: false };
             
-            // 1. Giftigkeits-Badge bestimmen
             let toxicBadge = `<span style="color: #bbb; font-style: italic; font-size: 0.75rem;">Keine Angabe</span>`;
             if (part.toxic && toxicConfig[part.toxic]) {
                 const cfg = toxicConfig[part.toxic];
@@ -625,7 +727,6 @@
                 `;
             }
 
-            // 2. Eigenschaften-Badges bestimmen
             let badgesHTML = "";
             if (part.tee) badgesHTML += `<div class="feature-badge badge-pro" style="display:inline-flex;" title="Tee / Heilpflanze"><i class="fas fa-mug-hot"></i></div>`;
             if (part.nahrung) badgesHTML += `<div class="feature-badge badge-pro" style="display:inline-flex;" title="Essbar / Nahrungspflege"><i class="fas fa-utensils"></i></div>`;
@@ -705,6 +806,9 @@
             div.setAttribute('data-category', e.category || 'flora');
             div.setAttribute('onclick', `toggleCardExpand(${e.id}, this, event)`);
             
+            // Wende die dynamische Randfarbe an
+            div.style.borderLeft = `8px solid ${getCardBorderColor(e)}`;
+            
             const originVal = e.origin || '-';
             const statusLabel = originVal !== '-' ? ` | ${originVal}` : '';
             
@@ -718,8 +822,6 @@
 
             const toxicIcons = (e.category === 'flora') ? getToxicityHTML(e.toxic) : "";
             const featureBadgesHTML = getFeatureBadgesHTML(e);
-            
-            // Generiere den HTML-Code für die anatomischen Pflanzenteile
             const partsDetailsHTML = getPartsDetailsHTML(e);
 
             const currentImgSrc = imagesLoaded 
@@ -734,7 +836,6 @@
 
             div.innerHTML = `
                 <div style="display:flex; flex-direction:column; width:100%;">
-                    <!-- Haupt-Eintrag (Header-Bereich) -->
                     <div style="display:flex; min-height:110px; width:100%;">
                         <div class="entry-main">
                             <div class="action-btns">
@@ -757,7 +858,6 @@
                         </div>
                         <div class="entry-image"><img src="${currentImgSrc}"></div>
                     </div>
-                    <!-- Aufklappbare Pflanzen-Anatomie-Details -->
                     <div class="entry-expanded-details" id="expanded-${e.id}" style="display:none;">
                         ${partsDetailsHTML}
                     </div>
@@ -792,8 +892,18 @@
         // Checkboxen allgemein laden
         document.getElementById('benefitTee').checked = (e.benefits && e.benefits.tee) || false;
         document.getElementById('benefitNahrung').checked = (e.benefits && e.benefits.nahrung) || false;
+        document.getElementById('benefitBienen').checked = (e.benefits && e.benefits.bienen) || false;
+        document.getElementById('benefitVoegel').checked = (e.benefits && e.benefits.voegel) || false;
+        document.getElementById('benefitRobust').checked = (e.benefits && e.benefits.robust) || false;
+        
         document.getElementById('harmHautkontakt').checked = (e.harms && e.harms.hautkontakt) || false;
         document.getElementById('harmMagen').checked = (e.harms && e.harms.magen) || false;
+        document.getElementById('harmGeruch').checked = (e.harms && e.harms.geruch) || false;
+        document.getElementById('harmAtmen').checked = (e.harms && e.harms.atmen) || false;
+        document.getElementById('harmKreislauf').checked = (e.harms && e.harms.kreislauf) || false;
+        document.getElementById('harmUebelkeit').checked = (e.harms && e.harms.uebelkeit) || false;
+        document.getElementById('harmTiere').checked = (e.harms && e.harms.tiere) || false;
+        document.getElementById('harmInvasiv').checked = (e.harms && e.harms.invasiv) || false;
 
         // Pflanzenteile im Bearbeitungsformular laden
         const pData = e.parts_data || {};
@@ -813,7 +923,7 @@
         if(confirm("Eintrag löschen?")) { 
             try {
                 const { error } = await db
-                    .from('garten_archiv')
+                    .from('garten_archive')
                     .delete()
                     .eq('id', id);
                 if (error) throw error;
