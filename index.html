@@ -119,6 +119,144 @@
         .part-row:last-child {
             border-bottom: none;
         }
+
+/* ==========================================================================
+   MOBILE OPTIMIERUNG (SMARTPHONE-ANSICHT < 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+    /* 1. Haupt-Layout auf vertikal umstellen */
+    body {
+        flex-direction: column;
+        height: auto;
+        overflow-x: hidden;
+    }
+
+    /* 2. Sidebar zur schmalen, fixierten Menüleiste am oberen Rand umbauen */
+    .sidebar {
+        width: 100%;
+        height: auto;
+        padding: 10px 20px;
+        border-right: none;
+        border-bottom: 2px solid #c8e6c9;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        box-sizing: border-box;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: #e8f5e9;
+    }
+
+    .sidebar h1 {
+        font-size: 1.1rem;
+        margin-bottom: 0;
+    }
+
+    .nav-item {
+        margin-bottom: 0;
+        padding: 6px 12px;
+        font-size: 0.85rem;
+    }
+
+    /* 3. Inhaltsbereich für Touch-Bedienung optimieren */
+    .content {
+        padding: 15px;
+        overflow-y: visible;
+    }
+
+    /* 4. Formular einspaltig stapeln */
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    .full-width {
+        grid-column: span 1;
+    }
+
+    /* Vorteile & Nachteile im Formular ordentlich untereinander legen */
+    #proConGroup > div {
+        flex-direction: column;
+        gap: 15px !important;
+    }
+    #proConGroup > div > div:last-child {
+        border-left: none !important;
+        padding-left: 0 !important;
+        border-top: 1px dashed #c8e6c9;
+        padding-top: 15px;
+    }
+    /* Grid der Checkboxen auf 1 Spalte zwingen */
+    #proConGroup div[style*="display:grid"] {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Anatomie-Formularfelder für kleine Bildschirme stapeln */
+    #partsFormContainer > div {
+        grid-template-columns: 1fr !important;
+        gap: 8px !important;
+        padding: 12px !important;
+    }
+
+    /* 5. Archiv-Karten kompakter gestalten */
+    .entry-wrapper {
+        margin-left: 35px; /* Weniger Versatz für schwebende Icons */
+    }
+    
+    .outer-type-icon {
+        left: -28px;
+        font-size: 1.25rem;
+        top: 40px;
+    }
+
+    /* Bild und Beschreibung auf Handys untereinander anzeigen */
+    .entry-item div[style*="display:flex"][style*="min-height"] {
+        flex-direction: column-reverse !important;
+    }
+
+    .entry-image {
+        width: 100% !important;
+        height: 160px;
+    }
+
+    .entry-title {
+        margin-right: 0;
+        padding-top: 25px; /* Platz für Aktions-Buttons schaffen */
+    }
+
+    .action-btns {
+        top: 8px;
+        right: 10px;
+    }
+
+    .toxicity-icons {
+        top: 8px;
+        left: 15px; /* Gift-Skulls nach links schieben um Kollisionen zu vermeiden */
+        right: auto;
+    }
+
+    .feature-badges {
+        top: 38px;
+        right: 10px;
+    }
+
+    /* 6. Klappbare Anatomie-Details für Mobilgeräte anpassen */
+    .entry-expanded-details {
+        padding: 10px 15px;
+    }
+
+    /* Kopfzeile der Tabelle auf Mobilgeräten ausblenden */
+    .entry-expanded-details div[style*="font-weight:bold"][style*="color:#888"] {
+        display: none !important;
+    }
+
+    .part-row {
+        grid-template-columns: 1fr !important;
+        gap: 4px;
+        padding: 10px 0;
+        border-bottom: 1px solid #f1f1f1;
+        align-items: flex-start;
+    }
+}
     </style>
 </head>
 <body>
@@ -316,8 +454,8 @@
 
 <script>
     const { createClient } = window.supabase;
-    const supabaseUrl = 'https://dbblynmsqweqdknygfjp.supabase.co'; 
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiYmx5bm1zcXdlcWRrbnlnZmpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTk4NDMsImV4cCI6MjEwMzEzNTg0M30.wXeb6kThdYkv7puNkUY-wNbigVfhYKtz1X5RwM-g9dw'; 
+    const supabaseUrl = 'DEINE_SUPABASE_URL'; 
+    const supabaseKey = 'DEIN_SUPABASE_ANON_KEY'; 
     const db = createClient(supabaseUrl, supabaseKey);
 
     let entries = []; 
@@ -386,7 +524,7 @@
     async function fetchEntries() {
         try {
             const { data, error } = await db
-                .from('garten_archiv')
+                .from('garten_archive')
                 .select('*');
             if (error) throw error;
             entries = data || [];
@@ -565,14 +703,14 @@
         try {
             if (editId) {
                 const { error } = await db
-                    .from('garten_archiv')
+                    .from('garten_archive')
                     .update(entry)
                     .eq('id', editId);
                 if (error) throw error;
             } else {
                 entry.id = Date.now();
                 const { error } = await db
-                    .from('garten_archiv')
+                    .from('garten_archive')
                     .insert([entry]);
                 if (error) throw error;
             }
@@ -958,7 +1096,7 @@
         if(confirm("Eintrag löschen?")) { 
             try {
                 const { error } = await db
-                    .from('garten_archiv')
+                    .from('garten_archive')
                     .delete()
                     .eq('id', id);
                 if (error) throw error;
