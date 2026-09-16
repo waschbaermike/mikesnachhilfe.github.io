@@ -269,35 +269,15 @@
                     </select>
                 </div>
 
-                <!-- Zeitraum für FLORA (Sichtigungszeitraum) -->
+                <!-- Zeitraum für FLORA (Sichtigungszeiträume dynamisch) -->
                 <div class="form-group full-width" id="floraPeriodGroup" style="display:none;">
-                    <label>Sichtigungszeitraum im Garten</label>
-                    <div style="display:flex; gap:20px; background:#fafafa; padding:12px 15px; border-radius:8px; border:1px solid #c8e6c9; align-items:center; flex-wrap:wrap;">
-                        <div style="display:flex; gap:8px; align-items:center;">
-                            <strong style="font-size:0.85rem; color:#2e7d32;">Von:</strong>
-                            <select id="floraFromMonth" style="padding:6px; font-size:0.8rem; border-radius:4px; border:1px solid #ddd;">
-                                <option value="1">Januar</option><option value="2">Februar</option>
-                                <option value="3">März</option><option value="4">April</option>
-                                <option value="5">Mai</option><option value="6">Juni</option>
-                                <option value="7">Juli</option><option value="8">August</option>
-                                <option value="9">September</option><option value="10">Oktober</option>
-                                <option value="11">November</option><option value="12">Dezember</option>
-                            </select>
-                            <select id="floraFromYear" style="padding:6px; font-size:0.8rem; border-radius:4px; border:1px solid #ddd;"></select>
-                        </div>
-                        <div style="display:flex; gap:8px; align-items:center;">
-                            <strong style="font-size:0.85rem; color:#2e7d32;">Bis:</strong>
-                            <select id="floraToMonth" style="padding:6px; font-size:0.8rem; border-radius:4px; border:1px solid #ddd;">
-                                <option value="1">Januar</option><option value="2">Februar</option>
-                                <option value="3">März</option><option value="4">April</option>
-                                <option value="5">Mai</option><option value="6">Juni</option>
-                                <option value="7">Juli</option><option value="8">August</option>
-                                <option value="9">September</option><option value="10">Oktober</option>
-                                <option value="11">November</option><option value="12" selected>Dezember</option>
-                            </select>
-                            <select id="floraToYear" style="padding:6px; font-size:0.8rem; border-radius:4px; border:1px solid #ddd;"></select>
-                        </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <label style="margin-bottom:0;">Sichtigungszeiträume im Garten</label>
+                        <button type="button" class="filter-btn active" style="background:#2e7d32; color:white; padding:3px 10px; font-size:0.75rem;" onclick="addPeriodRow()">
+                            <i class="fas fa-plus"></i> Zeitraum hinzufügen
+                        </button>
                     </div>
+                    <div id="floraPeriodsContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
                 </div>
                 
                 <!-- Vor- und Nachteile mit neuer Strukturierung -->
@@ -458,6 +438,70 @@
         samen: "Samen"
     };
 
+    const monthOptionsHTML = `
+        <option value="1">Januar</option><option value="2">Februar</option>
+        <option value="3">März</option><option value="4">April</option>
+        <option value="5">Mai</option><option value="6">Juni</option>
+        <option value="7">Juli</option><option value="8">August</option>
+        <option value="9">September</option><option value="10">Oktober</option>
+        <option value="11">November</option><option value="12">Dezember</option>
+    `;
+
+    function getYearOptionsHTML(selectedYear) {
+        let options = "";
+        for (let y = 2019; y <= 2030; y++) {
+            const sel = String(y) === String(selectedYear) ? "selected" : "";
+            options += `<option value="${y}" ${sel}>${y}</option>`;
+        }
+        return options;
+    }
+
+    function addPeriodRow(data = {}) {
+        const container = document.getElementById('floraPeriodsContainer');
+        if (!container) return;
+
+        const rowId = 'period_row_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+        const fromM = data.fromMonth || "1";
+        const fromY = data.fromYear || "2019";
+        const toM = data.toMonth || "12";
+        const toY = data.toYear || "2027";
+
+        const row = document.createElement('div');
+        row.className = 'flora-period-row';
+        row.id = rowId;
+        row.style.cssText = "display:flex; gap:15px; background:#fafafa; padding:10px 12px; border-radius:8px; border:1px solid #c8e6c9; align-items:center; flex-wrap:wrap;";
+
+        row.innerHTML = `
+            <div style="display:flex; gap:6px; align-items:center;">
+                <strong style="font-size:0.8rem; color:#2e7d32;">Von:</strong>
+                <select class="p-from-m" style="padding:5px; font-size:0.8rem; border-radius:4px; border:1px solid #ddd;">${monthOptionsHTML}</select>
+                <select class="p-from-y" style="padding:5px; font-size:0.8rem; border-radius:4px; border:1px solid #ddd;">${getYearOptionsHTML(fromY)}</select>
+            </div>
+            <div style="display:flex; gap:6px; align-items:center;">
+                <strong style="font-size:0.8rem; color:#2e7d32;">Bis:</strong>
+                <select class="p-to-m" style="padding:5px; font-size:0.8rem; border-radius:4px; border:1px solid #ddd;">${monthOptionsHTML}</select>
+                <select class="p-to-y" style="padding:5px; font-size:0.8rem; border-radius:4px; border:1px solid #ddd;">${getYearOptionsHTML(toY)}</select>
+            </div>
+            <button type="button" onclick="removePeriodRow('${rowId}')" style="background:#ff7675; color:white; border:none; border-radius:4px; padding:4px 8px; cursor:pointer; font-size:0.75rem; margin-left:auto;" title="Zeitraum entfernen">
+                <i class="fas fa-trash"></i>
+            </button>
+        `;
+
+        container.appendChild(row);
+        row.querySelector('.p-from-m').value = String(fromM);
+        row.querySelector('.p-to-m').value = String(toM);
+    }
+
+    function removePeriodRow(rowId) {
+        const container = document.getElementById('floraPeriodsContainer');
+        if (container && container.children.length > 1) {
+            const row = document.getElementById(rowId);
+            if (row) row.remove();
+        } else {
+            alert("Mindestens ein Zeitraum muss bestehen bleiben.");
+        }
+    }
+
     function showSection(id) {
         const sections = ['home', 'archiv', 'quiz', 'glossar'];
         sections.forEach(sec => {
@@ -465,19 +509,6 @@
             if (el) el.style.display = (sec === id) ? 'block' : 'none';
         });
         if (id === 'archiv') fetchEntries();
-    }
-
-    function populateYearSelects() {
-        const fromY = document.getElementById('floraFromYear');
-        const toY = document.getElementById('floraToYear');
-        if (!fromY || !toY) return;
-        fromY.innerHTML = ""; toY.innerHTML = "";
-        for (let y = 2019; y <= 2030; y++) {
-            const opt1 = document.createElement('option'); opt1.value = String(y); opt1.innerText = String(y); fromY.appendChild(opt1);
-            const opt2 = document.createElement('option'); opt2.value = String(y); opt2.innerText = String(y); toY.appendChild(opt2);
-        }
-        fromY.value = "2019";
-        toY.value = "2027";
     }
 
     function generatePartsFormFields() {
@@ -558,10 +589,11 @@
         const toxicInput = document.getElementById('toxicInput');
         if (toxicInput) toxicInput.value = "Unsicher";
         
-        const fromM = document.getElementById('floraFromMonth'); if (fromM) fromM.value = "1";
-        const fromY = document.getElementById('floraFromYear'); if (fromY) fromY.value = "2019";
-        const toM = document.getElementById('floraToMonth'); if (toM) toM.value = "12";
-        const toY = document.getElementById('floraToYear'); if (toY) toY.value = "2027";
+        const pContainer = document.getElementById('floraPeriodsContainer');
+        if (pContainer) {
+            pContainer.innerHTML = "";
+            addPeriodRow();
+        }
 
         ['benefitTee', 'benefitNahrung', 'benefitMedizin', 'benefitBienen', 'benefitVoegel', 'benefitRobust',
          'harmHautkontakt', 'harmMagen', 'harmGeruch', 'harmAtmen', 'harmKreislauf', 'harmUebelkeit', 'harmTiere', 'harmInvasiv'].forEach(id => {
@@ -685,8 +717,28 @@
             });
         }
 
+        const periodsData = [];
+        if (cat === 'flora') {
+            document.querySelectorAll('.flora-period-row').forEach(row => {
+                const fM = row.querySelector('.p-from-m');
+                const fY = row.querySelector('.p-from-y');
+                const tM = row.querySelector('.p-to-m');
+                const tY = row.querySelector('.p-to-y');
+                if (fM && fY && tM && tY) {
+                    periodsData.push({
+                        fromMonth: fM.value,
+                        fromYear: fY.value,
+                        toMonth: tM.value,
+                        toYear: tY.value
+                    });
+                }
+            });
+        }
+
         const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ""; };
         const getChk = (id) => { const el = document.getElementById(id); return el ? el.checked : false; };
+
+        const firstP = periodsData.length > 0 ? periodsData : { fromYear: '2019', fromMonth: '1', toYear: '2027', toMonth: '12' };
 
         const entry = {
             category: cat,
@@ -699,10 +751,11 @@
             confidence: getVal('confInput'),
             location: getVal('locInput') || '-',
             timevalue: timeDisplay,
-            flora_from_year: cat === 'flora' ? getVal('floraFromYear') : '2019',
-            flora_from_month: cat === 'flora' ? getVal('floraFromMonth') : '1',
-            flora_to_year: cat === 'flora' ? getVal('floraToYear') : '2027',
-            flora_to_month: cat === 'flora' ? getVal('floraToMonth') : '12',
+            flora_periods: cat === 'flora' ? periodsData : [],
+            flora_from_year: cat === 'flora' ? firstP.fromYear : '2019',
+            flora_from_month: cat === 'flora' ? firstP.fromMonth : '1',
+            flora_to_year: cat === 'flora' ? firstP.toYear : '2027',
+            flora_to_month: cat === 'flora' ? firstP.toMonth : '12',
             img: imgVal || 'https://via.placeholder.com/150?text=Kein+Bild',
             description: descVal ? descVal.trim() : "",
             benefits: cat === 'flora' ? {
@@ -928,39 +981,58 @@
     function getFloraTimelineHTML(e) {
         if (e.category !== 'flora') return "";
 
-        const fromY = parseInt(e.flora_from_year || '2019', 10);
-        const fromM = parseInt(e.flora_from_month || '1', 10);
-        const toY = parseInt(e.flora_to_year || '2027', 10);
-        const toM = parseInt(e.flora_to_month || '12', 10);
+        let periods = e.flora_periods;
+        if (typeof periods === 'string') {
+            try { periods = JSON.parse(periods); } catch(err) { periods = null; }
+        }
+        if (!Array.isArray(periods) || periods.length === 0) {
+            periods = [{
+                fromYear: e.flora_from_year || '2019',
+                fromMonth: e.flora_from_month || '1',
+                toYear: e.flora_to_year || '2027',
+                toMonth: e.flora_to_month || '12'
+            }];
+        }
 
         const monthNames = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
-        
-        let fromStr = (fromM > 0 && fromM <= 12) ? `${monthNames[fromM - 1]} ${fromY}` : `${fromY}`;
-        let toStr = (toM > 0 && toM <= 12) ? `${monthNames[toM - 1]} ${toY}` : `${toY}`;
-        let periodText = `${fromStr} – ${toStr}`;
-
         const startAxis = 2019.0;
         const totalYears = 9.0;
 
-        const valFrom = Math.max(startAxis, Math.min(2028.0, fromY + (fromM - 1) / 12));
-        const valTo = Math.max(startAxis, Math.min(2028.0, toY + toM / 12));
+        let barsHTML = "";
+        let periodTexts = [];
 
-        let leftPct = ((valFrom - startAxis) / totalYears) * 100;
-        let widthPct = ((valTo - valFrom) / totalYears) * 100;
+        periods.forEach(p => {
+            const fromY = parseInt(p.fromYear || '2019', 10);
+            const fromM = parseInt(p.fromMonth || '1', 10);
+            const toY = parseInt(p.toYear || '2027', 10);
+            const toM = parseInt(p.toMonth || '12', 10);
 
-        if (leftPct < 0) leftPct = 0;
-        if (leftPct > 100) leftPct = 95;
-        if (widthPct < 2) widthPct = 2;
-        if (leftPct + widthPct > 100) widthPct = 100 - leftPct;
+            let fromStr = (fromM > 0 && fromM <= 12) ? `${monthNames[fromM - 1]} ${fromY}` : `${fromY}`;
+            let toStr = (toM > 0 && toM <= 12) ? `${monthNames[toM - 1]} ${toY}` : `${toY}`;
+            periodTexts.push(`${fromStr} – ${toStr}`);
+
+            const valFrom = Math.max(startAxis, Math.min(2028.0, fromY + (fromM - 1) / 12));
+            const valTo = Math.max(startAxis, Math.min(2028.0, toY + toM / 12));
+
+            let leftPct = ((valFrom - startAxis) / totalYears) * 100;
+            let widthPct = ((valTo - valFrom) / totalYears) * 100;
+
+            if (leftPct < 0) leftPct = 0;
+            if (leftPct > 100) leftPct = 95;
+            if (widthPct < 2) widthPct = 2;
+            if (leftPct + widthPct > 100) widthPct = 100 - leftPct;
+
+            barsHTML += `<div class="timeline-bar" style="left: ${leftPct.toFixed(1)}%; width: ${widthPct.toFixed(1)}%;"></div>`;
+        });
 
         return `
             <div class="timeline-container" onclick="event.stopPropagation();">
                 <div class="timeline-title">
                     <span><i class="fas fa-calendar-alt" style="color:#2e7d32;"></i> Zeitraum im Garten:</span>
-                    <span style="color:#2e7d32; font-weight:bold;">${periodText}</span>
+                    <span style="color:#2e7d32; font-weight:bold; text-align:right;">${periodTexts.join(' | ')}</span>
                 </div>
                 <div class="timeline-track">
-                    <div class="timeline-bar" style="left: ${leftPct.toFixed(1)}%; width: ${widthPct.toFixed(1)}%;"></div>
+                    ${barsHTML}
                 </div>
                 <div class="timeline-labels">
                     <span>2019</span>
@@ -1117,10 +1189,22 @@
         setVal('locInput', (e.location === '-') ? "" : e.location);
         
         if (e.category === 'flora') {
-            setVal('floraFromMonth', e.flora_from_month || "1");
-            setVal('floraFromYear', e.flora_from_year || "2019");
-            setVal('floraToMonth', e.flora_to_month || "12");
-            setVal('floraToYear', e.flora_to_year || "2027");
+            const pContainer = document.getElementById('floraPeriodsContainer');
+            if (pContainer) pContainer.innerHTML = "";
+            
+            let periods = e.flora_periods;
+            if (typeof periods === 'string') {
+                try { periods = JSON.parse(periods); } catch(err) { periods = null; }
+            }
+            if (!Array.isArray(periods) || periods.length === 0) {
+                periods = [{
+                    fromYear: e.flora_from_year || '2019',
+                    fromMonth: e.flora_from_month || '1',
+                    toYear: e.flora_to_year || '2027',
+                    toMonth: e.flora_to_month || '12'
+                }];
+            }
+            periods.forEach(p => addPeriodRow(p));
         }
 
         if (e.category === 'fauna') {
@@ -1185,15 +1269,11 @@
         } 
     }
     
-    // Initialisierung beim Laden der Seite
     document.addEventListener("DOMContentLoaded", () => {
-        populateYearSelects();
         generatePartsFormFields();
         fetchEntries();
     });
-    // Fallback falls DOMContentLoaded bereits gefeuert wurde
     if (document.readyState === "interactive" || document.readyState === "complete") {
-        populateYearSelects();
         generatePartsFormFields();
         fetchEntries();
     }
