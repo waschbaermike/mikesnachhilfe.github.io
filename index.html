@@ -430,10 +430,14 @@
 </div>
 
 <script>
-    const { createClient } = window.supabase;
+    const { createClient } = window.supabase || {};
     const supabaseUrl = 'https://dbblynmsqweqdknygfjp.supabase.co'; 
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiYmx5bm1zcXdlcWRrbnlnZmpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTk4NDMsImV4cCI6MjEwMzEzNTg0M30.wXeb6kThdYkv7puNkUY-wNbigVfhYKtz1X5RwM-g9dw'; 
-    const db = createClient(supabaseUrl, supabaseKey);
+    
+    let db = null;
+    if (createClient && supabaseUrl && !supabaseUrl.includes('DEINE_SUPABASE_URL')) {
+        db = createClient(supabaseUrl, supabaseKey);
+    }
 
     let entries = []; 
     let mainFilter = 'all';
@@ -454,15 +458,23 @@
         samen: "Samen"
     };
 
-    // Jahre von 2019 bis 2030 in die Auswahlfelder füllen
+    function showSection(id) {
+        const sections = ['home', 'archiv', 'quiz', 'glossar'];
+        sections.forEach(sec => {
+            const el = document.getElementById(sec);
+            if (el) el.style.display = (sec === id) ? 'block' : 'none';
+        });
+        if (id === 'archiv') fetchEntries();
+    }
+
     function populateYearSelects() {
         const fromY = document.getElementById('floraFromYear');
         const toY = document.getElementById('floraToYear');
         if (!fromY || !toY) return;
         fromY.innerHTML = ""; toY.innerHTML = "";
         for (let y = 2019; y <= 2030; y++) {
-            const opt1 = document.createElement('option'); opt1.value = y; opt1.innerText = y; fromY.appendChild(opt1);
-            const opt2 = document.createElement('option'); opt2.value = y; opt2.innerText = y; toY.appendChild(opt2);
+            const opt1 = document.createElement('option'); opt1.value = String(y); opt1.innerText = String(y); fromY.appendChild(opt1);
+            const opt2 = document.createElement('option'); opt2.value = String(y); opt2.innerText = String(y); toY.appendChild(opt2);
         }
         fromY.value = "2019";
         toY.value = "2027";
@@ -470,6 +482,7 @@
 
     function generatePartsFormFields() {
         const container = document.getElementById('partsFormContainer');
+        if (!container) return;
         container.innerHTML = "";
         
         Object.entries(plantParts).forEach(([key, label]) => {
@@ -511,6 +524,10 @@
     }
 
     async function fetchEntries() {
+        if (!db) {
+            renderEntries();
+            return;
+        }
         try {
             const { data, error } = await db
                 .from('garten_archiv')
@@ -524,67 +541,56 @@
         }
     }
 
-    function showSection(id) {
-        document.getElementById('home').style.display = (id === 'home') ? 'block' : 'none';
-        document.getElementById('archiv').style.display = (id === 'archiv') ? 'block' : 'none';
-        document.getElementById('quiz').style.display = (id === 'quiz') ? 'block' : 'none';
-        document.getElementById('glossar').style.display = (id === 'glossar') ? 'block' : 'none';
-        if(id === 'archiv') fetchEntries();
-    }
-
     function toggleForm() {
         const f = document.getElementById('entryForm');
-        f.style.display = (f.style.display === 'none') ? 'block' : 'none';
+        if (f) f.style.display = (f.style.display === 'none') ? 'block' : 'none';
     }
 
     function prepareNewEntry() {
         editId = null;
-        document.getElementById('formTitle').innerText = "Neuer Eintrag";
+        const formTitle = document.getElementById('formTitle');
+        if (formTitle) formTitle.innerText = "Neuer Eintrag";
+        
         ['titleInput', 'scienceInput', 'subInput', 'locInput', 'imgInput', 'descInput', 'originInput'].forEach(i => {
-            document.getElementById(i).value = "";
+            const el = document.getElementById(i);
+            if (el) el.value = "";
         });
-        document.getElementById('toxicInput').value = "Unsicher";
+        const toxicInput = document.getElementById('toxicInput');
+        if (toxicInput) toxicInput.value = "Unsicher";
         
-        // Zeitraum zurücksetzen
-        document.getElementById('floraFromMonth').value = "1";
-        document.getElementById('floraFromYear').value = "2019";
-        document.getElementById('floraToMonth').value = "12";
-        document.getElementById('floraToYear').value = "2027";
+        const fromM = document.getElementById('floraFromMonth'); if (fromM) fromM.value = "1";
+        const fromY = document.getElementById('floraFromYear'); if (fromY) fromY.value = "2019";
+        const toM = document.getElementById('floraToMonth'); if (toM) toM.value = "12";
+        const toY = document.getElementById('floraToYear'); if (toY) toY.value = "2027";
 
-        // Checkboxen allgemein zurücksetzen
-        document.getElementById('benefitTee').checked = false;
-        document.getElementById('benefitNahrung').checked = false;
-        document.getElementById('benefitMedizin').checked = false;
-        document.getElementById('benefitBienen').checked = false;
-        document.getElementById('benefitVoegel').checked = false;
-        document.getElementById('benefitRobust').checked = false;
-        
-        document.getElementById('harmHautkontakt').checked = false;
-        document.getElementById('harmMagen').checked = false;
-        document.getElementById('harmGeruch').checked = false;
-        document.getElementById('harmAtmen').checked = false;
-        document.getElementById('harmKreislauf').checked = false;
-        document.getElementById('harmUebelkeit').checked = false;
-        document.getElementById('harmTiere').checked = false;
-        document.getElementById('harmInvasiv').checked = false;
+        ['benefitTee', 'benefitNahrung', 'benefitMedizin', 'benefitBienen', 'benefitVoegel', 'benefitRobust',
+         'harmHautkontakt', 'harmMagen', 'harmGeruch', 'harmAtmen', 'harmKreislauf', 'harmUebelkeit', 'harmTiere', 'harmInvasiv'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.checked = false;
+        });
         
         Object.keys(plantParts).forEach(key => {
-            document.getElementById(`part_toxic_${key}`).value = "";
-            document.getElementById(`part_tee_${key}`).checked = false;
-            document.getElementById(`part_nahrung_${key}`).checked = false;
-            document.getElementById(`part_med_${key}`).checked = false;
-            document.getElementById(`part_haut_${key}`).checked = false;
-            document.getElementById(`part_magen_${key}`).checked = false;
+            const pT = document.getElementById(`part_toxic_${key}`); if (pT) pT.value = "";
+            const pTee = document.getElementById(`part_tee_${key}`); if (pTee) pTee.checked = false;
+            const pNah = document.getElementById(`part_nahrung_${key}`); if (pNah) pNah.checked = false;
+            const pMed = document.getElementById(`part_med_${key}`); if (pMed) pMed.checked = false;
+            const pHaut = document.getElementById(`part_haut_${key}`); if (pHaut) pHaut.checked = false;
+            const pMag = document.getElementById(`part_magen_${key}`); if (pMag) pMag.checked = false;
         });
 
-        Array.from(document.getElementById('timeSelect').options).forEach(opt => opt.selected = false);
+        const timeSelect = document.getElementById('timeSelect');
+        if (timeSelect) Array.from(timeSelect.options).forEach(opt => opt.selected = false);
         updateFormDynamics();
         toggleForm();
     }
 
     function updateFormDynamics() {
-        const cat = document.getElementById('categoryInput').value;
-        const origin = document.getElementById('originInput').value;
+        const catEl = document.getElementById('categoryInput');
+        const originEl = document.getElementById('originInput');
+        if (!catEl || !originEl) return;
+        
+        const cat = catEl.value;
+        const origin = originEl.value;
         const freqGroup = document.getElementById('freqGroup');
         const freqSelect = document.getElementById('freqInput');
         const originGroup = document.getElementById('originGroup');
@@ -594,53 +600,56 @@
         const partsGroup = document.getElementById('partsGroup');
         const floraPeriodGroup = document.getElementById('floraPeriodGroup');
         
-        freqSelect.innerHTML = '<option value="">-- Keine Angabe --</option>';
-        const options = (cat === 'fauna') ? freqFauna : freqFlora;
-        options.forEach(opt => {
-            const o = document.createElement('option'); o.value = opt; o.innerText = opt; freqSelect.appendChild(o);
-        });
+        if (freqSelect) {
+            freqSelect.innerHTML = '<option value="">-- Keine Angabe --</option>';
+            const options = (cat === 'fauna') ? freqFauna : freqFlora;
+            options.forEach(opt => {
+                const o = document.createElement('option'); o.value = opt; o.innerText = opt; freqSelect.appendChild(o);
+            });
+        }
 
         if (cat === 'flora') {
-            originGroup.style.display = 'block';
-            toxicGroup.style.display = 'block';
-            timeBlock.style.display = 'none';
-            proConGroup.style.display = 'block';
-            partsGroup.style.display = 'block';
-            floraPeriodGroup.style.display = 'block';
+            if (originGroup) originGroup.style.display = 'block';
+            if (toxicGroup) toxicGroup.style.display = 'block';
+            if (timeBlock) timeBlock.style.display = 'none';
+            if (proConGroup) proConGroup.style.display = 'block';
+            if (partsGroup) partsGroup.style.display = 'block';
+            if (floraPeriodGroup) floraPeriodGroup.style.display = 'block';
 
-            // WICHTIG: Häufigkeit taucht NUR bei ausgewählter Option 'Wildwuchs' auf!
-            if (origin === 'Wildwuchs') {
-                freqGroup.style.display = 'block';
-            } else {
-                freqGroup.style.display = 'none';
-            }
+            if (freqGroup) freqGroup.style.display = (origin === 'Wildwuchs') ? 'block' : 'none';
         } else {
-            originGroup.style.display = 'none';
-            toxicGroup.style.display = 'none';
-            freqGroup.style.display = 'block';
-            timeBlock.style.display = 'block';
-            proConGroup.style.display = 'none';
-            partsGroup.style.display = 'none';
-            floraPeriodGroup.style.display = 'none';
+            if (originGroup) originGroup.style.display = 'none';
+            if (toxicGroup) toxicGroup.style.display = 'none';
+            if (freqGroup) freqGroup.style.display = 'block';
+            if (timeBlock) timeBlock.style.display = 'block';
+            if (proConGroup) proConGroup.style.display = 'none';
+            if (partsGroup) partsGroup.style.display = 'none';
+            if (floraPeriodGroup) floraPeriodGroup.style.display = 'none';
         }
         updateDatalists(cat);
     }
 
     function updateDatalists(cat) {
         const subDataList = document.getElementById('subcategoryOptions');
-        subDataList.innerHTML = "";
-        const existingSubs = [...new Set(entries.filter(e => e && e.category === cat).map(e => e.subcategory))];
-        existingSubs.sort().forEach(sub => {
-            const o = document.createElement('option'); o.value = sub; subDataList.appendChild(o);
-        });
+        if (subDataList) {
+            subDataList.innerHTML = "";
+            const existingSubs = [...new Set(entries.filter(e => e && e.category === cat).map(e => e.subcategory))];
+            existingSubs.sort().forEach(sub => {
+                const o = document.createElement('option'); o.value = sub; subDataList.appendChild(o);
+            });
+        }
         const locDataList = document.getElementById('locationOptions');
-        locDataList.innerHTML = "";
-        const existingLocs = [...new Set(entries.map(e => e ? e.location : null))].filter(l => l && l !== '-');
-        existingLocs.sort().forEach(loc => {
-            const o = document.createElement('option'); o.value = loc; locDataList.appendChild(o);
-        });
+        if (locDataList) {
+            locDataList.innerHTML = "";
+            const existingLocs = [...new Set(entries.map(e => e ? e.location : null))].filter(l => l && l !== '-');
+            existingLocs.sort().forEach(loc => {
+                const o = document.createElement('option'); o.value = loc; locDataList.appendChild(o);
+            });
+        }
         const originDataList = document.getElementById('originOptions');
-        originDataList.innerHTML = '<option value="Angebaut"><option value="Wildwuchs"><option value="Keine Angabe">';
+        if (originDataList) {
+            originDataList.innerHTML = '<option value="Angebaut"><option value="Wildwuchs"><option value="Keine Angabe">';
+        }
     }
 
     async function saveEntry() {
@@ -650,65 +659,79 @@
         const descVal = document.getElementById('descInput').value;
         
         let timeDisplay = "";
-        if(cat === 'fauna') {
-            const selectedOptions = Array.from(document.getElementById('timeSelect').selectedOptions);
+        if (cat === 'fauna') {
+            const timeSelect = document.getElementById('timeSelect');
+            const selectedOptions = Array.from(timeSelect ? timeSelect.selectedOptions : []);
             timeDisplay = selectedOptions.map(opt => opt.value).join(', ') || "-";
         }
 
         const partsData = {};
         if (cat === 'flora') {
             Object.keys(plantParts).forEach(key => {
+                const pT = document.getElementById(`part_toxic_${key}`);
+                const pTee = document.getElementById(`part_tee_${key}`);
+                const pNah = document.getElementById(`part_nahrung_${key}`);
+                const pMed = document.getElementById(`part_med_${key}`);
+                const pHaut = document.getElementById(`part_haut_${key}`);
+                const pMag = document.getElementById(`part_magen_${key}`);
                 partsData[key] = {
-                    toxic: document.getElementById(`part_toxic_${key}`).value,
-                    tee: document.getElementById(`part_tee_${key}`).checked,
-                    nahrung: document.getElementById(`part_nahrung_${key}`).checked,
-                    medizin: document.getElementById(`part_med_${key}`).checked,
-                    hautkontakt: document.getElementById(`part_haut_${key}`).checked,
-                    magen: document.getElementById(`part_magen_${key}`).checked
+                    toxic: pT ? pT.value : "",
+                    tee: pTee ? pTee.checked : false,
+                    nahrung: pNah ? pNah.checked : false,
+                    medizin: pMed ? pMed.checked : false,
+                    hautkontakt: pHaut ? pHaut.checked : false,
+                    magen: pMag ? pMag.checked : false
                 };
             });
         }
 
+        const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ""; };
+        const getChk = (id) => { const el = document.getElementById(id); return el ? el.checked : false; };
+
         const entry = {
             category: cat,
-            subcategory: document.getElementById('subInput').value || 'Unsortiert',
-            title: document.getElementById('titleInput').value,
-            science: document.getElementById('scienceInput').value,
-            // Häufigkeit nur speichern wenn Fauna oder Flora mit Wildwuchs
-            frequency: (cat === 'flora' && origin !== 'Wildwuchs') ? '-' : (document.getElementById('freqInput').value || '-'),
+            subcategory: getVal('subInput') || 'Unsortiert',
+            title: getVal('titleInput'),
+            science: getVal('scienceInput'),
+            frequency: (cat === 'flora' && origin !== 'Wildwuchs') ? '-' : (getVal('freqInput') || '-'),
             origin: cat === 'flora' ? (origin || '-') : '',
-            toxic: cat === 'flora' ? document.getElementById('toxicInput').value : '',
-            confidence: document.getElementById('confInput').value,
-            location: document.getElementById('locInput').value || '-',
+            toxic: cat === 'flora' ? getVal('toxicInput') : '',
+            confidence: getVal('confInput'),
+            location: getVal('locInput') || '-',
             timevalue: timeDisplay,
-            flora_from_year: cat === 'flora' ? document.getElementById('floraFromYear').value : '2019',
-            flora_from_month: cat === 'flora' ? document.getElementById('floraFromMonth').value : '1',
-            flora_to_year: cat === 'flora' ? document.getElementById('floraToYear').value : '2027',
-            flora_to_month: cat === 'flora' ? document.getElementById('floraToMonth').value : '12',
+            flora_from_year: cat === 'flora' ? getVal('floraFromYear') : '2019',
+            flora_from_month: cat === 'flora' ? getVal('floraFromMonth') : '1',
+            flora_to_year: cat === 'flora' ? getVal('floraToYear') : '2027',
+            flora_to_month: cat === 'flora' ? getVal('floraToMonth') : '12',
             img: imgVal || 'https://via.placeholder.com/150?text=Kein+Bild',
             description: descVal ? descVal.trim() : "",
             benefits: cat === 'flora' ? {
-                tee: document.getElementById('benefitTee').checked,
-                nahrung: document.getElementById('benefitNahrung').checked,
-                medizin: document.getElementById('benefitMedizin').checked,
-                bienen: document.getElementById('benefitBienen').checked,
-                voegel: document.getElementById('benefitVoegel').checked,
-                robust: document.getElementById('benefitRobust').checked
+                tee: getChk('benefitTee'),
+                nahrung: getChk('benefitNahrung'),
+                medizin: getChk('benefitMedizin'),
+                bienen: getChk('benefitBienen'),
+                voegel: getChk('benefitVoegel'),
+                robust: getChk('benefitRobust')
             } : { tee: false, nahrung: false, medizin: false, bienen: false, voegel: false, robust: false },
             harms: cat === 'flora' ? {
-                hautkontakt: document.getElementById('harmHautkontakt').checked,
-                magen: document.getElementById('harmMagen').checked,
-                geruch: document.getElementById('harmGeruch').checked,
-                atmen: document.getElementById('harmAtmen').checked,
-                kreislauf: document.getElementById('harmKreislauf').checked,
-                uebelkeit: document.getElementById('harmUebelkeit').checked,
-                tiere: document.getElementById('harmTiere').checked,
-                invasiv: document.getElementById('harmInvasiv').checked
+                hautkontakt: getChk('harmHautkontakt'),
+                magen: getChk('harmMagen'),
+                geruch: getChk('harmGeruch'),
+                atmen: getChk('harmAtmen'),
+                kreislauf: getChk('harmKreislauf'),
+                uebelkeit: getChk('harmUebelkeit'),
+                tiere: getChk('harmTiere'),
+                invasiv: getChk('harmInvasiv')
             } : { hautkontakt: false, magen: false, geruch: false, atmen: false, kreislauf: false, uebelkeit: false, tiere: false, invasiv: false },
             parts_data: cat === 'flora' ? partsData : null
         };
 
-        if(!entry.title) return alert("Bitte Namen eingeben!");
+        if (!entry.title) return alert("Bitte Namen eingeben!");
+
+        if (!db) {
+            alert("Supabase ist nicht konfiguriert. Bitte trage deine Supabase URL & Key ein.");
+            return;
+        }
 
         try {
             if (editId) {
@@ -735,7 +758,7 @@
     function setMainFilter(f, btn) {
         mainFilter = f; selectedSubcategories = []; selectedOrigins = [];
         document.querySelectorAll('#mainFilterBar .filter-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+        if (btn) btn.classList.add('active');
         renderEntries();
     }
 
@@ -749,9 +772,11 @@
     function toggleImages() {
         imagesLoaded = !imagesLoaded;
         const btn = document.getElementById('loadImagesBtn');
-        btn.innerHTML = imagesLoaded 
-            ? '<i class="fas fa-eye-slash"></i> Bilder ausblenden' 
-            : '<i class="fas fa-image"></i> Bilder laden';
+        if (btn) {
+            btn.innerHTML = imagesLoaded 
+                ? '<i class="fas fa-eye-slash"></i> Bilder ausblenden' 
+                : '<i class="fas fa-image"></i> Bilder laden';
+        }
         renderEntries();
     }
 
@@ -772,13 +797,13 @@
         
         const toxic = e.toxic;
         switch (toxic) {
-            case '0': return '#a3e635'; // Stufe 0: Hellgrün
-            case '1': return '#15803d'; // Stufe 1: Dunkelgrün
-            case '2': return '#facc15'; // Stufe 2: Gelb
-            case '3': return '#fb923c'; // Stufe 3: Orange
-            case '4': return '#ef4444'; // Stufe 4: Rot
-            case '5': return '#300303'; // Stufe 5: Dunkelrot bis Schwarz
-            default: return '#bdc3c7';  // Unsicher: Grau
+            case '0': return '#a3e635';
+            case '1': return '#15803d';
+            case '2': return '#facc15';
+            case '3': return '#fb923c';
+            case '4': return '#ef4444';
+            case '5': return '#300303';
+            default: return '#bdc3c7';
         }
     }
 
@@ -900,14 +925,13 @@
         `;
     }
 
-    // Generiert den Zeitstrahl für FLORA Einträge (statische Achse 2019-2027)
     function getFloraTimelineHTML(e) {
         if (e.category !== 'flora') return "";
 
-        const fromY = parseInt(e.flora_from_year || '2019');
-        const fromM = parseInt(e.flora_from_month || '1');
-        const toY = parseInt(e.flora_to_year || '2027');
-        const toM = parseInt(e.flora_to_month || '12');
+        const fromY = parseInt(e.flora_from_year || '2019', 10);
+        const fromM = parseInt(e.flora_from_month || '1', 10);
+        const toY = parseInt(e.flora_to_year || '2027', 10);
+        const toM = parseInt(e.flora_to_month || '12', 10);
 
         const monthNames = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
         
@@ -915,7 +939,6 @@
         let toStr = (toM > 0 && toM <= 12) ? `${monthNames[toM - 1]} ${toY}` : `${toY}`;
         let periodText = `${fromStr} – ${toStr}`;
 
-        // Statische Zeitachse 2019.0 bis 2028.0 (9 Jahre Span)
         const startAxis = 2019.0;
         const totalYears = 9.0;
 
@@ -927,7 +950,7 @@
 
         if (leftPct < 0) leftPct = 0;
         if (leftPct > 100) leftPct = 95;
-        if (widthPct < 2) widthPct = 2; // Mindestbreite für Sichtbarkeit
+        if (widthPct < 2) widthPct = 2;
         if (leftPct + widthPct > 100) widthPct = 100 - leftPct;
 
         return `
@@ -952,15 +975,20 @@
 
     function renderEntries() {
         const list = document.getElementById('entryList');
+        if (!list) return;
+
         const catBar = document.getElementById('categoryFilterBar');
         const originBar = document.getElementById('originFilterBar');
         const countText = document.getElementById('entryCountText');
-        const search = document.getElementById('searchInput').value.toLowerCase();
+        const searchInput = document.getElementById('searchInput');
+        const search = searchInput ? searchInput.value.toLowerCase() : "";
         
-        catBar.innerHTML = ""; originBar.innerHTML = "";
+        if (catBar) catBar.innerHTML = ""; 
+        if (originBar) originBar.innerHTML = "";
+
         if (mainFilter !== 'all') {
             const availableCats = [...new Set(entries.filter(e => e && e.category === mainFilter).map(e => e.subcategory))].sort();
-            if (availableCats.length > 0) {
+            if (availableCats.length > 0 && catBar) {
                 catBar.innerHTML = '<span class="filter-label">Kategorien:</span>';
                 availableCats.forEach(cat => {
                     const btn = document.createElement('button');
@@ -968,7 +996,7 @@
                     btn.innerText = cat; btn.onclick = () => toggleSubFilter(cat, 'cat'); catBar.appendChild(btn);
                 });
             }
-            if (mainFilter === 'flora') {
+            if (mainFilter === 'flora' && originBar) {
                 const availableOrigins = [...new Set(entries.filter(e => e && e.category === 'flora').map(e => e.origin))].filter(o => o && o !== '-').sort();
                 if (availableOrigins.length > 0) {
                     originBar.innerHTML = '<span class="filter-label">Wuchsstatus:</span>';
@@ -992,7 +1020,7 @@
             return matchesMain && matchesSearch && matchesSub && matchesOrigin;
         }).sort((a, b) => b.id - a.id);
 
-        countText.innerText = `${filtered.length} Eintrag/Einträge gefunden`;
+        if (countText) countText.innerText = `${filtered.length} Eintrag/Einträge gefunden`;
         list.innerHTML = "";
         
         filtered.forEach(e => {
@@ -1002,7 +1030,6 @@
             const originVal = e.origin || '-';
             const statusLabel = originVal !== '-' ? ` | ${originVal}` : '';
             
-            // Häufigkeit nur bei Flora mit Wildwuchs ODER Fauna anzeigen
             const freqHTML = (e.category === 'flora' && originVal !== 'Wildwuchs') 
                 ? "" 
                 : `<div><strong>Häufigkeit:</strong> ${e.frequency || '-'}</div>`;
@@ -1065,68 +1092,85 @@
     }
 
     function editEntry(id) {
-        const e = entries.find(x => x.id === id); editId = id;
-        document.getElementById('formTitle').innerText = "Bearbeiten";
-        document.getElementById('categoryInput').value = e.category;
-        document.getElementById('originInput').value = e.origin || "";
+        const e = entries.find(x => x.id === id); 
+        if (!e) return;
+        editId = id;
+        
+        const formTitle = document.getElementById('formTitle'); if (formTitle) formTitle.innerText = "Bearbeiten";
+        const catInput = document.getElementById('categoryInput'); if (catInput) catInput.value = e.category;
+        const origInput = document.getElementById('originInput'); if (origInput) origInput.value = e.origin || "";
+        
         updateFormDynamics();
-        document.getElementById('scrollContainer').scrollTo({ top: 0, behavior: 'smooth' });
-        document.getElementById('subInput').value = e.subcategory;
-        document.getElementById('titleInput').value = e.title;
-        document.getElementById('scienceInput').value = e.science;
-        document.getElementById('freqInput').value = (e.frequency === '-') ? "" : e.frequency;
-        if(e.toxic) document.getElementById('toxicInput').value = e.toxic;
-        document.getElementById('confInput').value = e.confidence;
-        document.getElementById('locInput').value = (e.location === '-') ? "" : e.location;
+        
+        const scrollContainer = document.getElementById('scrollContainer');
+        if (scrollContainer) scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+        const setChk = (id, chk) => { const el = document.getElementById(id); if (el) el.checked = !!chk; };
+
+        setVal('subInput', e.subcategory);
+        setVal('titleInput', e.title);
+        setVal('scienceInput', e.science);
+        setVal('freqInput', (e.frequency === '-') ? "" : e.frequency);
+        if (e.toxic) setVal('toxicInput', e.toxic);
+        setVal('confInput', e.confidence);
+        setVal('locInput', (e.location === '-') ? "" : e.location);
         
         if (e.category === 'flora') {
-            document.getElementById('floraFromMonth').value = e.flora_from_month || "1";
-            document.getElementById('floraFromYear').value = e.flora_from_year || "2019";
-            document.getElementById('floraToMonth').value = e.flora_to_month || "12";
-            document.getElementById('floraToYear').value = e.flora_to_year || "2027";
+            setVal('floraFromMonth', e.flora_from_month || "1");
+            setVal('floraFromYear', e.flora_from_year || "2019");
+            setVal('floraToMonth', e.flora_to_month || "12");
+            setVal('floraToYear', e.flora_to_year || "2027");
         }
 
         if (e.category === 'fauna') {
-            const savedTimes = (e.timevalue || "").split(', ');
-            Array.from(document.getElementById('timeSelect').options).forEach(opt => opt.selected = savedTimes.includes(opt.value));
+            const timeSelect = document.getElementById('timeSelect');
+            if (timeSelect) {
+                const savedTimes = (e.timevalue || "").split(', ');
+                Array.from(timeSelect.options).forEach(opt => opt.selected = savedTimes.includes(opt.value));
+            }
         }
-        document.getElementById('imgInput').value = (e.img && !e.img.includes('placeholder')) ? e.img : "";
-        document.getElementById('descInput').value = e.description || "";
+        setVal('imgInput', (e.img && !e.img.includes('placeholder')) ? e.img : "");
+        setVal('descInput', e.description || "");
         
-        // Checkboxen allgemein laden
-        document.getElementById('benefitTee').checked = (e.benefits && e.benefits.tee) || false;
-        document.getElementById('benefitNahrung').checked = (e.benefits && e.benefits.nahrung) || false;
-        document.getElementById('benefitMedizin').checked = (e.benefits && e.benefits.medizin) || false;
-        document.getElementById('benefitBienen').checked = (e.benefits && e.benefits.bienen) || false;
-        document.getElementById('benefitVoegel').checked = (e.benefits && e.benefits.voegel) || false;
-        document.getElementById('benefitRobust').checked = (e.benefits && e.benefits.robust) || false;
+        setChk('benefitTee', e.benefits && e.benefits.tee);
+        setChk('benefitNahrung', e.benefits && e.benefits.nahrung);
+        setChk('benefitMedizin', e.benefits && e.benefits.medizin);
+        setChk('benefitBienen', e.benefits && e.benefits.bienen);
+        setChk('benefitVoegel', e.benefits && e.benefits.voegel);
+        setChk('benefitRobust', e.benefits && e.benefits.robust);
         
-        document.getElementById('harmHautkontakt').checked = (e.harms && e.harms.hautkontakt) || false;
-        document.getElementById('harmMagen').checked = (e.harms && e.harms.magen) || false;
-        document.getElementById('harmGeruch').checked = (e.harms && e.harms.geruch) || false;
-        document.getElementById('harmAtmen').checked = (e.harms && e.harms.atmen) || false;
-        document.getElementById('harmKreislauf').checked = (e.harms && e.harms.kreislauf) || false;
-        document.getElementById('harmUebelkeit').checked = (e.harms && e.harms.uebelkeit) || false;
-        document.getElementById('harmTiere').checked = (e.harms && e.harms.tiere) || false;
-        document.getElementById('harmInvasiv').checked = (e.harms && e.harms.invasiv) || false;
+        setChk('harmHautkontakt', e.harms && e.harms.hautkontakt);
+        setChk('harmMagen', e.harms && e.harms.magen);
+        setChk('harmGeruch', e.harms && e.harms.geruch);
+        setChk('harmAtmen', e.harms && e.harms.atmen);
+        setChk('harmKreislauf', e.harms && e.harms.kreislauf);
+        setChk('harmUebelkeit', e.harms && e.harms.uebelkeit);
+        setChk('harmTiere', e.harms && e.harms.tiere);
+        setChk('harmInvasiv', e.harms && e.harms.invasiv);
 
-        // Pflanzenteile im Bearbeitungsformular laden
         const pData = e.parts_data || {};
         Object.keys(plantParts).forEach(key => {
             const part = pData[key] || { toxic: "", tee: false, nahrung: false, medizin: false, hautkontakt: false, magen: false };
-            document.getElementById(`part_toxic_${key}`).value = part.toxic || "";
-            document.getElementById(`part_tee_${key}`).checked = !!part.tee;
-            document.getElementById(`part_nahrung_${key}`).checked = !!part.nahrung;
-            document.getElementById(`part_med_${key}`).checked = !!part.medizin;
-            document.getElementById(`part_haut_${key}`).checked = !!part.hautkontakt;
-            document.getElementById(`part_magen_${key}`).checked = !!part.magen;
+            setVal(`part_toxic_${key}`, part.toxic || "");
+            setChk(`part_tee_${key}`, part.tee);
+            setChk(`part_nahrung_${key}`, part.nahrung);
+            setChk(`part_med_${key}`, part.medizin);
+            setChk(`part_haut_${key}`, part.hautkontakt);
+            setChk(`part_magen_${key}`, part.magen);
         });
 
-        if(document.getElementById('entryForm').style.display === 'none') toggleForm();
+        const entryForm = document.getElementById('entryForm');
+        if (entryForm && entryForm.style.display === 'none') toggleForm();
     }
 
     async function deleteEntry(id) { 
-        if(confirm("Eintrag löschen?")) { 
+        if (confirm("Eintrag löschen?")) { 
+            if (!db) {
+                entries = entries.filter(x => x.id !== id);
+                renderEntries();
+                return;
+            }
             try {
                 const { error } = await db
                     .from('garten_archiv')
@@ -1141,9 +1185,18 @@
         } 
     }
     
-    populateYearSelects();
-    generatePartsFormFields();
-    fetchEntries();
+    // Initialisierung beim Laden der Seite
+    document.addEventListener("DOMContentLoaded", () => {
+        populateYearSelects();
+        generatePartsFormFields();
+        fetchEntries();
+    });
+    // Fallback falls DOMContentLoaded bereits gefeuert wurde
+    if (document.readyState === "interactive" || document.readyState === "complete") {
+        populateYearSelects();
+        generatePartsFormFields();
+        fetchEntries();
+    }
 </script>
 </body>
 </html>
