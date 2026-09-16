@@ -36,10 +36,9 @@
 
         .entry-count { font-size: 0.9rem; color: #666; margin-bottom: 0; font-style: italic; }
 
-        /* Neuer Container-Wrapper für die Außen-Icons links neben den Einträgen */
+        /* Container-Wrapper für schwebende Außen-Icons */
         .entry-wrapper { position: relative; margin-bottom: 15px; margin-left: 55px; }
         
-        /* Das schwebende Außen-Icon links neben der Farbleiste */
         .outer-type-icon { 
             position: absolute; 
             left: -40px; 
@@ -76,11 +75,50 @@
         .toxicity-icons { position: absolute; top: 45px; right: 15px; display: flex; gap: 2px; }
         .toxicity-icons i { font-size: 0.8rem; }
 
-        /* Modifiziert, um alle Badges garantiert in einer einzigen Zeile anzuzeigen */
         .feature-badges { position: absolute; top: 72px; right: 15px; display: flex; gap: 4px; flex-wrap: nowrap; justify-content: flex-end; z-index: 5; }
         .feature-badge { width: 24px; height: 24px; border-radius: 6px; display: flex; justify-content: center; align-items: center; font-size: 0.8rem; border: 1px solid transparent; flex-shrink: 0; }
         .badge-pro { background: #e8f5e9; color: #2e7d32; border-color: #c8e6c9; }
         .badge-con { background: #ffebee; color: #ff7675; border-color: #ffccd2; }
+
+        /* Styles für den Zeitstrahl im Eintrag */
+        .timeline-container {
+            margin-top: 8px;
+            margin-bottom: 4px;
+            background: #f8faf8;
+            border-radius: 6px;
+            padding: 6px 10px;
+            border: 1px solid #e0e8e0;
+        }
+        .timeline-title {
+            font-size: 0.7rem;
+            color: #555;
+            font-weight: bold;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .timeline-track {
+            position: relative;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .timeline-bar {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, #81c784, #2e7d32);
+            border-radius: 4px;
+            min-width: 6px;
+        }
+        .timeline-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.65rem;
+            color: #888;
+            margin-top: 3px;
+        }
 
         .btn-load-images {
             background: #fff;
@@ -120,143 +158,31 @@
             border-bottom: none;
         }
 
-/* ==========================================================================
-   MOBILE OPTIMIERUNG (SMARTPHONE-ANSICHT < 768px)
-   ========================================================================== */
-@media (max-width: 768px) {
-    /* 1. Haupt-Layout auf vertikal umstellen */
-    body {
-        flex-direction: column;
-        height: auto;
-        overflow-x: hidden;
-    }
-
-    /* 2. Sidebar zur schmalen, fixierten Menüleiste am oberen Rand umbauen */
-    .sidebar {
-        width: 100%;
-        height: auto;
-        padding: 10px 20px;
-        border-right: none;
-        border-bottom: 2px solid #c8e6c9;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        box-sizing: border-box;
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-        background: #e8f5e9;
-    }
-
-    .sidebar h1 {
-        font-size: 1.1rem;
-        margin-bottom: 0;
-    }
-
-    .nav-item {
-        margin-bottom: 0;
-        padding: 6px 12px;
-        font-size: 0.85rem;
-    }
-
-    /* 3. Inhaltsbereich für Touch-Bedienung optimieren */
-    .content {
-        padding: 15px;
-        overflow-y: visible;
-    }
-
-    /* 4. Formular einspaltig stapeln */
-    .form-grid {
-        grid-template-columns: 1fr;
-    }
-    .full-width {
-        grid-column: span 1;
-    }
-
-    /* Vorteile & Nachteile im Formular ordentlich untereinander legen */
-    #proConGroup > div {
-        flex-direction: column;
-        gap: 15px !important;
-    }
-    #proConGroup > div > div:last-child {
-        border-left: none !important;
-        padding-left: 0 !important;
-        border-top: 1px dashed #c8e6c9;
-        padding-top: 15px;
-    }
-    /* Grid der Checkboxen auf 1 Spalte zwingen */
-    #proConGroup div[style*="display:grid"] {
-        grid-template-columns: 1fr !important;
-    }
-
-    /* Anatomie-Formularfelder für kleine Bildschirme stapeln */
-    #partsFormContainer > div {
-        grid-template-columns: 1fr !important;
-        gap: 8px !important;
-        padding: 12px !important;
-    }
-
-    /* 5. Archiv-Karten kompakter gestalten */
-    .entry-wrapper {
-        margin-left: 35px; /* Weniger Versatz für schwebende Icons */
-    }
-    
-    .outer-type-icon {
-        left: -28px;
-        font-size: 1.25rem;
-        top: 40px;
-    }
-
-    /* Bild und Beschreibung auf Handys untereinander anzeigen */
-    .entry-item div[style*="display:flex"][style*="min-height"] {
-        flex-direction: column-reverse !important;
-    }
-
-    .entry-image {
-        width: 100% !important;
-        height: 160px;
-    }
-
-    .entry-title {
-        margin-right: 0;
-        padding-top: 25px; /* Platz für Aktions-Buttons schaffen */
-    }
-
-    .action-btns {
-        top: 8px;
-        right: 10px;
-    }
-
-    .toxicity-icons {
-        top: 8px;
-        left: 15px; /* Gift-Skulls nach links schieben um Kollisionen zu vermeiden */
-        right: auto;
-    }
-
-    .feature-badges {
-        top: 38px;
-        right: 10px;
-    }
-
-    /* 6. Klappbare Anatomie-Details für Mobilgeräte anpassen */
-    .entry-expanded-details {
-        padding: 10px 15px;
-    }
-
-    /* Kopfzeile der Tabelle auf Mobilgeräten ausblenden */
-    .entry-expanded-details div[style*="font-weight:bold"][style*="color:#888"] {
-        display: none !important;
-    }
-
-    .part-row {
-        grid-template-columns: 1fr !important;
-        gap: 4px;
-        padding: 10px 0;
-        border-bottom: 1px solid #f1f1f1;
-        align-items: flex-start;
-    }
-}
+        /* Smartphone Optimierung Media Query */
+        @media (max-width: 768px) {
+            body { flex-direction: column; height: auto; overflow-x: hidden; }
+            .sidebar { width: 100%; height: auto; padding: 10px 15px; border-right: none; border-bottom: 2px solid #c8e6c9; display: flex; flex-direction: row; align-items: center; justify-content: space-between; box-sizing: border-box; position: sticky; top: 0; z-index: 1000; background: #e8f5e9; overflow-x: auto; }
+            .sidebar h1 { font-size: 1rem; margin-bottom: 0; }
+            .nav-item { margin-bottom: 0; padding: 5px 10px; font-size: 0.8rem; white-space: nowrap; }
+            .content { padding: 15px; overflow-y: visible; }
+            .form-grid { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+            #proConGroup > div { flex-direction: column; gap: 15px !important; }
+            #proConGroup > div > div:last-child { border-left: none !important; padding-left: 0 !important; border-top: 1px dashed #c8e6c9; padding-top: 15px; }
+            #proConGroup div[style*="display:grid"] { grid-template-columns: 1fr !important; }
+            #partsFormContainer > div { grid-template-columns: 1fr !important; gap: 8px !important; padding: 12px !important; }
+            .entry-wrapper { margin-left: 35px; }
+            .outer-type-icon { left: -28px; font-size: 1.25rem; top: 40px; }
+            .entry-item div[style*="display:flex"][style*="min-height"] { flex-direction: column-reverse !important; }
+            .entry-image { width: 100% !important; height: 160px; }
+            .entry-title { margin-right: 0; padding-top: 25px; }
+            .action-btns { top: 8px; right: 10px; }
+            .toxicity-icons { top: 8px; left: 15px; right: auto; }
+            .feature-badges { top: 38px; right: 10px; }
+            .entry-expanded-details { padding: 10px 15px; }
+            .entry-expanded-details div[style*="font-weight:bold"][style*="color:#888"] { display: none !important; }
+            .part-row { grid-template-columns: 1fr !important; gap: 4px; padding: 10px 0; border-bottom: 1px solid #f1f1f1; align-items: flex-start; }
+        }
     </style>
 </head>
 <body>
@@ -265,12 +191,24 @@
     <h1>Gartenarchiv</h1>
     <div class="nav-item" onclick="showSection('home')">Home</div>
     <div class="nav-item" onclick="showSection('archiv')">Archiv</div>
+    <div class="nav-item" onclick="showSection('quiz')">Quiz</div>
+    <div class="nav-item" onclick="showSection('glossar')">Glossar</div>
 </div>
 
 <div class="content" id="scrollContainer">
     <div id="home">
         <h2>Willkommen im Garten!</h2>
         <p>Deine persönliche Dokumentation der Natur direkt vor der Tür.</p>
+    </div>
+
+    <div id="quiz" style="display:none;">
+        <h2>Garten-Quiz</h2>
+        <p>Hier entsteht in Kürze ein interaktives Quiz zu deinen Gartenpflanzen, ihrer Identifikation und Giftigkeit.</p>
+    </div>
+
+    <div id="glossar" style="display:none;">
+        <h2>Botanisches Glossar</h2>
+        <p>Hier entsteht ein Nachschlagewerk mit botanischen Fachbegriffen, Wuchsformen und Pflegetipps.</p>
     </div>
 
     <div id="archiv" style="display:none;">
@@ -300,7 +238,8 @@
                     <datalist id="originOptions"></datalist>
                 </div>
 
-                <div class="form-group" id="freqGroup">
+                <!-- Häufigkeit (nur bei Wildwuchs sichtbar) -->
+                <div class="form-group" id="freqGroup" style="display:none;">
                     <label>Häufigkeit</label>
                     <select id="freqInput"></select>
                 </div>
@@ -329,12 +268,43 @@
                         </optgroup>
                     </select>
                 </div>
+
+                <!-- Zeitraum für FLORA (Sichtigungszeitraum) -->
+                <div class="form-group full-width" id="floraPeriodGroup" style="display:none;">
+                    <label>Sichtigungszeitraum im Garten</label>
+                    <div style="display:flex; gap:20px; background:#fafafa; padding:12px 15px; border-radius:8px; border:1px solid #c8e6c9; align-items:center; flex-wrap:wrap;">
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <strong style="font-size:0.85rem; color:#2e7d32;">Von:</strong>
+                            <select id="floraFromMonth" style="padding:6px; font-size:0.8rem; border-radius:4px; border:1px solid #ddd;">
+                                <option value="1">Januar</option><option value="2">Februar</option>
+                                <option value="3">März</option><option value="4">April</option>
+                                <option value="5">Mai</option><option value="6">Juni</option>
+                                <option value="7">Juli</option><option value="8">August</option>
+                                <option value="9">September</option><option value="10">Oktober</option>
+                                <option value="11">November</option><option value="12">Dezember</option>
+                            </select>
+                            <select id="floraFromYear" style="padding:6px; font-size:0.8rem; border-radius:4px; border:1px solid #ddd;"></select>
+                        </div>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <strong style="font-size:0.85rem; color:#2e7d32;">Bis:</strong>
+                            <select id="floraToMonth" style="padding:6px; font-size:0.8rem; border-radius:4px; border:1px solid #ddd;">
+                                <option value="1">Januar</option><option value="2">Februar</option>
+                                <option value="3">März</option><option value="4">April</option>
+                                <option value="5">Mai</option><option value="6">Juni</option>
+                                <option value="7">Juli</option><option value="8">August</option>
+                                <option value="9">September</option><option value="10">Oktober</option>
+                                <option value="11">November</option><option value="12" selected>Dezember</option>
+                            </select>
+                            <select id="floraToYear" style="padding:6px; font-size:0.8rem; border-radius:4px; border:1px solid #ddd;"></select>
+                        </div>
+                    </div>
+                </div>
                 
-                <!-- Neu strukturiertes, zweispaltiges Layout für Vor- und Nachteile im Formular -->
+                <!-- Vor- und Nachteile mit neuer Strukturierung -->
                 <div class="form-group full-width" id="proConGroup" style="display:none;">
                     <label>Eigenschaften allgemein (Vorteile & Nachteile)</label>
                     <div style="display:flex; gap:20px; background:#fafafa; padding:15px; border-radius:10px; border:1px solid #c8e6c9;">
-                        <!-- Vorteile Spalte (mit 2-Spalten-Untergrid) -->
+                        <!-- Vorteile Spalte -->
                         <div style="flex:1;">
                             <strong style="font-size:0.85rem; color:#2e7d32; display:block; margin-bottom:12px;">Vorteile</strong>
                             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px 15px;">
@@ -351,40 +321,47 @@
                                     <input type="checkbox" id="benefitBienen"> <i class="fas fa-bug" style="color:#fbc02d; width:16px;"></i> Bienenweide
                                 </label>
                                 <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; font-weight:normal; cursor:pointer;">
-                                    <input type="checkbox" id="benefitVoegel"> <i class="fas fa-crow" style="color:#1e88e5; width:16px;"></i> Vogelschutz
+                                    <input type="checkbox" id="benefitVoegel"> <i class="fas fa-crow" style="color:#1e88e5; width:16px;"></i> Vogelnahrung
                                 </label>
                                 <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; font-weight:normal; cursor:pointer;">
                                     <input type="checkbox" id="benefitRobust"> <i class="fas fa-hand-holding-heart" style="color:#6d4c41; width:16px;"></i> Robust / Pflegeleicht
                                 </label>
                             </div>
                         </div>
-                        <!-- Nachteile Spalte (mit 2-Spalten-Untergrid) -->
+                        
+                        <!-- Nachteile Spalte mit 'Bei Verzehr' und 'Sonstiges' -->
                         <div style="flex:1; border-left:1px solid #c8e6c9; padding-left:20px;">
-                            <strong style="font-size:0.85rem; color:#ff7675; display:block; margin-bottom:12px;">Nachteile (Symptome & Risiken)</strong>
-                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px 15px;">
-                                <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; font-weight:normal; cursor:pointer;">
-                                    <input type="checkbox" id="harmHautkontakt"> <i class="fas fa-hand" style="color:#ff7675; width:16px;"></i> Haut-Reizung
+                            <strong style="font-size:0.85rem; color:#ff7675; display:block; margin-bottom:8px;">Nachteile (Symptome & Risiken)</strong>
+                            
+                            <span style="font-size:0.75rem; font-weight:bold; color:#d63031; display:block; margin-top:4px; margin-bottom:6px;">Bei Verzehr:</span>
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px 12px; margin-bottom:10px;">
+                                <label style="display:flex; align-items:center; gap:8px; font-size:0.8rem; font-weight:normal; cursor:pointer;">
+                                    <input type="checkbox" id="harmMagen"> <i class="fas fa-capsules" style="color:#ff7675; width:14px;"></i> Magen-Reizung
                                 </label>
-                                <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; font-weight:normal; cursor:pointer;">
-                                    <input type="checkbox" id="harmMagen"> <i class="fas fa-capsules" style="color:#ff7675; width:16px;"></i> Magen-Reizung
+                                <label style="display:flex; align-items:center; gap:8px; font-size:0.8rem; font-weight:normal; cursor:pointer;">
+                                    <input type="checkbox" id="harmAtmen"> <i class="fas fa-lungs" style="color:#ff7675; width:14px;"></i> Atemnot
                                 </label>
-                                <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; font-weight:normal; cursor:pointer;">
-                                    <input type="checkbox" id="harmGeruch"> <i class="fas fa-wind" style="color:#78909c; width:16px;"></i> Übler Geruch
+                                <label style="display:flex; align-items:center; gap:8px; font-size:0.8rem; font-weight:normal; cursor:pointer;">
+                                    <input type="checkbox" id="harmKreislauf"> <i class="fas fa-heartbeat" style="color:#ff7675; width:14px;"></i> Kreislauf
                                 </label>
-                                <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; font-weight:normal; cursor:pointer;">
-                                    <input type="checkbox" id="harmAtmen"> <i class="fas fa-lungs" style="color:#ff7675; width:16px;"></i> Atemnot
+                                <label style="display:flex; align-items:center; gap:8px; font-size:0.8rem; font-weight:normal; cursor:pointer;">
+                                    <input type="checkbox" id="harmUebelkeit"> <i class="fas fa-frown" style="color:#ff7675; width:14px;"></i> Übelkeit
                                 </label>
-                                <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; font-weight:normal; cursor:pointer;">
-                                    <input type="checkbox" id="harmKreislauf"> <i class="fas fa-heartbeat" style="color:#ff7675; width:16px;"></i> Kreislauf
+                            </div>
+
+                            <span style="font-size:0.75rem; font-weight:bold; color:#d63031; display:block; margin-top:4px; margin-bottom:6px;">Sonstiges:</span>
+                            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px 12px;">
+                                <label style="display:flex; align-items:center; gap:8px; font-size:0.8rem; font-weight:normal; cursor:pointer;">
+                                    <input type="checkbox" id="harmHautkontakt"> <i class="fas fa-hand" style="color:#ff7675; width:14px;"></i> Haut-Reizung
                                 </label>
-                                <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; font-weight:normal; cursor:pointer;">
-                                    <input type="checkbox" id="harmUebelkeit"> <i class="fas fa-frown" style="color:#ff7675; width:16px;"></i> Übelkeit
+                                <label style="display:flex; align-items:center; gap:8px; font-size:0.8rem; font-weight:normal; cursor:pointer;">
+                                    <input type="checkbox" id="harmGeruch"> <i class="fas fa-wind" style="color:#78909c; width:14px;"></i> Übler Geruch
                                 </label>
-                                <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; font-weight:normal; cursor:pointer;">
-                                    <input type="checkbox" id="harmTiere"> <i class="fas fa-paw" style="color:#fb8c00; width:16px;"></i> Tier-Gefahr
+                                <label style="display:flex; align-items:center; gap:8px; font-size:0.8rem; font-weight:normal; cursor:pointer;">
+                                    <input type="checkbox" id="harmTiere"> <i class="fas fa-paw" style="color:#fb8c00; width:14px;"></i> Tier-Gefahr
                                 </label>
-                                <label style="display:flex; align-items:center; gap:8px; font-size:0.85rem; font-weight:normal; cursor:pointer;">
-                                    <input type="checkbox" id="harmInvasiv"> <i class="fas fa-expand-arrows-alt" style="color:#5d4037; width:16px;"></i> Wuchernd
+                                <label style="display:flex; align-items:center; gap:8px; font-size:0.8rem; font-weight:normal; cursor:pointer;">
+                                    <input type="checkbox" id="harmInvasiv"> <i class="fas fa-expand-arrows-alt" style="color:#5d4037; width:14px;"></i> Wuchernd
                                 </label>
                             </div>
                         </div>
@@ -455,7 +432,8 @@
 <script>
     const { createClient } = window.supabase;
     const supabaseUrl = 'https://dbblynmsqweqdknygfjp.supabase.co'; 
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiYmx5bm1zcXdlcWRrbnlnZmpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTk4NDMsImV4cCI6MjEwMzEzNTg0M30.wXeb6kThdYkv7puNkUY-wNbigVfhYKtz1X5RwM-g9dw'; 
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRiYmx5bm1zcXdlcWRrbnlnZmpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1NTk4NDMsImV4cCI6MjEwMzEzNTg0M30.wXeb6kThdYkv7puNkUY-wNbigVfhYKtz1X5RwM-g9dw
+'; 
     const db = createClient(supabaseUrl, supabaseKey);
 
     let entries = []; 
@@ -476,6 +454,20 @@
         fruechte: "Früchte",
         samen: "Samen"
     };
+
+    // Jahre von 2019 bis 2030 in die Auswahlfelder füllen
+    function populateYearSelects() {
+        const fromY = document.getElementById('floraFromYear');
+        const toY = document.getElementById('floraToYear');
+        if (!fromY || !toY) return;
+        fromY.innerHTML = ""; toY.innerHTML = "";
+        for (let y = 2019; y <= 2030; y++) {
+            const opt1 = document.createElement('option'); opt1.value = y; opt1.innerText = y; fromY.appendChild(opt1);
+            const opt2 = document.createElement('option'); opt2.value = y; opt2.innerText = y; toY.appendChild(opt2);
+        }
+        fromY.value = "2019";
+        toY.value = "2027";
+    }
 
     function generatePartsFormFields() {
         const container = document.getElementById('partsFormContainer');
@@ -519,8 +511,6 @@
         });
     }
 
-    generatePartsFormFields();
-
     async function fetchEntries() {
         try {
             const { data, error } = await db
@@ -538,6 +528,8 @@
     function showSection(id) {
         document.getElementById('home').style.display = (id === 'home') ? 'block' : 'none';
         document.getElementById('archiv').style.display = (id === 'archiv') ? 'block' : 'none';
+        document.getElementById('quiz').style.display = (id === 'quiz') ? 'block' : 'none';
+        document.getElementById('glossar').style.display = (id === 'glossar') ? 'block' : 'none';
         if(id === 'archiv') fetchEntries();
     }
 
@@ -554,7 +546,13 @@
         });
         document.getElementById('toxicInput').value = "Unsicher";
         
-        // Alle Checkboxen im Formular zurücksetzen
+        // Zeitraum zurücksetzen
+        document.getElementById('floraFromMonth').value = "1";
+        document.getElementById('floraFromYear').value = "2019";
+        document.getElementById('floraToMonth').value = "12";
+        document.getElementById('floraToYear').value = "2027";
+
+        // Checkboxen allgemein zurücksetzen
         document.getElementById('benefitTee').checked = false;
         document.getElementById('benefitNahrung').checked = false;
         document.getElementById('benefitMedizin').checked = false;
@@ -595,6 +593,7 @@
         const timeBlock = document.getElementById('timeBlock');
         const proConGroup = document.getElementById('proConGroup');
         const partsGroup = document.getElementById('partsGroup');
+        const floraPeriodGroup = document.getElementById('floraPeriodGroup');
         
         freqSelect.innerHTML = '<option value="">-- Keine Angabe --</option>';
         const options = (cat === 'fauna') ? freqFauna : freqFlora;
@@ -608,8 +607,14 @@
             timeBlock.style.display = 'none';
             proConGroup.style.display = 'block';
             partsGroup.style.display = 'block';
-            if (origin === 'Angebaut' || origin === 'Wildwuchs') freqGroup.style.display = 'none';
-            else freqGroup.style.display = 'block';
+            floraPeriodGroup.style.display = 'block';
+
+            // WICHTIG: Häufigkeit taucht NUR bei ausgewählter Option 'Wildwuchs' auf!
+            if (origin === 'Wildwuchs') {
+                freqGroup.style.display = 'block';
+            } else {
+                freqGroup.style.display = 'none';
+            }
         } else {
             originGroup.style.display = 'none';
             toxicGroup.style.display = 'none';
@@ -617,6 +622,7 @@
             timeBlock.style.display = 'block';
             proConGroup.style.display = 'none';
             partsGroup.style.display = 'none';
+            floraPeriodGroup.style.display = 'none';
         }
         updateDatalists(cat);
     }
@@ -669,12 +675,17 @@
             subcategory: document.getElementById('subInput').value || 'Unsortiert',
             title: document.getElementById('titleInput').value,
             science: document.getElementById('scienceInput').value,
-            frequency: (cat === 'flora' && (origin === 'Angebaut' || origin === 'Wildwuchs')) ? '-' : (document.getElementById('freqInput').value || '-'),
+            // Häufigkeit nur speichern wenn Fauna oder Flora mit Wildwuchs
+            frequency: (cat === 'flora' && origin !== 'Wildwuchs') ? '-' : (document.getElementById('freqInput').value || '-'),
             origin: cat === 'flora' ? (origin || '-') : '',
             toxic: cat === 'flora' ? document.getElementById('toxicInput').value : '',
             confidence: document.getElementById('confInput').value,
             location: document.getElementById('locInput').value || '-',
             timevalue: timeDisplay,
+            flora_from_year: cat === 'flora' ? document.getElementById('floraFromYear').value : '2019',
+            flora_from_month: cat === 'flora' ? document.getElementById('floraFromMonth').value : '1',
+            flora_to_year: cat === 'flora' ? document.getElementById('floraToYear').value : '2027',
+            flora_to_month: cat === 'flora' ? document.getElementById('floraToMonth').value : '12',
             img: imgVal || 'https://via.placeholder.com/150?text=Kein+Bild',
             description: descVal ? descVal.trim() : "",
             benefits: cat === 'flora' ? {
@@ -757,23 +768,21 @@
         }
     }
 
-    // Liefert die neu definierten dynamischen Border-Farben je nach Giftigkeit
     function getCardBorderColor(e) {
-        if (e.category === 'fauna') return '#ffb74d'; // Fauna-Standard
+        if (e.category === 'fauna') return '#ffb74d'; 
         
         const toxic = e.toxic;
         switch (toxic) {
-            case '0': return '#a3e635'; // Stufe 0: Hellgrün [1]
-            case '1': return '#15803d'; // Stufe 1: Dunkelgrün [2]
-            case '2': return '#facc15'; // Stufe 2: Gelb [3]
-            case '3': return '#fb923c'; // Stufe 3: Orange [4]
-            case '4': return '#ef4444'; // Stufe 4: Rot [5]
-            case '5': return '#300303'; // Stufe 5: Dunkelrot bis Schwarz [6]
-            default: return '#bdc3c7';  // Unsicher / Keine Angabe: Grau
+            case '0': return '#a3e635'; // Stufe 0: Hellgrün
+            case '1': return '#15803d'; // Stufe 1: Dunkelgrün
+            case '2': return '#facc15'; // Stufe 2: Gelb
+            case '3': return '#fb923c'; // Stufe 3: Orange
+            case '4': return '#ef4444'; // Stufe 4: Rot
+            case '5': return '#300303'; // Stufe 5: Dunkelrot bis Schwarz
+            default: return '#bdc3c7';  // Unsicher: Grau
         }
     }
 
-    // Generiert die optischen Blausäure/Totenkopf-Icons mit den neuen Farbstufen
     function getToxicityHTML(level) {
         if (level === undefined || level === null || level === '' || level === 'Unsicher') {
             return `<div class="toxicity-icons" title="Giftigkeit: Unsicher">
@@ -792,11 +801,11 @@
         const count = parseInt(level);
         let skullColor = '#bdc3c7';
         switch (level) {
-            case '1': skullColor = '#15803d'; break; // Dunkelgrün [2]
-            case '2': skullColor = '#facc15'; break; // Gelb [3]
-            case '3': skullColor = '#fb923c'; break; // Orange [4]
-            case '4': skullColor = '#ef4444'; break; // Rot [5]
-            case '5': skullColor = '#300303'; break; // Dunkelrot bis Schwarz [6]
+            case '1': skullColor = '#15803d'; break;
+            case '2': skullColor = '#facc15'; break;
+            case '3': skullColor = '#fb923c'; break;
+            case '4': skullColor = '#ef4444'; break;
+            case '5': skullColor = '#300303'; break;
         }
 
         let skulls = '';
@@ -807,7 +816,6 @@
         return `<div class="toxicity-icons" title="Giftigkeitsstufe ${level}">${skulls}</div>`;
     }
 
-    // Rendert die erweiterten Vor- und Nachteile auf den Übersichtskarten in einer Reihe
     function getFeatureBadgesHTML(e) {
         if (e.category !== 'flora') return "";
         let badges = "";
@@ -815,57 +823,26 @@
         const b = e.benefits || {};
         const h = e.harms || {};
 
-        // Vorteile
-        if (b.tee) {
-            badges += `<div class="feature-badge badge-pro" title="Als Tee / Heilpflanze verwendbar"><i class="fas fa-mug-hot"></i></div>`;
-        }
-        if (b.nahrung) {
-            badges += `<div class="feature-badge badge-pro" title="Essbar / Nahrungspflege"><i class="fas fa-utensils"></i></div>`;
-        }
-        if (b.medizin) {
-            badges += `<div class="feature-badge badge-pro" title="Als Medizin verwendbar" style="background:#e8f5e9; color:#2e7d32; border-color:#c8e6c9;"><i class="fas fa-mortar-pestle"></i></div>`;
-        }
-        if (b.bienen) {
-            badges += `<div class="feature-badge badge-pro" title="Bienen- & Insektenfreundliche Weide" style="background:#fffde7; color:#fbc02d; border-color:#fff9c4;"><i class="fas fa-bug"></i></div>`;
-        }
-        if (b.voegel) {
-            badges += `<div class="feature-badge badge-pro" title="Vogelfutter / Vogelschutz" style="background:#e3f2fd; color:#1e88e5; border-color:#bbdefb;"><i class="fas fa-crow"></i></div>`;
-        }
-        if (b.robust) {
-            badges += `<div class="feature-badge badge-pro" title="Sehr pflegeleicht & robust" style="background:#efebe9; color:#6d4c41; border-color:#d7ccc8;"><i class="fas fa-hand-holding-heart"></i></div>`;
-        }
+        if (b.tee) badges += `<div class="feature-badge badge-pro" title="Als Tee / Heilpflanze verwendbar"><i class="fas fa-mug-hot"></i></div>`;
+        if (b.nahrung) badges += `<div class="feature-badge badge-pro" title="Essbar / Nahrungspflege"><i class="fas fa-utensils"></i></div>`;
+        if (b.medizin) badges += `<div class="feature-badge badge-pro" title="Als Medizin verwendbar" style="background:#e8f5e9; color:#2e7d32; border-color:#c8e6c9;"><i class="fas fa-mortar-pestle"></i></div>`;
+        if (b.bienen) badges += `<div class="feature-badge badge-pro" title="Bienen- & Insektenfreundliche Weide" style="background:#fffde7; color:#fbc02d; border-color:#fff9c4;"><i class="fas fa-bug"></i></div>`;
+        if (b.voegel) badges += `<div class="feature-badge badge-pro" title="Vogelnahrung" style="background:#e3f2fd; color:#1e88e5; border-color:#bbdefb;"><i class="fas fa-crow"></i></div>`;
+        if (b.robust) badges += `<div class="feature-badge badge-pro" title="Sehr pflegeleicht & robust" style="background:#efebe9; color:#6d4c41; border-color:#d7ccc8;"><i class="fas fa-hand-holding-heart"></i></div>`;
 
-        // Nachteile
-        if (h.hautkontakt) {
-            badges += `<div class="feature-badge badge-con" title="Gefahr bei Hautkontakt (Reizung)"><i class="fas fa-hand"></i></div>`;
-        }
-        if (h.magen) {
-            badges += `<div class="feature-badge badge-con" title="Verursacht Magen-Darm-Beschwerden"><i class="fas fa-capsules"></i></div>`;
-        }
-        if (h.geruch) {
-            badges += `<div class="feature-badge badge-con" title="Unangenehmer Geruch" style="background:#eceff1; color:#546e7a; border-color:#cfd8dc;"><i class="fas fa-wind"></i></div>`;
-        }
-        if (h.atmen) {
-            badges += `<div class="feature-badge badge-con" title="Kann Atembeschwerden verursachen"><i class="fas fa-lungs"></i></div>`;
-        }
-        if (h.kreislauf) {
-            badges += `<div class="feature-badge badge-con" title="Kann Kreislaufbeschwerden verursachen"><i class="fas fa-heartbeat"></i></div>`;
-        }
-        if (h.uebelkeit) {
-            badges += `<div class="feature-badge badge-con" title="Kann Übelkeit verursachen"><i class="fas fa-frown"></i></div>`;
-        }
-        if (h.tiere) {
-            badges += `<div class="feature-badge badge-con" title="Gefahr für Haustiere" style="background:#fff3e0; color:#fb8c00; border-color:#ffe0b2;"><i class="fas fa-paw"></i></div>`;
-        }
-        if (h.invasiv) {
-            badges += `<div class="feature-badge badge-con" title="Invasive / Stark wuchernde Art" style="background:#efebe9; color:#5d4037; border-color:#d7ccc8;"><i class="fas fa-expand-arrows-alt"></i></div>`;
-        }
+        if (h.hautkontakt) badges += `<div class="feature-badge badge-con" title="Gefahr bei Hautkontakt (Reizung)"><i class="fas fa-hand"></i></div>`;
+        if (h.magen) badges += `<div class="feature-badge badge-con" title="Verursacht Magen-Darm-Beschwerden"><i class="fas fa-capsules"></i></div>`;
+        if (h.geruch) badges += `<div class="feature-badge badge-con" title="Unangenehmer Geruch" style="background:#eceff1; color:#546e7a; border-color:#cfd8dc;"><i class="fas fa-wind"></i></div>`;
+        if (h.atmen) badges += `<div class="feature-badge badge-con" title="Kann Atembeschwerden verursachen"><i class="fas fa-lungs"></i></div>`;
+        if (h.kreislauf) badges += `<div class="feature-badge badge-con" title="Kann Kreislaufbeschwerden verursachen"><i class="fas fa-heartbeat"></i></div>`;
+        if (h.uebelkeit) badges += `<div class="feature-badge badge-con" title="Kann Übelkeit verursachen"><i class="fas fa-frown"></i></div>`;
+        if (h.tiere) badges += `<div class="feature-badge badge-con" title="Gefahr für Haustiere" style="background:#fff3e0; color:#fb8c00; border-color:#ffe0b2;"><i class="fas fa-paw"></i></div>`;
+        if (h.invasiv) badges += `<div class="feature-badge badge-con" title="Invasive / Stark wuchernde Art" style="background:#efebe9; color:#5d4037; border-color:#d7ccc8;"><i class="fas fa-expand-arrows-alt"></i></div>`;
 
         if (!badges) return "";
         return `<div class="feature-badges">${badges}</div>`;
     }
 
-    // Anatomie-Details mit den neuen, angepassten Farb-Stufen
     function getPartsDetailsHTML(e) {
         if (e.category !== 'flora') return "";
         
@@ -924,6 +901,56 @@
         `;
     }
 
+    // Generiert den Zeitstrahl für FLORA Einträge (statische Achse 2019-2027)
+    function getFloraTimelineHTML(e) {
+        if (e.category !== 'flora') return "";
+
+        const fromY = parseInt(e.flora_from_year || '2019');
+        const fromM = parseInt(e.flora_from_month || '1');
+        const toY = parseInt(e.flora_to_year || '2027');
+        const toM = parseInt(e.flora_to_month || '12');
+
+        const monthNames = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
+        
+        let fromStr = (fromM > 0 && fromM <= 12) ? `${monthNames[fromM - 1]} ${fromY}` : `${fromY}`;
+        let toStr = (toM > 0 && toM <= 12) ? `${monthNames[toM - 1]} ${toY}` : `${toY}`;
+        let periodText = `${fromStr} – ${toStr}`;
+
+        // Statische Zeitachse 2019.0 bis 2028.0 (9 Jahre Span)
+        const startAxis = 2019.0;
+        const totalYears = 9.0;
+
+        const valFrom = Math.max(startAxis, Math.min(2028.0, fromY + (fromM - 1) / 12));
+        const valTo = Math.max(startAxis, Math.min(2028.0, toY + toM / 12));
+
+        let leftPct = ((valFrom - startAxis) / totalYears) * 100;
+        let widthPct = ((valTo - valFrom) / totalYears) * 100;
+
+        if (leftPct < 0) leftPct = 0;
+        if (leftPct > 100) leftPct = 95;
+        if (widthPct < 2) widthPct = 2; // Mindestbreite für Sichtbarkeit
+        if (leftPct + widthPct > 100) widthPct = 100 - leftPct;
+
+        return `
+            <div class="timeline-container" onclick="event.stopPropagation();">
+                <div class="timeline-title">
+                    <span><i class="fas fa-calendar-alt" style="color:#2e7d32;"></i> Zeitraum im Garten:</span>
+                    <span style="color:#2e7d32; font-weight:bold;">${periodText}</span>
+                </div>
+                <div class="timeline-track">
+                    <div class="timeline-bar" style="left: ${leftPct.toFixed(1)}%; width: ${widthPct.toFixed(1)}%;"></div>
+                </div>
+                <div class="timeline-labels">
+                    <span>2019</span>
+                    <span>2021</span>
+                    <span>2023</span>
+                    <span>2025</span>
+                    <span>2027</span>
+                </div>
+            </div>
+        `;
+    }
+
     function renderEntries() {
         const list = document.getElementById('entryList');
         const catBar = document.getElementById('categoryFilterBar');
@@ -970,14 +997,14 @@
         list.innerHTML = "";
         
         filtered.forEach(e => {
-            // Container für das schwebende linke Außen-Icon erstellen
             const wrapper = document.createElement('div');
             wrapper.className = 'entry-wrapper';
             
             const originVal = e.origin || '-';
             const statusLabel = originVal !== '-' ? ` | ${originVal}` : '';
             
-            const freqHTML = (e.category === 'flora' && (originVal === 'Angebaut' || originVal === 'Wildwuchs')) 
+            // Häufigkeit nur bei Flora mit Wildwuchs ODER Fauna anzeigen
+            const freqHTML = (e.category === 'flora' && originVal !== 'Wildwuchs') 
                 ? "" 
                 : `<div><strong>Häufigkeit:</strong> ${e.frequency || '-'}</div>`;
 
@@ -988,13 +1015,12 @@
             const toxicIcons = (e.category === 'flora') ? getToxicityHTML(e.toxic) : "";
             const featureBadgesHTML = getFeatureBadgesHTML(e);
             const partsDetailsHTML = getPartsDetailsHTML(e);
+            const timelineHTML = getFloraTimelineHTML(e);
 
-            // 5. Bestimmungssicherheit mit Haken/Fragezeichen
             const confidenceIcon = e.confidence === 'Sicher'
                 ? `<span style="color:#2ecc71; margin-left: 10px; font-weight: bold; font-size: 0.8rem;" title="Bestimmung Sicher"><i class="fas fa-check-circle"></i> Sicher</span>`
                 : `<span style="color:#3498db; margin-left: 10px; font-weight: bold; font-size: 0.8rem;" title="Bestimmung Unsicher"><i class="fas fa-question-circle"></i> Unsicher</span>`;
 
-            // 6. Grünes Blatt für FLORA, Bärentatze für FAUNA links mittig
             const outerIcon = e.category === 'fauna'
                 ? `<div class="outer-type-icon" title="Fauna"><i class="fas fa-paw" style="color: #d97706;"></i></div>`
                 : `<div class="outer-type-icon" title="Flora"><i class="fas fa-leaf" style="color: #a3e635;"></i></div>`;
@@ -1024,6 +1050,7 @@
                                     <div><strong>Ort:</strong> ${e.location || '-'}</div>
                                     ${timeHTML}
                                 </div>
+                                ${timelineHTML}
                                 <div class="entry-desc">${e.description || ""}</div>
                             </div>
                             <div class="entry-image"><img src="${currentImgSrc}"></div>
@@ -1053,6 +1080,13 @@
         document.getElementById('confInput').value = e.confidence;
         document.getElementById('locInput').value = (e.location === '-') ? "" : e.location;
         
+        if (e.category === 'flora') {
+            document.getElementById('floraFromMonth').value = e.flora_from_month || "1";
+            document.getElementById('floraFromYear').value = e.flora_from_year || "2019";
+            document.getElementById('floraToMonth').value = e.flora_to_month || "12";
+            document.getElementById('floraToYear').value = e.flora_to_year || "2027";
+        }
+
         if (e.category === 'fauna') {
             const savedTimes = (e.timevalue || "").split(', ');
             Array.from(document.getElementById('timeSelect').options).forEach(opt => opt.selected = savedTimes.includes(opt.value));
@@ -1108,6 +1142,8 @@
         } 
     }
     
+    populateYearSelects();
+    generatePartsFormFields();
     fetchEntries();
 </script>
 </body>
