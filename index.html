@@ -19,11 +19,10 @@
         h2 { color: #388e3c; border-bottom: 2px solid #a5d6a7; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
         
         #entryForm { background: #fff; padding: 25px; border-radius: 12px; border: 1px solid #c8e6c9; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-grid { display: flex; flex-direction: column; gap: 15px; }
         .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.85rem; }
         .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
         select[multiple] { height: 120px; padding: 5px; }
-        .full-width { grid-column: span 2; }
 
         .search-box { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #c8e6c9; border-radius: 8px; }
         .filter-bar, .sub-filter-bar { margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
@@ -56,11 +55,12 @@
         .entry-item[data-category="fauna"] { border-left-color: #ffb74d; }
         .entry-item[data-category="fauna"] .entry-title { color: #ffb74d; }
 
-        .entry-main { padding: 12px 15px; flex-grow: 1; position: relative; }
+        /* Right Padding im entry-main verhindert das Überlappen von Icons & Zeitstrahl */
+        .entry-main { padding: 12px 140px 12px 15px; flex-grow: 1; position: relative; box-sizing: border-box; }
         .entry-image { width: 110px; flex-shrink: 0; background: #eee; }
         .entry-image img { width: 100%; height: 100%; object-fit: cover; }
 
-        .entry-title { font-weight: bold; font-size: 1.05rem; color: #2e7d32; margin-right: 70px; }
+        .entry-title { font-weight: bold; font-size: 1.05rem; color: #2e7d32; margin-right: 0; }
         .entry-meta { font-size: 0.7rem; color: #666; margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
         .entry-details { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 15px; font-size: 0.75rem; margin-top: 5px; }
         .entry-desc { font-size: 0.75rem; color: #444; margin-top: 5px; font-style: italic; }
@@ -82,12 +82,13 @@
 
         /* Styles für den Zeitstrahl im Eintrag */
         .timeline-container {
-            margin-top: 8px;
+            margin-top: 10px;
             margin-bottom: 4px;
             background: #f8faf8;
             border-radius: 6px;
             padding: 6px 10px;
             border: 1px solid #e0e8e0;
+            clear: both;
         }
         .timeline-title {
             font-size: 0.7rem;
@@ -111,6 +112,12 @@
             background: linear-gradient(90deg, #81c784, #2e7d32);
             border-radius: 4px;
             min-width: 6px;
+        }
+        /* Style für unsichere Zeiträume: Schräg gestreift / schraffiert mit grünem Rand */
+        .timeline-bar.uncertain {
+            background: repeating-linear-gradient(45deg, #a5d6a7, #a5d6a7 5px, #ffffff 5px, #ffffff 10px) !important;
+            border: 1.5px solid #2e7d32 !important;
+            box-sizing: border-box;
         }
         .timeline-labels {
             display: flex;
@@ -158,6 +165,11 @@
             border-bottom: none;
         }
 
+        /* Responsive Layout-Klassen für den Editor */
+        .editor-row-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
+        .editor-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+        .editor-row-2 { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; }
+
         /* Smartphone Optimierung Media Query */
         @media (max-width: 768px) {
             body { flex-direction: column; height: auto; overflow-x: hidden; }
@@ -165,8 +177,7 @@
             .sidebar h1 { font-size: 1rem; margin-bottom: 0; }
             .nav-item { margin-bottom: 0; padding: 5px 10px; font-size: 0.8rem; white-space: nowrap; }
             .content { padding: 15px; overflow-y: visible; }
-            .form-grid { grid-template-columns: 1fr; }
-            .full-width { grid-column: span 1; }
+            .entry-main { padding-right: 15px; }
             #proConGroup > div { flex-direction: column; gap: 15px !important; }
             #proConGroup > div > div:last-child { border-left: none !important; padding-left: 0 !important; border-top: 1px dashed #c8e6c9; padding-top: 15px; }
             #proConGroup div[style*="display:grid"] { grid-template-columns: 1fr !important; }
@@ -182,6 +193,7 @@
             .entry-expanded-details { padding: 10px 15px; }
             .entry-expanded-details div[style*="font-weight:bold"][style*="color:#888"] { display: none !important; }
             .part-row { grid-template-columns: 1fr !important; gap: 4px; padding: 10px 0; border-bottom: 1px solid #f1f1f1; align-items: flex-start; }
+            .editor-row-4, .editor-row-3, .editor-row-2 { grid-template-columns: 1fr !important; }
         }
     </style>
 </head>
@@ -215,64 +227,91 @@
         <h2>Archiv <button class="filter-btn active" style="background:#2e7d32; color:white;" onclick="prepareNewEntry()">+ Neu</button></h2>
         
         <div id="entryForm" style="display:none;">
-            <h3 id="formTitle">Neuer Eintrag</h3>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label>Typ</label>
-                    <select id="categoryInput" onchange="updateFormDynamics()">
+            <!-- Header mit Titel und Typ-Icons (FLORA / FAUNA) direkt daneben -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:2px solid #c8e6c9; padding-bottom:10px;">
+                <h3 id="formTitle" style="margin:0; color:#2e7d32; font-size:1.3rem;">Neuer Eintrag</h3>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <span style="font-size:0.85rem; font-weight:bold; color:#555;">Kategorie:</span>
+                    <button type="button" id="typeBtnFlora" class="filter-btn active" style="background:#81c784; color:white; border-color:#81c784;" onclick="selectCategory('flora')">
+                        <i class="fas fa-leaf"></i> Flora
+                    </button>
+                    <button type="button" id="typeBtnFauna" class="filter-btn" style="background:#f0f0f0; color:#555;" onclick="selectCategory('fauna')">
+                        <i class="fas fa-paw"></i> Fauna
+                    </button>
+                    <select id="categoryInput" style="display:none;" onchange="updateFormDynamics()">
                         <option value="flora">Flora</option>
                         <option value="fauna">Fauna</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>Unterkategorie</label>
-                    <input type="text" id="subInput" list="subcategoryOptions" placeholder="Vorschläge...">
-                    <datalist id="subcategoryOptions"></datalist>
-                </div>
-                <div class="form-group"><label>Name</label><input type="text" id="titleInput"></div>
-                <div class="form-group"><label>Wiss. Name</label><input type="text" id="scienceInput"></div>
-                
-                <div class="form-group" id="originGroup">
-                    <label>Wuchs-Status</label>
-                    <input type="text" id="originInput" list="originOptions" placeholder="Vorschläge..." oninput="updateFormDynamics()">
-                    <datalist id="originOptions"></datalist>
+            </div>
+
+            <div class="form-grid">
+                <!-- Sektion 1: Bezeichnung (Name, Familie, Gattung, Artepitheton) -->
+                <div style="background:#fafafa; border:1px solid #e0e0e0; border-radius:8px; padding:12px;" id="bezeichnungSection">
+                    <strong style="font-size:0.85rem; color:#2e7d32; display:block; margin-bottom:10px; border-bottom:1px solid #e8f5e9; padding-bottom:4px;">Bezeichnung</strong>
+                    <div class="editor-row-4" id="bezeichnungFields">
+                        <div class="form-group"><label id="nameInputLabel">Name (Trivialname)</label><input type="text" id="titleInput"></div>
+                        <div class="form-group" id="familyGroup"><label>Familie</label><input type="text" id="familyInput" placeholder="z.B. Rosengewächse"></div>
+                        <div class="form-group" id="genusGroup"><label>Gattung</label><input type="text" id="genusInput" placeholder="z.B. Rosa"></div>
+                        <div class="form-group" id="epithetonGroup"><label>Artepitheton</label><input type="text" id="epithetonInput" placeholder="z.B. canina"></div>
+                        <input type="hidden" id="scienceInput">
+                    </div>
                 </div>
 
-                <!-- Häufigkeit (nur bei Wildwuchs sichtbar) -->
-                <div class="form-group" id="freqGroup" style="display:none;">
-                    <label>Häufigkeit</label>
-                    <select id="freqInput"></select>
+                <!-- Sektion 2: Wuchsform + Wuchsstatus + Wuchsort -->
+                <div style="background:#fafafa; border:1px solid #e0e0e0; border-radius:8px; padding:12px;" id="wuchsSection">
+                    <strong style="font-size:0.85rem; color:#2e7d32; display:block; margin-bottom:10px; border-bottom:1px solid #e8f5e9; padding-bottom:4px;" id="wuchsSectionTitle">Wuchsform & Standort</strong>
+                    <div class="editor-row-3" id="wuchsFields">
+                        <div class="form-group">
+                            <label id="subInputLabel">Wuchsform</label>
+                            <input type="text" id="subInput" list="subcategoryOptions" placeholder="Vorschläge...">
+                            <datalist id="subcategoryOptions"></datalist>
+                        </div>
+                        <div class="form-group" id="originGroup">
+                            <label>Wuchs-Status</label>
+                            <input type="text" id="originInput" list="originOptions" placeholder="Vorschläge..." oninput="updateFormDynamics()">
+                            <datalist id="originOptions"></datalist>
+                        </div>
+                        <div class="form-group" id="freqGroup" style="display:none;">
+                            <label>Häufigkeit</label>
+                            <select id="freqInput"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Wuchsort</label>
+                            <input type="text" id="locInput" list="locationOptions" placeholder="Vorschläge...">
+                            <datalist id="locationOptions"></datalist>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="form-group"><label>Sicherheit</label><select id="confInput"><option value="Sicher">Sicher</option><option value="Unsicher">Unsicher</option></select></div>
-                
-                <div class="form-group">
-                    <label>Ort</label>
-                    <input type="text" id="locInput" list="locationOptions" placeholder="Vorschläge...">
-                    <datalist id="locationOptions"></datalist>
+                <!-- Sektion 3: Giftigkeit (gesamt) + Sicherheit -->
+                <div style="background:#fafafa; border:1px solid #e0e0e0; border-radius:8px; padding:12px;" id="toxicSection">
+                    <strong style="font-size:0.85rem; color:#2e7d32; display:block; margin-bottom:10px; border-bottom:1px solid #e8f5e9; padding-bottom:4px;">Giftigkeit (gesamt) & Sicherheit</strong>
+                    <div class="editor-row-2">
+                        <div class="form-group" id="toxicGroup">
+                            <label>Giftigkeit (gesamt)</label>
+                            <select id="toxicInput" onchange="syncOverallToxicityToParts()">
+                                <optgroup label="Giftigkeitsstufen">
+                                    <option value="0">0: Absolut ungiftig / Universell harmlos</option>
+                                    <option value="1">1: Ungiftig / Essbar (mit Einschränkungen)</option>
+                                    <option value="2">2: Leicht giftig / bedingt essbar</option>
+                                    <option value="3">3: Giftig (mäßig bis stark)</option>
+                                    <option value="4">4: Sehr giftig / Lebensgefährlich</option>
+                                    <option value="5">5: Extrem giftig / Tödlich</option>
+                                </optgroup>
+                                <optgroup label="Sonstiges">
+                                    <option value="Unsicher" selected>Unsicher</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="form-group"><label>Sicherheit</label><select id="confInput"><option value="Sicher">Sicher</option><option value="Unsicher">Unsicher</option></select></div>
+                    </div>
                 </div>
 
-                <div class="form-group" id="toxicGroup">
-                    <label>Giftigkeit (gesamt)</label>
-                    <select id="toxicInput">
-                        <optgroup label="Giftigkeitsstufen">
-                            <option value="0">0: Absolut ungiftig / Universell harmlos</option>
-                            <option value="1">1: Ungiftig / Essbar (mit Einschränkungen)</option>
-                            <option value="2">2: Leicht giftig / bedingt essbar</option>
-                            <option value="3">3: Giftig (mäßig bis stark)</option>
-                            <option value="4">4: Sehr giftig / Lebensgefährlich</option>
-                            <option value="5">5: Extrem giftig / Tödlich</option>
-                        </optgroup>
-                        <optgroup label="Sonstiges">
-                            <option value="Unsicher" selected>Unsicher</option>
-                        </optgroup>
-                    </select>
-                </div>
-
-                <!-- Zeitraum für FLORA (Sichtigungszeiträume dynamisch) -->
+                <!-- Zeitraum für FLORA (Sichtigungszeiträume dynamisch mit Unsicher-Option) -->
                 <div class="form-group full-width" id="floraPeriodGroup" style="display:none;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                        <label style="margin-bottom:0;">Sichtigungszeiträume im Garten</label>
+                        <label style="margin-bottom:0;">Sichtigungszeiträume im Garten (frühestens Sep 2019)</label>
                         <button type="button" class="filter-btn active" style="background:#2e7d32; color:white; padding:3px 10px; font-size:0.75rem;" onclick="addPeriodRow()">
                             <i class="fas fa-plus"></i> Zeitraum hinzufügen
                         </button>
@@ -280,7 +319,7 @@
                     <div id="floraPeriodsContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
                 </div>
                 
-                <!-- Vor- und Nachteile mit neuer Strukturierung -->
+                <!-- Vor- und Nachteile -->
                 <div class="form-group full-width" id="proConGroup" style="display:none;">
                     <label>Eigenschaften allgemein (Vorteile & Nachteile)</label>
                     <div style="display:flex; gap:20px; background:#fafafa; padding:15px; border-radius:10px; border:1px solid #c8e6c9;">
@@ -309,7 +348,7 @@
                             </div>
                         </div>
                         
-                        <!-- Nachteile Spalte mit 'Bei Verzehr' und 'Sonstiges' -->
+                        <!-- Nachteile Spalte -->
                         <div style="flex:1; border-left:1px solid #c8e6c9; padding-left:20px;">
                             <strong style="font-size:0.85rem; color:#ff7675; display:block; margin-bottom:8px;">Nachteile (Symptome & Risiken)</strong>
                             
@@ -438,14 +477,17 @@
         samen: "Samen"
     };
 
-    const monthOptionsHTML = `
-        <option value="1">Januar</option><option value="2">Februar</option>
-        <option value="3">März</option><option value="4">April</option>
-        <option value="5">Mai</option><option value="6">Juni</option>
-        <option value="7">Juli</option><option value="8">August</option>
-        <option value="9">September</option><option value="10">Oktober</option>
-        <option value="11">November</option><option value="12">Dezember</option>
-    `;
+    function getMonthOptionsHTML(selectedMonth, selectedYear) {
+        const monthNames = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+        let options = "";
+        for (let m = 1; m <= 12; m++) {
+            // Frühestens Sep 2019 (Monat 9)
+            if (String(selectedYear) === "2019" && m < 9) continue;
+            const sel = String(m) === String(selectedMonth) ? "selected" : "";
+            options += `<option value="${m}" ${sel}>${monthNames[m-1]}</option>`;
+        }
+        return options;
+    }
 
     function getYearOptionsHTML(selectedYear) {
         let options = "";
@@ -456,15 +498,30 @@
         return options;
     }
 
+    function handlePeriodYearChange(rowId) {
+        const row = document.getElementById(rowId);
+        if (!row) return;
+        const fromY = row.querySelector('.p-from-y').value;
+        const fromMEl = row.querySelector('.p-from-m');
+        const currentM = fromMEl.value;
+        
+        fromMEl.innerHTML = getMonthOptionsHTML(currentM, fromY);
+        // Falls 2019 gewählt wurde und vorher ein Monat < 9 drin war
+        if (fromY === "2019" && parseInt(currentM, 10) < 9) {
+            fromMEl.value = "9";
+        }
+    }
+
     function addPeriodRow(data = {}) {
         const container = document.getElementById('floraPeriodsContainer');
         if (!container) return;
 
         const rowId = 'period_row_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
-        const fromM = data.fromMonth || "1";
+        const fromM = data.fromMonth || (data.fromYear === "2019" ? "9" : "1");
         const fromY = data.fromYear || "2019";
         const toM = data.toMonth || "12";
         const toY = data.toYear || "2027";
+        const isUncertain = !!data.uncertain;
 
         const row = document.createElement('div');
         row.className = 'flora-period-row';
@@ -474,22 +531,23 @@
         row.innerHTML = `
             <div style="display:flex; gap:6px; align-items:center;">
                 <strong style="font-size:0.8rem; color:#2e7d32;">Von:</strong>
-                <select class="p-from-m" style="padding:5px; font-size:0.8rem; border-radius:4px; border:1px solid #ddd;">${monthOptionsHTML}</select>
-                <select class="p-from-y" style="padding:5px; font-size:0.8rem; border-radius:4px; border:1px solid #ddd;">${getYearOptionsHTML(fromY)}</select>
+                <select class="p-from-m" style="padding:5px; font-size:0.8rem; border-radius:4px; border:1px solid #ddd;">${getMonthOptionsHTML(fromM, fromY)}</select>
+                <select class="p-from-y" style="padding:5px; font-size:0.8rem; border-radius:4px; border:1px solid #ddd;" onchange="handlePeriodYearChange('${rowId}')">${getYearOptionsHTML(fromY)}</select>
             </div>
             <div style="display:flex; gap:6px; align-items:center;">
                 <strong style="font-size:0.8rem; color:#2e7d32;">Bis:</strong>
-                <select class="p-to-m" style="padding:5px; font-size:0.8rem; border-radius:4px; border:1px solid #ddd;">${monthOptionsHTML}</select>
+                <select class="p-to-m" style="padding:5px; font-size:0.8rem; border-radius:4px; border:1px solid #ddd;">${getMonthOptionsHTML(toM, toY)}</select>
                 <select class="p-to-y" style="padding:5px; font-size:0.8rem; border-radius:4px; border:1px solid #ddd;">${getYearOptionsHTML(toY)}</select>
             </div>
+            <label style="font-size:0.8rem; cursor:pointer; display:flex; align-items:center; gap:4px; color:#555;">
+                <input type="checkbox" class="p-uncertain" ${isUncertain ? 'checked' : ''}> Unsicher
+            </label>
             <button type="button" onclick="removePeriodRow('${rowId}')" style="background:#ff7675; color:white; border:none; border-radius:4px; padding:4px 8px; cursor:pointer; font-size:0.75rem; margin-left:auto;" title="Zeitraum entfernen">
                 <i class="fas fa-trash"></i>
             </button>
         `;
 
         container.appendChild(row);
-        row.querySelector('.p-from-m').value = String(fromM);
-        row.querySelector('.p-to-m').value = String(toM);
     }
 
     function removePeriodRow(rowId) {
@@ -500,6 +558,23 @@
         } else {
             alert("Mindestens ein Zeitraum muss bestehen bleiben.");
         }
+    }
+
+    function selectCategory(cat) {
+        const catSelect = document.getElementById('categoryInput');
+        if (catSelect) {
+            catSelect.value = cat;
+            updateFormDynamics();
+        }
+    }
+
+    // Automatische Übernahme der Gesamtgiftigkeit auf alle Pflanzenteile
+    function syncOverallToxicityToParts() {
+        const toxicVal = document.getElementById('toxicInput').value;
+        Object.keys(plantParts).forEach(key => {
+            const el = document.getElementById(`part_toxic_${key}`);
+            if (el) el.value = toxicVal;
+        });
     }
 
     function showSection(id) {
@@ -582,7 +657,9 @@
         const formTitle = document.getElementById('formTitle');
         if (formTitle) formTitle.innerText = "Neuer Eintrag";
         
-        ['titleInput', 'scienceInput', 'subInput', 'locInput', 'imgInput', 'descInput', 'originInput'].forEach(i => {
+        selectCategory('flora');
+
+        ['titleInput', 'familyInput', 'genusInput', 'epithetonInput', 'scienceInput', 'subInput', 'locInput', 'imgInput', 'descInput', 'originInput'].forEach(i => {
             const el = document.getElementById(i);
             if (el) el.value = "";
         });
@@ -618,20 +695,54 @@
 
     function updateFormDynamics() {
         const catEl = document.getElementById('categoryInput');
-        const originEl = document.getElementById('originInput');
-        if (!catEl || !originEl) return;
+        if (!catEl) return;
         
         const cat = catEl.value;
-        const origin = originEl.value;
+        const originEl = document.getElementById('originInput');
+        const origin = originEl ? originEl.value : "";
+
+        const typeBtnFlora = document.getElementById('typeBtnFlora');
+        const typeBtnFauna = document.getElementById('typeBtnFauna');
+        if (typeBtnFlora && typeBtnFauna) {
+            if (cat === 'flora') {
+                typeBtnFlora.className = 'filter-btn active';
+                typeBtnFlora.style.background = '#81c784';
+                typeBtnFlora.style.color = 'white';
+                typeBtnFlora.style.borderColor = '#81c784';
+
+                typeBtnFauna.className = 'filter-btn';
+                typeBtnFauna.style.background = '#f0f0f0';
+                typeBtnFauna.style.color = '#555';
+                typeBtnFauna.style.borderColor = '#e0e0e0';
+            } else {
+                typeBtnFauna.className = 'filter-btn active';
+                typeBtnFauna.style.background = '#ffb74d';
+                typeBtnFauna.style.color = 'white';
+                typeBtnFauna.style.borderColor = '#ffb74d';
+
+                typeBtnFlora.className = 'filter-btn';
+                typeBtnFlora.style.background = '#f0f0f0';
+                typeBtnFlora.style.color = '#555';
+                typeBtnFlora.style.borderColor = '#e0e0e0';
+            }
+        }
+
+        const subInputLabel = document.getElementById('subInputLabel');
+        const wuchsSectionTitle = document.getElementById('wuchsSectionTitle');
+        const familyGroup = document.getElementById('familyGroup');
+        const genusGroup = document.getElementById('genusGroup');
+        const epithetonGroup = document.getElementById('epithetonGroup');
+        const originGroup = document.getElementById('originGroup');
         const freqGroup = document.getElementById('freqGroup');
         const freqSelect = document.getElementById('freqInput');
-        const originGroup = document.getElementById('originGroup');
-        const toxicGroup = document.getElementById('toxicGroup');
+        const toxicSection = document.getElementById('toxicSection');
         const timeBlock = document.getElementById('timeBlock');
         const proConGroup = document.getElementById('proConGroup');
         const partsGroup = document.getElementById('partsGroup');
         const floraPeriodGroup = document.getElementById('floraPeriodGroup');
-        
+        const bezeichnungFields = document.getElementById('bezeichnungFields');
+        const nameInputLabel = document.getElementById('nameInputLabel');
+
         if (freqSelect) {
             freqSelect.innerHTML = '<option value="">-- Keine Angabe --</option>';
             const options = (cat === 'fauna') ? freqFauna : freqFlora;
@@ -641,8 +752,17 @@
         }
 
         if (cat === 'flora') {
+            if (subInputLabel) subInputLabel.innerText = "Wuchsform";
+            if (wuchsSectionTitle) wuchsSectionTitle.innerText = "Wuchsform & Standort";
+            if (nameInputLabel) nameInputLabel.innerText = "Name (Trivialname)";
+            
+            if (bezeichnungFields) bezeichnungFields.className = "editor-row-4";
+            if (familyGroup) familyGroup.style.display = 'block';
+            if (genusGroup) genusGroup.style.display = 'block';
+            if (epithetonGroup) epithetonGroup.style.display = 'block';
+
             if (originGroup) originGroup.style.display = 'block';
-            if (toxicGroup) toxicGroup.style.display = 'block';
+            if (toxicSection) toxicSection.style.display = 'block';
             if (timeBlock) timeBlock.style.display = 'none';
             if (proConGroup) proConGroup.style.display = 'block';
             if (partsGroup) partsGroup.style.display = 'block';
@@ -650,8 +770,17 @@
 
             if (freqGroup) freqGroup.style.display = (origin === 'Wildwuchs') ? 'block' : 'none';
         } else {
+            if (subInputLabel) subInputLabel.innerText = "Unterkategorie";
+            if (wuchsSectionTitle) wuchsSectionTitle.innerText = "Kategorie & Standort";
+            if (nameInputLabel) nameInputLabel.innerText = "Name";
+
+            if (bezeichnungFields) bezeichnungFields.className = "editor-row-2";
+            if (familyGroup) familyGroup.style.display = 'none';
+            if (genusGroup) genusGroup.style.display = 'none';
+            if (epithetonGroup) epithetonGroup.style.display = 'none';
+
             if (originGroup) originGroup.style.display = 'none';
-            if (toxicGroup) toxicGroup.style.display = 'none';
+            if (toxicSection) toxicSection.style.display = 'none';
             if (freqGroup) freqGroup.style.display = 'block';
             if (timeBlock) timeBlock.style.display = 'block';
             if (proConGroup) proConGroup.style.display = 'none';
@@ -686,7 +815,7 @@
 
     async function saveEntry() {
         const cat = document.getElementById('categoryInput').value;
-        const origin = document.getElementById('originInput').value;
+        const origin = document.getElementById('originInput') ? document.getElementById('originInput').value : '';
         const imgVal = document.getElementById('imgInput').value;
         const descVal = document.getElementById('descInput').value;
         
@@ -724,12 +853,14 @@
                 const fY = row.querySelector('.p-from-y');
                 const tM = row.querySelector('.p-to-m');
                 const tY = row.querySelector('.p-to-y');
+                const pUnc = row.querySelector('.p-uncertain');
                 if (fM && fY && tM && tY) {
                     periodsData.push({
                         fromMonth: fM.value,
                         fromYear: fY.value,
                         toMonth: tM.value,
-                        toYear: tY.value
+                        toYear: tY.value,
+                        uncertain: pUnc ? pUnc.checked : false
                     });
                 }
             });
@@ -738,13 +869,33 @@
         const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ""; };
         const getChk = (id) => { const el = document.getElementById(id); return el ? el.checked : false; };
 
-        const firstP = periodsData.length > 0 ? periodsData : { fromYear: '2019', fromMonth: '1', toYear: '2027', toMonth: '12' };
+        // Wissenschaftlichen Namen aus Gattung, Artepitheton & Familie zusammensetzen
+        const fam = getVal('familyInput').trim();
+        const gen = getVal('genusInput').trim();
+        const epi = getVal('epithetonInput').trim();
+        
+        let compiledScience = "";
+        if (cat === 'flora') {
+            if (gen || epi) {
+                compiledScience = `${gen} ${epi}`.trim();
+                if (fam) compiledScience += ` (${fam})`;
+            } else if (fam) {
+                compiledScience = fam;
+            }
+        } else {
+            compiledScience = getVal('scienceInput');
+        }
+
+        const firstP = periodsData.length > 0 ? periodsData : { fromYear: '2019', fromMonth: '9', toYear: '2027', toMonth: '12', uncertain: false };
 
         const entry = {
             category: cat,
             subcategory: getVal('subInput') || 'Unsortiert',
             title: getVal('titleInput'),
-            science: getVal('scienceInput'),
+            science: compiledScience,
+            family: fam,
+            genus: gen,
+            epitheton: epi,
             frequency: (cat === 'flora' && origin !== 'Wildwuchs') ? '-' : (getVal('freqInput') || '-'),
             origin: cat === 'flora' ? (origin || '-') : '',
             toxic: cat === 'flora' ? getVal('toxicInput') : '',
@@ -753,7 +904,7 @@
             timevalue: timeDisplay,
             flora_periods: cat === 'flora' ? periodsData : [],
             flora_from_year: cat === 'flora' ? firstP.fromYear : '2019',
-            flora_from_month: cat === 'flora' ? firstP.fromMonth : '1',
+            flora_from_month: cat === 'flora' ? firstP.fromMonth : '9',
             flora_to_year: cat === 'flora' ? firstP.toYear : '2027',
             flora_to_month: cat === 'flora' ? firstP.toMonth : '12',
             img: imgVal || 'https://via.placeholder.com/150?text=Kein+Bild',
@@ -988,41 +1139,46 @@
         if (!Array.isArray(periods) || periods.length === 0) {
             periods = [{
                 fromYear: e.flora_from_year || '2019',
-                fromMonth: e.flora_from_month || '1',
+                fromMonth: e.flora_from_month || '9',
                 toYear: e.flora_to_year || '2027',
-                toMonth: e.flora_to_month || '12'
+                toMonth: e.flora_to_month || '12',
+                uncertain: false
             }];
         }
 
         const monthNames = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
-        const startAxis = 2019.0;
-        const totalYears = 9.0;
+        // Statische Achse: Sep 2019 bis Dez 2027 (8.33 Jahre Span)
+        const startAxis = 2019.0 + (8.0 / 12.0); // 2019 + Sep
+        const endAxis = 2028.0; // Ende 2027 / Jan 2028
+        const totalSpan = endAxis - startAxis;
 
         let barsHTML = "";
         let periodTexts = [];
 
         periods.forEach(p => {
             const fromY = parseInt(p.fromYear || '2019', 10);
-            const fromM = parseInt(p.fromMonth || '1', 10);
+            const fromM = parseInt(p.fromMonth || '9', 10);
             const toY = parseInt(p.toYear || '2027', 10);
             const toM = parseInt(p.toMonth || '12', 10);
+            const isUncertain = !!p.uncertain;
 
             let fromStr = (fromM > 0 && fromM <= 12) ? `${monthNames[fromM - 1]} ${fromY}` : `${fromY}`;
             let toStr = (toM > 0 && toM <= 12) ? `${monthNames[toM - 1]} ${toY}` : `${toY}`;
-            periodTexts.push(`${fromStr} – ${toStr}`);
+            periodTexts.push(`${fromStr} – ${toStr}${isUncertain ? ' (Unsicher)' : ''}`);
 
-            const valFrom = Math.max(startAxis, Math.min(2028.0, fromY + (fromM - 1) / 12));
-            const valTo = Math.max(startAxis, Math.min(2028.0, toY + toM / 12));
+            const valFrom = Math.max(startAxis, Math.min(endAxis, fromY + (fromM - 1) / 12));
+            const valTo = Math.max(startAxis, Math.min(endAxis, toY + toM / 12));
 
-            let leftPct = ((valFrom - startAxis) / totalYears) * 100;
-            let widthPct = ((valTo - valFrom) / totalYears) * 100;
+            let leftPct = ((valFrom - startAxis) / totalSpan) * 100;
+            let widthPct = ((valTo - valFrom) / totalSpan) * 100;
 
             if (leftPct < 0) leftPct = 0;
             if (leftPct > 100) leftPct = 95;
             if (widthPct < 2) widthPct = 2;
             if (leftPct + widthPct > 100) widthPct = 100 - leftPct;
 
-            barsHTML += `<div class="timeline-bar" style="left: ${leftPct.toFixed(1)}%; width: ${widthPct.toFixed(1)}%;"></div>`;
+            const uncertainClass = isUncertain ? 'uncertain' : '';
+            barsHTML += `<div class="timeline-bar ${uncertainClass}" style="left: ${leftPct.toFixed(1)}%; width: ${widthPct.toFixed(1)}%;"></div>`;
         });
 
         return `
@@ -1035,7 +1191,7 @@
                     ${barsHTML}
                 </div>
                 <div class="timeline-labels">
-                    <span>2019</span>
+                    <span>Sep 2019</span>
                     <span>2021</span>
                     <span>2023</span>
                     <span>2025</span>
@@ -1127,6 +1283,8 @@
                 ? (e.img || 'https://via.placeholder.com/150?text=Kein+Bild') 
                 : 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
+            const catLabel = e.category === 'flora' ? 'FLORA' : 'FAUNA';
+
             wrapper.innerHTML = `
                 ${outerIcon}
                 <div class="entry-item" data-category="${e.category || 'flora'}" onclick="toggleCardExpand(${e.id}, this, event)" style="border-left: 8px solid ${getCardBorderColor(e)}; margin-bottom: 0;">
@@ -1140,7 +1298,7 @@
                                 ${toxicIcons}
                                 ${featureBadgesHTML}
                                 <div class="entry-meta">
-                                    <span>${(e.category || 'flora').toUpperCase()} | ${e.subcategory || 'Unsortiert'}${statusLabel} ${confidenceIcon}</span>
+                                    <span>${catLabel} | ${e.subcategory || 'Unsortiert'}${statusLabel} ${confidenceIcon}</span>
                                 </div>
                                 <div class="entry-title">${e.title || 'Unbekannt'} <span style="font-style:italic; font-size:0.75rem; color:#666;">${e.science || ''}</span></div>
                                 <div class="entry-details">
@@ -1169,7 +1327,8 @@
         editId = id;
         
         const formTitle = document.getElementById('formTitle'); if (formTitle) formTitle.innerText = "Bearbeiten";
-        const catInput = document.getElementById('categoryInput'); if (catInput) catInput.value = e.category;
+        selectCategory(e.category);
+        
         const origInput = document.getElementById('originInput'); if (origInput) origInput.value = e.origin || "";
         
         updateFormDynamics();
@@ -1182,7 +1341,11 @@
 
         setVal('subInput', e.subcategory);
         setVal('titleInput', e.title);
-        setVal('scienceInput', e.science);
+        setVal('familyInput', e.family || "");
+        setVal('genusInput', e.genus || "");
+        setVal('epithetonInput', e.epitheton || "");
+        setVal('scienceInput', e.science || "");
+
         setVal('freqInput', (e.frequency === '-') ? "" : e.frequency);
         if (e.toxic) setVal('toxicInput', e.toxic);
         setVal('confInput', e.confidence);
@@ -1199,9 +1362,10 @@
             if (!Array.isArray(periods) || periods.length === 0) {
                 periods = [{
                     fromYear: e.flora_from_year || '2019',
-                    fromMonth: e.flora_from_month || '1',
+                    fromMonth: e.flora_from_month || '9',
                     toYear: e.flora_to_year || '2027',
-                    toMonth: e.flora_to_month || '12'
+                    toMonth: e.flora_to_month || '12',
+                    uncertain: false
                 }];
             }
             periods.forEach(p => addPeriodRow(p));
