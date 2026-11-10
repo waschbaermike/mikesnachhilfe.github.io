@@ -508,7 +508,6 @@
       border-color: var(--accent-voc);
     }
 
-    /* Custom Checkbox für Verstecken */
     .checkbox-row {
       display: flex;
       align-items: center;
@@ -580,6 +579,12 @@
           <span class="filter-label">Thema</span>
           <div class="filter-tags">
             <button class="filter-btn tag-filter active" onclick="filterTag('all', this)">Alle Themen</button>
+            <button class="filter-btn tag-filter" onclick="filterTag('self', this)">🙋 Self / Ich</button>
+            <button class="filter-btn tag-filter" onclick="filterTag('person', this)">🧑 Person</button>
+            <button class="filter-btn tag-filter" onclick="filterTag('trait', this)">⭐ Trait</button>
+            <button class="filter-btn tag-filter" onclick="filterTag('size', this)">📏 Size</button>
+            <button class="filter-btn tag-filter" onclick="filterTag('quantity', this)">🔢 Quantity</button>
+            <button class="filter-btn tag-filter" onclick="filterTag('feeling', this)">❤️ Feeling</button>
             <button class="filter-btn tag-filter" onclick="filterTag('language', this)">📝 Language</button>
             <button class="filter-btn tag-filter" onclick="filterTag('shopping', this)">🛒 Shopping & Money</button>
             <button class="filter-btn tag-filter" onclick="filterTag('school', this)">📚 School & Education</button>
@@ -688,6 +693,12 @@
         <div class="form-group">
           <label>Themen (Mehrfachauswahl möglich)</label>
           <div class="pill-checkbox-grid">
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="self"><span class="pill-checkbox-label">🙋 Self / Ich</span></label>
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="person"><span class="pill-checkbox-label">🧑 Person</span></label>
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="trait"><span class="pill-checkbox-label">⭐ Trait</span></label>
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="size"><span class="pill-checkbox-label">📏 Size</span></label>
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="quantity"><span class="pill-checkbox-label">🔢 Quantity</span></label>
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="feeling"><span class="pill-checkbox-label">❤️ Feeling</span></label>
             <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="language"><span class="pill-checkbox-label">📝 Language</span></label>
             <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="shopping"><span class="pill-checkbox-label">🛒 Shopping & Money</span></label>
             <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="school"><span class="pill-checkbox-label">📚 School</span></label>
@@ -747,6 +758,12 @@
 
     // Tag Icons Mapping
     const tagIcons = {
+      self: '🙋',
+      person: '🧑',
+      trait: '⭐',
+      size: '📏',
+      quantity: '🔢',
+      feeling: '❤️',
       language: '📝',
       shopping: '🛒',
       school: '📚',
@@ -774,7 +791,7 @@
       { id: '1', word: 'Sentence', type: 'noun', tag: 'language', translation: 'der Satz', example: '"Every sentence requires a subject and a verb."', is_hidden: false },
       { id: '2', word: 'Context', type: 'noun', tag: 'language', translation: 'der Kontext / Zusammenhang', example: '"Learn vocabulary in context for better retention."', is_hidden: false },
       { id: '3', word: 'Memorize', type: 'verb', tag: 'mentality', translation: 'sich merken / einprägen', example: '"Practice daily to memorize new words quickly."', is_hidden: false },
-      { id: '4', word: 'Concise', type: 'adjective', tag: 'language', translation: 'präzise / prägnant', example: '"Keep your explanations clear and concise."', is_hidden: false },
+      { id: '4', word: 'Concise', type: 'adjective', tag: 'language,trait', translation: 'präzise / prägnant', example: '"Keep your explanations clear and concise."', is_hidden: false },
       { id: '5', word: 'Hidden Gem', type: 'noun,adjective', tag: 'general,mentality', translation: 'versteckter Schatz', example: '"This feature was hidden."', is_hidden: true }
     ];
 
@@ -925,7 +942,6 @@
         example = `"${example}"`;
       }
 
-      // Ausgewählte Types & Tags sammeln (als Komma-getrennter String für Supabase-Kompatibilität)
       const selectedTypes = Array.from(document.querySelectorAll('input[name="vocTypes"]:checked')).map(cb => cb.value);
       const selectedTags = Array.from(document.querySelectorAll('input[name="vocTags"]:checked')).map(cb => cb.value);
 
@@ -1041,16 +1057,9 @@
         const itemTags = parseCommaArray(row.dataset.tags);
         const isHiddenItem = row.dataset.hidden === 'true';
 
-        // Filter 1: Versteckt Check
         const hiddenMatch = showHidden || !isHiddenItem;
-
-        // Filter 2: Word Type Match
         const typeMatch = (currentWordType === 'all' || itemTypes.includes(currentWordType));
-
-        // Filter 3: Tag Match
         const tagMatch = (currentTagFilter === 'all' || itemTags.includes(currentTagFilter));
-
-        // Filter 4: Search Match
         const searchMatch = searchTerm === '' || wordTitle.includes(searchTerm);
 
         if (hiddenMatch && typeMatch && tagMatch && searchMatch) {
