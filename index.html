@@ -69,7 +69,7 @@
       margin: 0 auto;
     }
 
-    /* AUTOMATISCHE SMARTPHONE-ERKENNUNG & ANPASSUNG */
+    /* Smartphone-Optimierung */
     @media (max-width: 640px) {
       body {
         padding: 0.75rem 0.5rem;
@@ -81,77 +81,13 @@
         max-width: 100%;
       }
 
-      header {
-        margin-bottom: 1.25rem;
-      }
-
-      header h1 {
-        font-size: 2.1rem !important;
-      }
-
-      header p {
-        font-size: 1.1rem !important;
-      }
-
-      .subpage-title {
-        font-size: 1.55rem !important;
-      }
-
-      .search-bar {
-        font-size: 1.15rem !important;
-        padding: 1.1rem 1.25rem !important;
-        border-radius: 14px !important;
-      }
-
-      .filter-btn {
-        font-size: 1.05rem !important;
-        padding: 0.65rem 1.25rem !important;
-        min-height: 46px !important;
-      }
-
-      .list-row {
-        padding: 1.25rem 1.25rem !important;
-        border-radius: 16px !important;
-      }
-
-      .word-title {
-        font-size: 1.4rem !important;
-      }
-
-      .translation-text {
-        font-size: 1.2rem !important;
-      }
-
-      .example-text {
-        font-size: 1.05rem !important;
-        padding: 0.75rem 0.9rem !important;
-      }
-
-      .big-nav-btn {
-        padding: 2.75rem 1.5rem !important;
-        min-height: 150px !important;
-      }
-
-      .btn-badge {
-        font-size: 3.2rem !important;
-      }
-
-      .btn-subtitle {
-        font-size: 1.15rem !important;
-      }
-
-      .back-btn, .action-btn {
-        font-size: 1.05rem !important;
-        padding: 0.75rem 1.2rem !important;
-        min-height: 48px !important;
-        border-radius: 12px !important;
-      }
-
-      .icon-btn {
-        font-size: 1rem !important;
-        padding: 0.6rem 1rem !important;
-        min-height: 44px !important;
-      }
+      header h1 { font-size: 2.1rem !important; }
+      header p { font-size: 1.1rem !important; }
+      .subpage-title { font-size: 1.55rem !important; }
+      .search-bar { font-size: 1.15rem !important; padding: 1.1rem 1.25rem !important; }
+      .word-title { font-size: 1.4rem !important; }
+      .translation-text { font-size: 1.2rem !important; }
+      .example-text { font-size: 1.05rem !important; }
     }
 
     header {
@@ -188,7 +124,7 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Startseiten Navigation (VOC & GRA) */
+    /* Startseiten Navigation */
     .main-nav-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -213,13 +149,9 @@
       min-height: 130px;
     }
 
-    .big-nav-btn:active {
-      transform: scale(0.98);
-    }
-
+    .big-nav-btn:active { transform: scale(0.98); }
     .big-nav-btn.voc-btn { border-color: #bfdbfe; }
     .big-nav-btn.voc-btn:hover { border-color: var(--accent-voc); background: var(--accent-voc-light); }
-
     .big-nav-btn.gra-btn { border-color: #fde68a; }
     .big-nav-btn.gra-btn:hover { border-color: var(--accent-gra); background: var(--accent-gra-light); }
 
@@ -232,12 +164,7 @@
 
     .voc-btn .btn-badge { color: var(--accent-voc); }
     .gra-btn .btn-badge { color: var(--accent-gra); }
-
-    .btn-subtitle {
-      color: var(--text-muted);
-      font-size: 1.05rem;
-      font-weight: 600;
-    }
+    .btn-subtitle { color: var(--text-muted); font-size: 1.05rem; font-weight: 600; }
 
     /* Unterseiten Header & Controls */
     .subpage-header {
@@ -248,10 +175,7 @@
       gap: 0.5rem;
     }
 
-    .header-actions {
-      display: flex;
-      gap: 0.5rem;
-    }
+    .header-actions { display: flex; gap: 0.5rem; }
 
     .back-btn, .action-btn {
       background: var(--card-bg);
@@ -269,20 +193,9 @@
       min-height: 44px;
     }
 
-    .back-btn:active, .action-btn:active {
-      transform: scale(0.96);
-    }
-
-    .add-btn {
-      background: var(--accent-voc);
-      color: white;
-      border: 1px solid var(--accent-voc);
-    }
-
-    .subpage-title {
-      font-size: 1.4rem;
-      font-weight: 800;
-    }
+    .back-btn:active, .action-btn:active { transform: scale(0.96); }
+    .add-btn { background: var(--accent-voc); color: white; border: 1px solid var(--accent-voc); }
+    .subpage-title { font-size: 1.4rem; font-weight: 800; }
 
     /* Search & Filter Section */
     .search-section {
@@ -309,32 +222,44 @@
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
     }
 
-    /* Filter Buttons (Worttypen) - Wischbar ohne Scrollbar */
+    /* Multi-Filter Rows */
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .filter-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+    }
+
     .filter-tags {
       display: flex;
-      gap: 0.5rem;
+      gap: 0.45rem;
       overflow-x: auto;
       padding-bottom: 0.35rem;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
     }
 
-    .filter-tags::-webkit-scrollbar {
-      display: none;
-    }
+    .filter-tags::-webkit-scrollbar { display: none; }
 
     .filter-btn {
-      padding: 0.55rem 1.1rem;
+      padding: 0.45rem 1rem;
       border: 1.5px solid var(--border);
       border-radius: 9999px;
       background: var(--card-bg);
       color: var(--text-muted);
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       font-weight: 700;
       cursor: pointer;
       white-space: nowrap;
       transition: all 0.15s;
-      min-height: 42px;
+      min-height: 40px;
     }
 
     .filter-btn.active, .filter-btn:active {
@@ -343,7 +268,13 @@
       border-color: var(--accent-voc);
     }
 
-    /* Listenansicht & Accordion (Mobile First) */
+    .filter-btn.tag-filter.active {
+      background: #0f172a;
+      color: white;
+      border-color: #0f172a;
+    }
+
+    /* Listenansicht & Accordion */
     .list-container {
       display: flex;
       flex-direction: column;
@@ -362,26 +293,26 @@
     }
 
     /* Sanfte Farbindikatoren je Worttyp */
-    .list-row[data-type="noun"] {
-      background-color: var(--noun-bg);
-      border-color: var(--noun-border);
-    }
-
-    .list-row[data-type="verb"] {
-      background-color: var(--verb-bg);
-      border-color: var(--verb-border);
-    }
-
-    .list-row[data-type="adjective"] {
-      background-color: var(--adj-bg);
-      border-color: var(--adj-border);
-    }
+    .list-row[data-type="noun"] { background-color: var(--noun-bg); border-color: var(--noun-border); }
+    .list-row[data-type="verb"] { background-color: var(--verb-bg); border-color: var(--verb-border); }
+    .list-row[data-type="adjective"] { background-color: var(--adj-bg); border-color: var(--adj-border); }
 
     .list-row-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 0.5rem;
+    }
+
+    .word-title-group {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .tag-icon {
+      font-size: 1.35rem;
+      line-height: 1;
     }
 
     .word-title {
@@ -401,9 +332,7 @@
       padding-left: 0.5rem;
     }
 
-    .list-row.expanded .chevron {
-      transform: rotate(180deg);
-    }
+    .list-row.expanded .chevron { transform: rotate(180deg); }
 
     /* Einklappbarer Detailbereich */
     .list-row-details {
@@ -421,11 +350,7 @@
       animation: fadeIn 0.15s ease-in-out;
     }
 
-    .translation-text {
-      font-weight: 700;
-      font-size: 1.1rem;
-      color: var(--text-main);
-    }
+    .translation-text { font-weight: 700; font-size: 1.1rem; color: var(--text-main); }
 
     .example-text {
       font-size: 0.98rem;
@@ -464,14 +389,8 @@
       min-height: 40px;
     }
 
-    .icon-btn:active {
-      transform: scale(0.96);
-    }
-
-    .icon-btn.delete-btn {
-      color: var(--danger);
-      border-color: #fca5a5;
-    }
+    .icon-btn:active { transform: scale(0.96); }
+    .icon-btn.delete-btn { color: var(--danger); border-color: #fca5a5; }
 
     .no-results {
       text-align: center;
@@ -488,10 +407,8 @@
     /* Modal Eingabefenster */
     .modal-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
       background: rgba(15, 23, 42, 0.5);
       backdrop-filter: blur(4px);
       display: none;
@@ -501,10 +418,7 @@
       z-index: 1000;
     }
 
-    .modal-overlay.active {
-      display: flex;
-      animation: fadeIn 0.2s ease-out;
-    }
+    .modal-overlay.active { display: flex; animation: fadeIn 0.2s ease-out; }
 
     .modal-card {
       background: var(--card-bg);
@@ -520,37 +434,15 @@
       overflow-y: auto;
     }
 
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .modal-title {
-      font-size: 1.3rem;
-      font-weight: 800;
-    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; }
+    .modal-title { font-size: 1.3rem; font-weight: 800; }
 
     .close-modal-btn {
-      background: transparent;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: var(--text-muted);
-      padding: 0.25rem 0.5rem;
+      background: transparent; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); padding: 0.25rem 0.5rem;
     }
 
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
-    }
-
-    .form-group label {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--text-main);
-    }
+    .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+    .form-group label { font-size: 0.95rem; font-weight: 700; color: var(--text-main); }
 
     .form-input, .form-select {
       width: 100%;
@@ -567,12 +459,7 @@
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
     }
 
-    .modal-footer {
-      display: flex;
-      justify-content: flex-end;
-      gap: 0.75rem;
-      margin-top: 0.5rem;
-    }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 0.5rem; }
   </style>
 </head>
 <body>
@@ -611,12 +498,39 @@
       <div class="search-section">
         <input type="text" id="searchVoc" class="search-bar" placeholder="Vokabel suchen (nur Begriff)..." oninput="filterVocab()">
         
-        <!-- Worttyp-Filter Buttons -->
-        <div class="filter-tags">
-          <button class="filter-btn active" onclick="filterWordType('all', this)">Alle</button>
-          <button class="filter-btn" onclick="filterWordType('noun', this)">Nouns</button>
-          <button class="filter-btn" onclick="filterWordType('verb', this)">Verbs</button>
-          <button class="filter-btn" onclick="filterWordType('adjective', this)">Adjectives</button>
+        <!-- Filter 1: Worttyp -->
+        <div class="filter-group">
+          <span class="filter-label">Worttyp</span>
+          <div class="filter-tags">
+            <button class="filter-btn type-filter active" onclick="filterWordType('all', this)">Alle</button>
+            <button class="filter-btn type-filter" onclick="filterWordType('noun', this)">Nouns</button>
+            <button class="filter-btn type-filter" onclick="filterWordType('verb', this)">Verbs</button>
+            <button class="filter-btn type-filter" onclick="filterWordType('adjective', this)">Adjectives</button>
+          </div>
+        </div>
+
+        <!-- Filter 2: Themen-Tags -->
+        <div class="filter-group">
+          <span class="filter-label">Thema</span>
+          <div class="filter-tags">
+            <button class="filter-btn tag-filter active" onclick="filterTag('all', this)">Alle Themen</button>
+            <button class="filter-btn tag-filter" onclick="filterTag('language', this)">📝 Language</button>
+            <button class="filter-btn tag-filter" onclick="filterTag('plants', this)">🌱 Plants</button>
+            <button class="filter-btn tag-filter" onclick="filterTag('landscape', this)">🏔️ Landscape</button>
+            <button class="filter-btn tag-filter" onclick="filterTag('weather', this)">☀️ Weather</button>
+            <button class="filter-btn tag-filter" onclick="filterTag('animals', this)">🐾 Animals</button>
+            <button class="filter-btn tag-filter" onclick="filterTag('body', this)">🫀 Body</button>
+            <button class="filter-btn tag-filter" onclick="filterTag('activities', this)">🏃 Activities</button>
+            <button class="filter-btn tag-filter" onclick="filterTag('relations', this)">🤝 Relations</button>
+            <button class="filter-btn tag-filter" onclick="filterTag('clothes', this)">👕 Clothes</button>
+            <button class="filter-btn tag-filter" onclick="filterTag('society', this)">🏛️ Society</button>
+            <button class="filter-btn tag-filter" onclick="filterTag('buildings', this)">🏠 Buildings</button>
+            <button class="filter-btn tag-filter" onclick="filterTag('food', this)">🍎 Food</button>
+            <button class="filter-btn tag-filter" onclick="filterTag('travel', this)">🚗 Travel</button>
+            <button class="filter-btn tag-filter" onclick="filterTag('time', this)">⏰ Time</button>
+            <button class="filter-btn tag-filter" onclick="filterTag('emotions', this)">🧠 Emotions</button>
+            <button class="filter-btn tag-filter" onclick="filterTag('work', this)">💼 Work</button>
+          </div>
         </div>
       </div>
 
@@ -694,11 +608,34 @@
         </div>
 
         <div class="form-group">
-          <label for="vocType">Worttyp (Farb-Indikator)</label>
+          <label for="vocType">Worttyp</label>
           <select id="vocType" class="form-select">
             <option value="noun">Noun (Blau)</option>
             <option value="verb">Verb (Rot)</option>
             <option value="adjective">Adjective (Grün)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="vocTag">Themen-Tag / Gruppe</label>
+          <select id="vocTag" class="form-select">
+            <option value="language">📝 Language itself</option>
+            <option value="plants">🌱 Plants</option>
+            <option value="landscape">🏔️ Landscape</option>
+            <option value="weather">☀️ Weather</option>
+            <option value="animals">🐾 Animals</option>
+            <option value="body">🫀 Human Body</option>
+            <option value="activities">🏃 Human Activities</option>
+            <option value="relations">🤝 Human Relations</option>
+            <option value="clothes">👕 Clothes</option>
+            <option value="society">🏛️ Society</option>
+            <option value="buildings">🏠 Buildings</option>
+            <option value="food">🍎 Food & Drink</option>
+            <option value="travel">🚗 Travel & Transport</option>
+            <option value="time">⏰ Time</option>
+            <option value="emotions">🧠 Emotions & Mind</option>
+            <option value="work">💼 Work & School</option>
+            <option value="general">📦 General</option>
           </select>
         </div>
 
@@ -731,16 +668,42 @@
       db = createClient(supabaseUrl, supabaseKey);
     }
 
-    // Standard-Fallback Vokabeln
+    // Tag Icons Mapping
+    const tagIcons = {
+      language: '📝',
+      plants: '🌱',
+      landscape: '🏔️',
+      weather: '☀️',
+      animals: '🐾',
+      body: '🫀',
+      activities: '🏃',
+      relations: '🤝',
+      clothes: '👕',
+      society: '🏛️',
+      buildings: '🏠',
+      food: '🍎',
+      travel: '🚗',
+      time: '⏰',
+      emotions: '🧠',
+      work: '💼',
+      general: '📦'
+    };
+
+    function getTagIcon(tagKey) {
+      return tagIcons[tagKey] || '📦';
+    }
+
+    // Standard-Fallback Vokabeln mit Tags
     const defaultVocabs = [
-      { id: '1', word: 'Sentence', type: 'noun', translation: 'der Satz', example: '"Every sentence requires a subject and a verb."' },
-      { id: '2', word: 'Context', type: 'noun', translation: 'der Kontext / Zusammenhang', example: '"Learn vocabulary in context for better retention."' },
-      { id: '3', word: 'Memorize', type: 'verb', translation: 'sich merken / einprägen', example: '"Practice daily to memorize new words quickly."' },
-      { id: '4', word: 'Concise', type: 'adjective', translation: 'präzise / prägnant', example: '"Keep your explanations clear and concise."' }
+      { id: '1', word: 'Sentence', type: 'noun', tag: 'language', translation: 'der Satz', example: '"Every sentence requires a subject and a verb."' },
+      { id: '2', word: 'Context', type: 'noun', tag: 'language', translation: 'der Kontext / Zusammenhang', example: '"Learn vocabulary in context for better retention."' },
+      { id: '3', word: 'Memorize', type: 'verb', tag: 'emotions', translation: 'sich merken / einprägen', example: '"Practice daily to memorize new words quickly."' },
+      { id: '4', word: 'Concise', type: 'adjective', tag: 'language', translation: 'präzise / prägnant', example: '"Keep your explanations clear and concise."' }
     ];
 
     let vocabs = [];
     let currentWordType = 'all';
+    let currentTagFilter = 'all';
 
     // Vokabeln aus Supabase laden
     async function loadVocabs() {
@@ -771,16 +734,21 @@
         const row = document.createElement('div');
         row.className = 'list-row';
         row.dataset.type = item.type;
+        row.dataset.tag = item.tag || 'general';
         row.dataset.word = item.word.toLowerCase();
         row.dataset.id = item.id;
 
         row.onclick = () => toggleRow(row);
 
         const cleanTranslation = item.translation.replace(/^🇩🇪\s*/, '').replace(/^DE:\s*/i, '');
+        const icon = getTagIcon(item.tag || 'general');
 
         row.innerHTML = `
           <div class="list-row-header">
-            <span class="word-title">${escapeHtml(item.word)}</span>
+            <div class="word-title-group">
+              <span class="tag-icon" title="${item.tag}">${icon}</span>
+              <span class="word-title">${escapeHtml(item.word)}</span>
+            </div>
             <span class="chevron">▼</span>
           </div>
           <div class="list-row-details" onclick="event.stopPropagation()">
@@ -803,7 +771,6 @@
       rowElement.classList.toggle('expanded');
     }
 
-    // HTML-Escaping zur Sicherheit
     function escapeHtml(str) {
       if (!str) return '';
       return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -822,6 +789,7 @@
         document.getElementById('vocId').value = item.id;
         document.getElementById('vocWord').value = item.word;
         document.getElementById('vocType').value = item.type.toLowerCase();
+        document.getElementById('vocTag').value = item.tag || 'general';
         document.getElementById('vocTranslation').value = item.translation.replace(/^🇩🇪\s*/, '').replace(/^DE:\s*/i, '');
         document.getElementById('vocExample').value = item.example ? item.example.replace(/^"|"$/g, '') : '';
       } else {
@@ -837,12 +805,13 @@
       document.getElementById('vocModal').classList.remove('active');
     }
 
-    // Vokabel Hinzufügen / Editieren in Supabase speichern
+    // Vokabel Speichern
     async function saveVocabEntry(e) {
       e.preventDefault();
       const id = document.getElementById('vocId').value;
       const word = document.getElementById('vocWord').value.trim();
       const type = document.getElementById('vocType').value;
+      const tag = document.getElementById('vocTag').value;
       const translation = document.getElementById('vocTranslation').value.trim().replace(/^🇩🇪\s*/, '').replace(/^DE:\s*/i, '');
       let example = document.getElementById('vocExample').value.trim();
 
@@ -850,7 +819,7 @@
         example = `"${example}"`;
       }
 
-      const payload = { word, type, translation, example };
+      const payload = { word, type, tag, translation, example };
 
       if (!db) {
         alert("Supabase ist noch nicht konfiguriert. Bitte trage deine Supabase-URL und deinen API-Key ein.");
@@ -874,7 +843,7 @@
       }
     }
 
-    // Vokabel Löschen in Supabase
+    // Vokabel Löschen
     async function deleteVocab(id) {
       if (confirm('Möchtest Du diese Vokabel wirklich aus Supabase löschen?')) {
         if (!db) {
@@ -894,26 +863,23 @@
       }
     }
 
-    function editVocab(id) {
-      openVocModal(id);
-    }
+    function editVocab(id) { openVocModal(id); }
 
     // Seitensteuerung
     function navigateTo(pageId) {
-      document.querySelectorAll('.page').forEach(page => {
-        page.classList.remove('active');
-      });
+      document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
 
       const targetPage = document.getElementById(`page-${pageId}`);
-      if (targetPage) {
-        targetPage.classList.add('active');
-      }
+      if (targetPage) targetPage.classList.add('active');
 
       if (pageId === 'voc') {
         document.getElementById('searchVoc').value = '';
         currentWordType = 'all';
-        document.querySelectorAll('#page-voc .filter-btn').forEach(btn => btn.classList.remove('active'));
-        document.querySelector('#page-voc .filter-btn').classList.add('active');
+        currentTagFilter = 'all';
+        document.querySelectorAll('.type-filter').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tag-filter').forEach(btn => btn.classList.remove('active'));
+        document.querySelector('.type-filter').classList.add('active');
+        document.querySelector('.tag-filter').classList.add('active');
         filterVocab();
       } else if (pageId === 'gra') {
         document.getElementById('searchGra').value = '';
@@ -924,12 +890,20 @@
     // Worttyp-Filter ausführen
     function filterWordType(type, button) {
       currentWordType = type;
-      document.querySelectorAll('#page-voc .filter-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.type-filter').forEach(btn => btn.classList.remove('active'));
       button.classList.add('active');
       filterVocab();
     }
 
-    // Vokabel-Suche (nur Wortbegriff) + Worttyp-Filter
+    // Themen-Tag-Filter ausführen
+    function filterTag(tag, button) {
+      currentTagFilter = tag;
+      document.querySelectorAll('.tag-filter').forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+      filterVocab();
+    }
+
+    // Vokabel-Suche mit unabhängigen Worttyp- & Tag-Filtern
     function filterVocab() {
       const searchTerm = document.getElementById('searchVoc').value.toLowerCase().trim();
       const rows = document.querySelectorAll('#vocGrid .list-row');
@@ -939,11 +913,13 @@
       rows.forEach(row => {
         const wordTitle = row.dataset.word || '';
         const wordType = row.dataset.type ? row.dataset.type.toLowerCase() : '';
+        const wordTag = row.dataset.tag ? row.dataset.tag.toLowerCase() : 'general';
 
         const typeMatch = (currentWordType === 'all' || wordType === currentWordType);
+        const tagMatch = (currentTagFilter === 'all' || wordTag === currentTagFilter);
         const searchMatch = searchTerm === '' || wordTitle.includes(searchTerm);
 
-        if (typeMatch && searchMatch) {
+        if (typeMatch && tagMatch && searchMatch) {
           row.style.display = 'block';
           visibleCount++;
         } else {
@@ -974,7 +950,6 @@
       noResults.style.display = visibleCount === 0 ? 'block' : 'none';
     }
 
-    // Beim Laden der Seite initialisieren
     window.addEventListener('DOMContentLoaded', loadVocabs);
   </script>
 </body>
