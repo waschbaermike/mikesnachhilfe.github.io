@@ -23,20 +23,19 @@
       --border: #cbd5e1;
       --radius: 16px;
       --shadow: 0 4px 10px rgba(0,0,0,0.05);
-      --shadow-hover: 0 8px 20px rgba(0,0,0,0.08);
 
-      /* Worttyp-Farben */
-      --noun-bg: #eff6ff;
-      --noun-border: #93c5fd;
-      --noun-text: #1e40af;
+      /* Farben für Worttyp-Badges */
+      --badge-noun-bg: #eff6ff;
+      --badge-noun-text: #1e40af;
+      --badge-noun-border: #93c5fd;
 
-      --verb-bg: #fef2f2;
-      --verb-border: #fca5a5;
-      --verb-text: #991b1b;
+      --badge-verb-bg: #fef2f2;
+      --badge-verb-text: #991b1b;
+      --badge-verb-border: #fca5a5;
 
-      --adj-bg: #f0fdf4;
-      --adj-border: #86efac;
-      --adj-text: #166534;
+      --badge-adj-bg: #f0fdf4;
+      --badge-adj-text: #166534;
+      --badge-adj-border: #86efac;
     }
 
     * {
@@ -69,24 +68,15 @@
       margin: 0 auto;
     }
 
-    /* Smartphone-Optimierung */
     @media (max-width: 640px) {
-      body {
-        padding: 0.75rem 0.5rem;
-        font-size: 18px;
-      }
-
-      .container {
-        width: 100%;
-        max-width: 100%;
-      }
-
+      body { padding: 0.75rem 0.5rem; font-size: 18px; }
+      .container { width: 100%; max-width: 100%; }
       header h1 { font-size: 2.1rem !important; }
       header p { font-size: 1.1rem !important; }
-      .subpage-title { font-size: 1.55rem !important; }
+      .subpage-title { font-size: 1.4rem !important; }
       .search-bar { font-size: 1.15rem !important; padding: 1.1rem 1.25rem !important; }
-      .word-title { font-size: 1.4rem !important; }
-      .translation-text { font-size: 1.2rem !important; }
+      .word-title { font-size: 1.35rem !important; }
+      .translation-text { font-size: 1.15rem !important; }
       .example-text { font-size: 1.05rem !important; }
     }
 
@@ -109,22 +99,15 @@
       font-size: 1.05rem;
     }
 
-    /* Single-Page Steuerung */
-    .page {
-      display: none;
-    }
-
-    .page.active {
-      display: block;
-      animation: fadeIn 0.2s ease-in-out;
-    }
+    .page { display: none; }
+    .page.active { display: block; animation: fadeIn 0.2s ease-in-out; }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(4px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Startseiten Navigation */
+    /* Startseite */
     .main-nav-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -155,46 +138,55 @@
     .big-nav-btn.gra-btn { border-color: #fde68a; }
     .big-nav-btn.gra-btn:hover { border-color: var(--accent-gra); background: var(--accent-gra-light); }
 
-    .btn-badge {
-      font-size: 2.75rem;
-      font-weight: 900;
-      letter-spacing: 0.05em;
-      line-height: 1;
-    }
-
+    .btn-badge { font-size: 2.75rem; font-weight: 900; letter-spacing: 0.05em; line-height: 1; }
     .voc-btn .btn-badge { color: var(--accent-voc); }
     .gra-btn .btn-badge { color: var(--accent-gra); }
     .btn-subtitle { color: var(--text-muted); font-size: 1.05rem; font-weight: 600; }
 
-    /* Unterseiten Header & Controls */
+    /* Header & Controls */
     .subpage-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 1.25rem;
       gap: 0.5rem;
+      flex-wrap: wrap;
     }
 
-    .header-actions { display: flex; gap: 0.5rem; }
+    .header-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
 
     .back-btn, .action-btn {
       background: var(--card-bg);
       border: 1px solid var(--border);
-      padding: 0.65rem 1rem;
+      padding: 0.6rem 0.95rem;
       border-radius: 12px;
       cursor: pointer;
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: 600;
       color: var(--text-main);
       transition: all 0.15s;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 44px;
+      min-height: 42px;
     }
 
     .back-btn:active, .action-btn:active { transform: scale(0.96); }
     .add-btn { background: var(--accent-voc); color: white; border: 1px solid var(--accent-voc); }
+    
+    .toggle-hidden-btn {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #475569;
+    }
+
+    .toggle-hidden-btn.active {
+      background: #e2e8f0;
+      border-color: #94a3b8;
+      color: #0f172a;
+      font-weight: 700;
+    }
+
     .subpage-title { font-size: 1.4rem; font-weight: 800; }
 
     /* Search & Filter Section */
@@ -214,7 +206,6 @@
       background-color: var(--card-bg);
       box-shadow: var(--shadow);
       outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
     .search-bar:focus {
@@ -222,11 +213,10 @@
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
     }
 
-    /* Multi-Filter Rows */
     .filter-group {
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 0.4rem;
     }
 
     .filter-label {
@@ -237,6 +227,7 @@
       letter-spacing: 0.04em;
     }
 
+    /* Wischbare & per Mausrad scrollbare Filter-Zeilen */
     .filter-tags {
       display: flex;
       gap: 0.45rem;
@@ -244,12 +235,13 @@
       padding-bottom: 0.35rem;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
+      cursor: grab;
     }
 
     .filter-tags::-webkit-scrollbar { display: none; }
 
     .filter-btn {
-      padding: 0.45rem 1rem;
+      padding: 0.45rem 0.95rem;
       border: 1.5px solid var(--border);
       border-radius: 9999px;
       background: var(--card-bg);
@@ -274,7 +266,7 @@
       border-color: #0f172a;
     }
 
-    /* Listenansicht & Accordion */
+    /* Listenansicht & Accordion Cards */
     .list-container {
       display: flex;
       flex-direction: column;
@@ -287,15 +279,18 @@
       box-shadow: var(--shadow);
       cursor: pointer;
       transition: all 0.15s ease;
-      border: 2px solid var(--border);
+      border: 1.5px solid var(--border);
       background: var(--card-bg);
       user-select: none;
+      position: relative;
     }
 
-    /* Sanfte Farbindikatoren je Worttyp */
-    .list-row[data-type="noun"] { background-color: var(--noun-bg); border-color: var(--noun-border); }
-    .list-row[data-type="verb"] { background-color: var(--verb-bg); border-color: var(--verb-border); }
-    .list-row[data-type="adjective"] { background-color: var(--adj-bg); border-color: var(--adj-border); }
+    .list-row.is-hidden-item {
+      opacity: 0.75;
+      background: #f8fafc;
+      border-style: dashed;
+      border-color: #94a3b8;
+    }
 
     .list-row-header {
       display: flex;
@@ -304,14 +299,17 @@
       gap: 0.5rem;
     }
 
-    .word-title-group {
+    .word-main-info {
       display: flex;
       align-items: center;
-      gap: 0.6rem;
+      gap: 0.5rem;
+      flex-wrap: wrap;
     }
 
-    .tag-icon {
-      font-size: 1.35rem;
+    .icons-wrapper {
+      display: inline-flex;
+      gap: 0.2rem;
+      font-size: 1.25rem;
       line-height: 1;
     }
 
@@ -319,11 +317,28 @@
       font-size: 1.25rem;
       font-weight: 800;
       letter-spacing: -0.01em;
+      color: var(--text-main);
     }
 
-    .list-row[data-type="noun"] .word-title { color: var(--noun-text); }
-    .list-row[data-type="verb"] .word-title { color: var(--verb-text); }
-    .list-row[data-type="adjective"] .word-title { color: var(--adj-text); }
+    /* Worttyp Badges */
+    .type-badges-container {
+      display: flex;
+      gap: 0.3rem;
+      align-items: center;
+    }
+
+    .type-badge {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      border: 1px solid transparent;
+    }
+
+    .type-badge.noun { background: var(--badge-noun-bg); color: var(--badge-noun-text); border-color: var(--badge-noun-border); }
+    .type-badge.verb { background: var(--badge-verb-bg); color: var(--badge-verb-text); border-color: var(--badge-verb-border); }
+    .type-badge.adjective { background: var(--badge-adj-bg); color: var(--badge-adj-text); border-color: var(--badge-adj-border); }
 
     .chevron {
       font-size: 1rem;
@@ -334,7 +349,6 @@
 
     .list-row.expanded .chevron { transform: rotate(180deg); }
 
-    /* Einklappbarer Detailbereich */
     .list-row-details {
       display: none;
       margin-top: 0.85rem;
@@ -357,15 +371,11 @@
       color: #334155;
       font-style: italic;
       line-height: 1.45;
-      background: rgba(255, 255, 255, 0.75);
+      background: rgba(241, 245, 249, 0.7);
       padding: 0.65rem 0.85rem;
       border-radius: 10px;
-      border-left: 4px solid currentColor;
+      border-left: 4px solid var(--accent-voc);
     }
-
-    .list-row[data-type="noun"] .example-text { border-color: var(--noun-border); }
-    .list-row[data-type="verb"] .example-text { border-color: var(--verb-border); }
-    .list-row[data-type="adjective"] .example-text { border-color: var(--adj-border); }
 
     .row-actions {
       display: flex;
@@ -404,7 +414,7 @@
       font-weight: 500;
     }
 
-    /* Modal Eingabefenster */
+    /* Modal Formular */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0;
@@ -425,7 +435,7 @@
       border-radius: 20px;
       padding: 1.5rem;
       width: 100%;
-      max-width: 450px;
+      max-width: 480px;
       box-shadow: 0 25px 30px -5px rgba(0,0,0,0.2);
       display: flex;
       flex-direction: column;
@@ -444,7 +454,7 @@
     .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
     .form-group label { font-size: 0.95rem; font-weight: 700; color: var(--text-main); }
 
-    .form-input, .form-select {
+    .form-input {
       width: 100%;
       padding: 0.85rem 1rem;
       border: 1.5px solid var(--border);
@@ -454,9 +464,64 @@
       background: #fff;
     }
 
-    .form-input:focus, .form-select:focus {
+    .form-input:focus {
       border-color: var(--accent-voc);
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    }
+
+    /* Multi-Select Pills in Form */
+    .pill-checkbox-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .pill-checkbox-item {
+      position: relative;
+    }
+
+    .pill-checkbox-item input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 0; width: 0;
+    }
+
+    .pill-checkbox-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.45rem 0.85rem;
+      border: 1.5px solid var(--border);
+      border-radius: 9999px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s;
+    }
+
+    .pill-checkbox-item input:checked + .pill-checkbox-label {
+      background: var(--accent-voc);
+      color: white;
+      border-color: var(--accent-voc);
+    }
+
+    /* Custom Checkbox für Verstecken */
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.5rem 0;
+      cursor: pointer;
+    }
+
+    .checkbox-row input {
+      width: 1.2rem;
+      height: 1.2rem;
+      accent-color: var(--accent-voc);
+      cursor: pointer;
     }
 
     .modal-footer { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 0.5rem; }
@@ -490,6 +555,7 @@
       <div class="subpage-header">
         <h2 class="subpage-title">Vokabel-Archiv</h2>
         <div class="header-actions">
+          <button class="action-btn toggle-hidden-btn" id="toggleHiddenBtn" onclick="toggleShowHidden()">👁️ Versteckte</button>
           <button class="action-btn add-btn" onclick="openVocModal()">+ Neu</button>
           <button class="back-btn" onclick="navigateTo('home')">← Zurück</button>
         </div>
@@ -515,6 +581,10 @@
           <div class="filter-tags">
             <button class="filter-btn tag-filter active" onclick="filterTag('all', this)">Alle Themen</button>
             <button class="filter-btn tag-filter" onclick="filterTag('language', this)">📝 Language</button>
+            <button class="filter-btn tag-filter" onclick="filterTag('shopping', this)">🛒 Shopping & Money</button>
+            <button class="filter-btn tag-filter" onclick="filterTag('school', this)">📚 School & Education</button>
+            <button class="filter-btn tag-filter" onclick="filterTag('material', this)">🧱 Material</button>
+            <button class="filter-btn tag-filter" onclick="filterTag('mentality', this)">🧠 Mentality</button>
             <button class="filter-btn tag-filter" onclick="filterTag('plants', this)">🌱 Plants</button>
             <button class="filter-btn tag-filter" onclick="filterTag('landscape', this)">🏔️ Landscape</button>
             <button class="filter-btn tag-filter" onclick="filterTag('weather', this)">☀️ Weather</button>
@@ -528,7 +598,6 @@
             <button class="filter-btn tag-filter" onclick="filterTag('food', this)">🍎 Food</button>
             <button class="filter-btn tag-filter" onclick="filterTag('travel', this)">🚗 Travel</button>
             <button class="filter-btn tag-filter" onclick="filterTag('time', this)">⏰ Time</button>
-            <button class="filter-btn tag-filter" onclick="filterTag('emotions', this)">🧠 Emotions</button>
             <button class="filter-btn tag-filter" onclick="filterTag('work', this)">💼 Work</button>
           </div>
         </div>
@@ -552,7 +621,7 @@
       </div>
 
       <div class="list-container" id="graGrid">
-        <div class="list-row" style="background-color: var(--accent-gra-light); border-color: #fde68a;" onclick="toggleRow(this)">
+        <div class="list-row" onclick="toggleRow(this)">
           <div class="list-row-header">
             <span class="word-title" style="color: var(--accent-gra);">Subject-Verb Agreement</span>
             <span class="chevron">▼</span>
@@ -563,7 +632,7 @@
           </div>
         </div>
 
-        <div class="list-row" style="background-color: var(--accent-gra-light); border-color: #fde68a;" onclick="toggleRow(this)">
+        <div class="list-row" onclick="toggleRow(this)">
           <div class="list-row-header">
             <span class="word-title" style="color: var(--accent-gra);">Sentence Structure (S-V-O)</span>
             <span class="chevron">▼</span>
@@ -571,17 +640,6 @@
           <div class="list-row-details" onclick="event.stopPropagation()">
             <div class="translation-text">Standard-Satzbau: Subject + Verb + Object.</div>
             <div class="example-text">"The student (S) learns (V) grammar (O)."</div>
-          </div>
-        </div>
-
-        <div class="list-row" style="background-color: var(--accent-gra-light); border-color: #fde68a;" onclick="toggleRow(this)">
-          <div class="list-row-header">
-            <span class="word-title" style="color: var(--accent-gra);">Articles (A / An / The)</span>
-            <span class="chevron">▼</span>
-          </div>
-          <div class="list-row-details" onclick="event.stopPropagation()">
-            <div class="translation-text">'A' vor Konsonanten, 'An' vor Vokalen, 'The' für Bestimmtes.</div>
-            <div class="example-text">"a book", "an apple", "the sun"</div>
           </div>
         </div>
 
@@ -607,36 +665,49 @@
           <input type="text" id="vocWord" class="form-input" placeholder="z. B. Sentence" required>
         </div>
 
+        <!-- Multi-Select Worttypen -->
         <div class="form-group">
-          <label for="vocType">Worttyp</label>
-          <select id="vocType" class="form-select">
-            <option value="noun">Noun (Blau)</option>
-            <option value="verb">Verb (Rot)</option>
-            <option value="adjective">Adjective (Grün)</option>
-          </select>
+          <label>Worttyp (Mehrfachauswahl möglich)</label>
+          <div class="pill-checkbox-grid">
+            <label class="pill-checkbox-item">
+              <input type="checkbox" name="vocTypes" value="noun">
+              <span class="pill-checkbox-label">Noun</span>
+            </label>
+            <label class="pill-checkbox-item">
+              <input type="checkbox" name="vocTypes" value="verb">
+              <span class="pill-checkbox-label">Verb</span>
+            </label>
+            <label class="pill-checkbox-item">
+              <input type="checkbox" name="vocTypes" value="adjective">
+              <span class="pill-checkbox-label">Adjective</span>
+            </label>
+          </div>
         </div>
 
+        <!-- Multi-Select Themen-Tags -->
         <div class="form-group">
-          <label for="vocTag">Themen-Tag / Gruppe</label>
-          <select id="vocTag" class="form-select">
-            <option value="language">📝 Language itself</option>
-            <option value="plants">🌱 Plants</option>
-            <option value="landscape">🏔️ Landscape</option>
-            <option value="weather">☀️ Weather</option>
-            <option value="animals">🐾 Animals</option>
-            <option value="body">🫀 Human Body</option>
-            <option value="activities">🏃 Human Activities</option>
-            <option value="relations">🤝 Human Relations</option>
-            <option value="clothes">👕 Clothes</option>
-            <option value="society">🏛️ Society</option>
-            <option value="buildings">🏠 Buildings</option>
-            <option value="food">🍎 Food & Drink</option>
-            <option value="travel">🚗 Travel & Transport</option>
-            <option value="time">⏰ Time</option>
-            <option value="emotions">🧠 Emotions & Mind</option>
-            <option value="work">💼 Work & School</option>
-            <option value="general">📦 General</option>
-          </select>
+          <label>Themen (Mehrfachauswahl möglich)</label>
+          <div class="pill-checkbox-grid">
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="language"><span class="pill-checkbox-label">📝 Language</span></label>
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="shopping"><span class="pill-checkbox-label">🛒 Shopping & Money</span></label>
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="school"><span class="pill-checkbox-label">📚 School</span></label>
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="material"><span class="pill-checkbox-label">🧱 Material</span></label>
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="mentality"><span class="pill-checkbox-label">🧠 Mentality</span></label>
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="plants"><span class="pill-checkbox-label">🌱 Plants</span></label>
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="landscape"><span class="pill-checkbox-label">🏔️ Landscape</span></label>
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="weather"><span class="pill-checkbox-label">☀️ Weather</span></label>
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="animals"><span class="pill-checkbox-label">🐾 Animals</span></label>
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="body"><span class="pill-checkbox-label">🫀 Body</span></label>
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="activities"><span class="pill-checkbox-label">🏃 Activities</span></label>
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="relations"><span class="pill-checkbox-label">🤝 Relations</span></label>
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="clothes"><span class="pill-checkbox-label">👕 Clothes</span></label>
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="society"><span class="pill-checkbox-label">🏛️ Society</span></label>
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="buildings"><span class="pill-checkbox-label">🏠 Buildings</span></label>
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="food"><span class="pill-checkbox-label">🍎 Food</span></label>
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="travel"><span class="pill-checkbox-label">🚗 Travel</span></label>
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="time"><span class="pill-checkbox-label">⏰ Time</span></label>
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="work"><span class="pill-checkbox-label">💼 Work</span></label>
+          </div>
         </div>
 
         <div class="form-group">
@@ -648,6 +719,12 @@
           <label for="vocExample">Beispielsatz (optional)</label>
           <input type="text" id="vocExample" class="form-input" placeholder='z. B. "Every sentence requires a verb."'>
         </div>
+
+        <!-- Option: Verstecken -->
+        <label class="checkbox-row">
+          <input type="checkbox" id="vocIsHidden">
+          <span>🔒 Vokabel vorerst verstecken</span>
+        </label>
 
         <div class="modal-footer">
           <button type="button" class="back-btn" onclick="closeVocModal()">Abbrechen</button>
@@ -671,6 +748,10 @@
     // Tag Icons Mapping
     const tagIcons = {
       language: '📝',
+      shopping: '🛒',
+      school: '📚',
+      material: '🧱',
+      mentality: '🧠',
       plants: '🌱',
       landscape: '🏔️',
       weather: '☀️',
@@ -684,26 +765,23 @@
       food: '🍎',
       travel: '🚗',
       time: '⏰',
-      emotions: '🧠',
       work: '💼',
       general: '📦'
     };
 
-    function getTagIcon(tagKey) {
-      return tagIcons[tagKey] || '📦';
-    }
-
-    // Standard-Fallback Vokabeln mit Tags
+    // Fallback-Vokabeln
     const defaultVocabs = [
-      { id: '1', word: 'Sentence', type: 'noun', tag: 'language', translation: 'der Satz', example: '"Every sentence requires a subject and a verb."' },
-      { id: '2', word: 'Context', type: 'noun', tag: 'language', translation: 'der Kontext / Zusammenhang', example: '"Learn vocabulary in context for better retention."' },
-      { id: '3', word: 'Memorize', type: 'verb', tag: 'emotions', translation: 'sich merken / einprägen', example: '"Practice daily to memorize new words quickly."' },
-      { id: '4', word: 'Concise', type: 'adjective', tag: 'language', translation: 'präzise / prägnant', example: '"Keep your explanations clear and concise."' }
+      { id: '1', word: 'Sentence', type: 'noun', tag: 'language', translation: 'der Satz', example: '"Every sentence requires a subject and a verb."', is_hidden: false },
+      { id: '2', word: 'Context', type: 'noun', tag: 'language', translation: 'der Kontext / Zusammenhang', example: '"Learn vocabulary in context for better retention."', is_hidden: false },
+      { id: '3', word: 'Memorize', type: 'verb', tag: 'mentality', translation: 'sich merken / einprägen', example: '"Practice daily to memorize new words quickly."', is_hidden: false },
+      { id: '4', word: 'Concise', type: 'adjective', tag: 'language', translation: 'präzise / prägnant', example: '"Keep your explanations clear and concise."', is_hidden: false },
+      { id: '5', word: 'Hidden Gem', type: 'noun,adjective', tag: 'general,mentality', translation: 'versteckter Schatz', example: '"This feature was hidden."', is_hidden: true }
     ];
 
     let vocabs = [];
     let currentWordType = 'all';
     let currentTagFilter = 'all';
+    let showHidden = false;
 
     // Vokabeln aus Supabase laden
     async function loadVocabs() {
@@ -725,29 +803,48 @@
       }
     }
 
+    // Hilfsfunktion: Konvertiert String oder Array zu Array
+    function parseCommaArray(val) {
+      if (!val) return [];
+      if (Array.isArray(val)) return val;
+      return String(val).split(',').map(s => s.trim()).filter(Boolean);
+    }
+
     // Vokabeln im DOM anzeigen
     function renderVocabs() {
       const container = document.getElementById('vocGrid');
       container.innerHTML = '';
 
       vocabs.forEach(item => {
+        const types = parseCommaArray(item.type);
+        const tags = parseCommaArray(item.tag);
+        const isHidden = !!item.is_hidden;
+
         const row = document.createElement('div');
-        row.className = 'list-row';
-        row.dataset.type = item.type;
-        row.dataset.tag = item.tag || 'general';
+        row.className = `list-row ${isHidden ? 'is-hidden-item' : ''}`;
+        row.dataset.types = types.join(',');
+        row.dataset.tags = tags.join(',');
         row.dataset.word = item.word.toLowerCase();
         row.dataset.id = item.id;
+        row.dataset.hidden = isHidden ? 'true' : 'false';
 
         row.onclick = () => toggleRow(row);
 
         const cleanTranslation = item.translation.replace(/^🇩🇪\s*/, '').replace(/^DE:\s*/i, '');
-        const icon = getTagIcon(item.tag || 'general');
+
+        // Icons für alle gewählten Tags generieren
+        let iconsHtml = tags.map(t => tagIcons[t] || '📦').join('');
+        if (isHidden) iconsHtml = '🔒 ' + iconsHtml;
+
+        // Type Badges HTML generieren
+        const typeBadgesHtml = types.map(t => `<span class="type-badge ${t}">${t}</span>`).join('');
 
         row.innerHTML = `
           <div class="list-row-header">
-            <div class="word-title-group">
-              <span class="tag-icon" title="${item.tag}">${icon}</span>
+            <div class="word-main-info">
+              <span class="icons-wrapper">${iconsHtml}</span>
               <span class="word-title">${escapeHtml(item.word)}</span>
+              <div class="type-badges-container">${typeBadgesHtml}</div>
             </div>
             <span class="chevron">▼</span>
           </div>
@@ -766,7 +863,6 @@
       filterVocab();
     }
 
-    // Zeile einklappen / ausklappen
     function toggleRow(rowElement) {
       rowElement.classList.toggle('expanded');
     }
@@ -776,11 +872,13 @@
       return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     }
 
-    // Modal Steuerung
+    // Modal Öffnen
     function openVocModal(id = null) {
       const modal = document.getElementById('vocModal');
       const title = document.getElementById('modalVocTitle');
       const form = document.getElementById('vocForm');
+
+      form.reset();
 
       if (id) {
         const item = vocabs.find(v => String(v.id) === String(id));
@@ -788,14 +886,23 @@
         title.textContent = 'Vokabel bearbeiten';
         document.getElementById('vocId').value = item.id;
         document.getElementById('vocWord').value = item.word;
-        document.getElementById('vocType').value = item.type.toLowerCase();
-        document.getElementById('vocTag').value = item.tag || 'general';
         document.getElementById('vocTranslation').value = item.translation.replace(/^🇩🇪\s*/, '').replace(/^DE:\s*/i, '');
         document.getElementById('vocExample').value = item.example ? item.example.replace(/^"|"$/g, '') : '';
+        document.getElementById('vocIsHidden').checked = !!item.is_hidden;
+
+        const selectedTypes = parseCommaArray(item.type);
+        document.querySelectorAll('input[name="vocTypes"]').forEach(cb => {
+          cb.checked = selectedTypes.includes(cb.value);
+        });
+
+        const selectedTags = parseCommaArray(item.tag);
+        document.querySelectorAll('input[name="vocTags"]').forEach(cb => {
+          cb.checked = selectedTags.includes(cb.value);
+        });
       } else {
         title.textContent = 'Vokabel hinzufügen';
-        form.reset();
         document.getElementById('vocId').value = '';
+        document.getElementById('vocIsHidden').checked = false;
       }
 
       modal.classList.add('active');
@@ -810,16 +917,22 @@
       e.preventDefault();
       const id = document.getElementById('vocId').value;
       const word = document.getElementById('vocWord').value.trim();
-      const type = document.getElementById('vocType').value;
-      const tag = document.getElementById('vocTag').value;
       const translation = document.getElementById('vocTranslation').value.trim().replace(/^🇩🇪\s*/, '').replace(/^DE:\s*/i, '');
       let example = document.getElementById('vocExample').value.trim();
+      const is_hidden = document.getElementById('vocIsHidden').checked;
 
       if (example && !example.startsWith('"')) {
         example = `"${example}"`;
       }
 
-      const payload = { word, type, tag, translation, example };
+      // Ausgewählte Types & Tags sammeln (als Komma-getrennter String für Supabase-Kompatibilität)
+      const selectedTypes = Array.from(document.querySelectorAll('input[name="vocTypes"]:checked')).map(cb => cb.value);
+      const selectedTags = Array.from(document.querySelectorAll('input[name="vocTags"]:checked')).map(cb => cb.value);
+
+      const typeStr = selectedTypes.length > 0 ? selectedTypes.join(',') : 'noun';
+      const tagStr = selectedTags.length > 0 ? selectedTags.join(',') : 'general';
+
+      const payload = { word, type: typeStr, tag: tagStr, translation, example, is_hidden };
 
       if (!db) {
         alert("Supabase ist noch nicht konfiguriert. Bitte trage deine Supabase-URL und deinen API-Key ein.");
@@ -845,7 +958,7 @@
 
     // Vokabel Löschen
     async function deleteVocab(id) {
-      if (confirm('Möchtest Du diese Vokabel wirklich aus Supabase löschen?')) {
+      if (confirm('Möchtest Du diese Vokabel wirklich löschen?')) {
         if (!db) {
           vocabs = vocabs.filter(v => String(v.id) !== String(id));
           renderVocabs();
@@ -864,6 +977,20 @@
     }
 
     function editVocab(id) { openVocModal(id); }
+
+    // Toggle Button für Versteckte Vokabeln
+    function toggleShowHidden() {
+      showHidden = !showHidden;
+      const btn = document.getElementById('toggleHiddenBtn');
+      if (showHidden) {
+        btn.classList.add('active');
+        btn.textContent = '👁️ Versteckte an';
+      } else {
+        btn.classList.remove('active');
+        btn.textContent = '👁️ Versteckte';
+      }
+      filterVocab();
+    }
 
     // Seitensteuerung
     function navigateTo(pageId) {
@@ -887,7 +1014,6 @@
       }
     }
 
-    // Worttyp-Filter ausführen
     function filterWordType(type, button) {
       currentWordType = type;
       document.querySelectorAll('.type-filter').forEach(btn => btn.classList.remove('active'));
@@ -895,7 +1021,6 @@
       filterVocab();
     }
 
-    // Themen-Tag-Filter ausführen
     function filterTag(tag, button) {
       currentTagFilter = tag;
       document.querySelectorAll('.tag-filter').forEach(btn => btn.classList.remove('active'));
@@ -903,7 +1028,7 @@
       filterVocab();
     }
 
-    // Vokabel-Suche mit unabhängigen Worttyp- & Tag-Filtern
+    // Vokabel-Suche & Dual-Filter
     function filterVocab() {
       const searchTerm = document.getElementById('searchVoc').value.toLowerCase().trim();
       const rows = document.querySelectorAll('#vocGrid .list-row');
@@ -912,14 +1037,23 @@
 
       rows.forEach(row => {
         const wordTitle = row.dataset.word || '';
-        const wordType = row.dataset.type ? row.dataset.type.toLowerCase() : '';
-        const wordTag = row.dataset.tag ? row.dataset.tag.toLowerCase() : 'general';
+        const itemTypes = parseCommaArray(row.dataset.types);
+        const itemTags = parseCommaArray(row.dataset.tags);
+        const isHiddenItem = row.dataset.hidden === 'true';
 
-        const typeMatch = (currentWordType === 'all' || wordType === currentWordType);
-        const tagMatch = (currentTagFilter === 'all' || wordTag === currentTagFilter);
+        // Filter 1: Versteckt Check
+        const hiddenMatch = showHidden || !isHiddenItem;
+
+        // Filter 2: Word Type Match
+        const typeMatch = (currentWordType === 'all' || itemTypes.includes(currentWordType));
+
+        // Filter 3: Tag Match
+        const tagMatch = (currentTagFilter === 'all' || itemTags.includes(currentTagFilter));
+
+        // Filter 4: Search Match
         const searchMatch = searchTerm === '' || wordTitle.includes(searchTerm);
 
-        if (typeMatch && tagMatch && searchMatch) {
+        if (hiddenMatch && typeMatch && tagMatch && searchMatch) {
           row.style.display = 'block';
           visibleCount++;
         } else {
@@ -930,7 +1064,6 @@
       noResults.style.display = visibleCount === 0 ? 'block' : 'none';
     }
 
-    // Grammatik-Suche
     function filterGrammar() {
       const searchTerm = document.getElementById('searchGra').value.toLowerCase().trim();
       const rows = document.querySelectorAll('#graGrid .list-row');
@@ -950,7 +1083,22 @@
       noResults.style.display = visibleCount === 0 ? 'block' : 'none';
     }
 
-    window.addEventListener('DOMContentLoaded', loadVocabs);
+    // PC MAUSRAD HORIZONTAL SCROLL FOR FILTER TAGS
+    function initHorizontalScrollOnMouseWheel() {
+      document.querySelectorAll('.filter-tags').forEach(container => {
+        container.addEventListener('wheel', (e) => {
+          if (e.deltaY !== 0) {
+            e.preventDefault();
+            container.scrollLeft += e.deltaY;
+          }
+        }, { passive: false });
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadVocabs();
+      initHorizontalScrollOnMouseWheel();
+    });
   </script>
 </body>
 </html>
