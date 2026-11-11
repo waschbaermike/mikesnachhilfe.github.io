@@ -36,6 +36,22 @@
       --badge-adj-bg: #f0fdf4;
       --badge-adj-text: #166534;
       --badge-adj-border: #86efac;
+
+      --badge-adv-bg: #faf5ff;
+      --badge-adv-text: #6b21a8;
+      --badge-adv-border: #d8b4fe;
+
+      --badge-prep-bg: #fff7ed;
+      --badge-prep-text: #9a3412;
+      --badge-prep-border: #fed7aa;
+
+      --badge-conj-bg: #f0fdfa;
+      --badge-conj-text: #115e59;
+      --badge-conj-border: #99f6e4;
+
+      --badge-inj-bg: #fdf2f8;
+      --badge-inj-text: #9d174d;
+      --badge-inj-border: #fbcfe8;
     }
 
     * {
@@ -320,11 +336,12 @@
       color: var(--text-main);
     }
 
-    /* Worttyp Badges */
+    /* Worttyp Badges Styling */
     .type-badges-container {
       display: flex;
       gap: 0.3rem;
       align-items: center;
+      flex-wrap: wrap;
     }
 
     .type-badge {
@@ -339,6 +356,10 @@
     .type-badge.noun { background: var(--badge-noun-bg); color: var(--badge-noun-text); border-color: var(--badge-noun-border); }
     .type-badge.verb { background: var(--badge-verb-bg); color: var(--badge-verb-text); border-color: var(--badge-verb-border); }
     .type-badge.adjective { background: var(--badge-adj-bg); color: var(--badge-adj-text); border-color: var(--badge-adj-border); }
+    .type-badge.adverb { background: var(--badge-adv-bg); color: var(--badge-adv-text); border-color: var(--badge-adv-border); }
+    .type-badge.preposition { background: var(--badge-prep-bg); color: var(--badge-prep-text); border-color: var(--badge-prep-border); }
+    .type-badge.conjunction { background: var(--badge-conj-bg); color: var(--badge-conj-text); border-color: var(--badge-conj-border); }
+    .type-badge.interjection { background: var(--badge-inj-bg); color: var(--badge-inj-text); border-color: var(--badge-inj-border); }
 
     .chevron {
       font-size: 1rem;
@@ -571,6 +592,10 @@
             <button class="filter-btn type-filter" onclick="filterWordType('noun', this)">Nouns</button>
             <button class="filter-btn type-filter" onclick="filterWordType('verb', this)">Verbs</button>
             <button class="filter-btn type-filter" onclick="filterWordType('adjective', this)">Adjectives</button>
+            <button class="filter-btn type-filter" onclick="filterWordType('adverb', this)">Adverbs</button>
+            <button class="filter-btn type-filter" onclick="filterWordType('preposition', this)">Prepositions</button>
+            <button class="filter-btn type-filter" onclick="filterWordType('conjunction', this)">Conjunctions</button>
+            <button class="filter-btn type-filter" onclick="filterWordType('interjection', this)">Interjections</button>
           </div>
         </div>
 
@@ -686,6 +711,22 @@
               <input type="checkbox" name="vocTypes" value="adjective">
               <span class="pill-checkbox-label">Adjective</span>
             </label>
+            <label class="pill-checkbox-item">
+              <input type="checkbox" name="vocTypes" value="adverb">
+              <span class="pill-checkbox-label">Adverb</span>
+            </label>
+            <label class="pill-checkbox-item">
+              <input type="checkbox" name="vocTypes" value="preposition">
+              <span class="pill-checkbox-label">Preposition</span>
+            </label>
+            <label class="pill-checkbox-item">
+              <input type="checkbox" name="vocTypes" value="conjunction">
+              <span class="pill-checkbox-label">Conjunction</span>
+            </label>
+            <label class="pill-checkbox-item">
+              <input type="checkbox" name="vocTypes" value="interjection">
+              <span class="pill-checkbox-label">Interjection</span>
+            </label>
           </div>
         </div>
 
@@ -790,9 +831,10 @@
     const defaultVocabs = [
       { id: '1', word: 'Sentence', type: 'noun', tag: 'language', translation: 'der Satz', example: '"Every sentence requires a subject and a verb."', is_hidden: false },
       { id: '2', word: 'Context', type: 'noun', tag: 'language', translation: 'der Kontext / Zusammenhang', example: '"Learn vocabulary in context for better retention."', is_hidden: false },
-      { id: '3', word: 'Memorize', type: 'verb', tag: 'mentality', translation: 'sich merken / einprägen', example: '"Practice daily to memorize new words quickly."', is_hidden: false },
-      { id: '4', word: 'Concise', type: 'adjective', tag: 'language,trait', translation: 'präzise / prägnant', example: '"Keep your explanations clear and concise."', is_hidden: false },
-      { id: '5', word: 'Hidden Gem', type: 'noun,adjective', tag: 'general,mentality', translation: 'versteckter Schatz', example: '"This feature was hidden."', is_hidden: true }
+      { id: '3', word: 'Today', type: 'adverb,noun', tag: 'time', translation: 'heute', example: '"I am learning English today."', is_hidden: false },
+      { id: '4', word: 'Above', type: 'preposition,adverb', tag: 'landscape,general', translation: 'über / oberhalb', example: '"The plane flew above the clouds."', is_hidden: false },
+      { id: '5', word: 'Memorize', type: 'verb', tag: 'mentality', translation: 'sich merken / einprägen', example: '"Practice daily to memorize new words quickly."', is_hidden: false },
+      { id: '6', word: 'Concise', type: 'adjective', tag: 'language,trait', translation: 'präzise / prägnant', example: '"Keep your explanations clear and concise."', is_hidden: false }
     ];
 
     let vocabs = [];
