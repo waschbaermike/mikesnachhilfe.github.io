@@ -203,6 +203,18 @@
       font-weight: 700;
     }
 
+    .irr-verbs-btn {
+      background: #fffbeb;
+      border-color: #fde68a;
+      color: #b45309;
+    }
+
+    .practice-btn {
+      background: #f0fdf4;
+      border-color: #bbf7d0;
+      color: #15803d;
+    }
+
     .subpage-title { font-size: 1.4rem; font-weight: 800; }
 
     /* Search & Filter Section */
@@ -385,7 +397,13 @@
       animation: fadeIn 0.15s ease-in-out;
     }
 
-    .translation-text { font-weight: 700; font-size: 1.1rem; color: var(--text-main); }
+    /* Zeilenumbrüche in Übersetzung & Beispielsatz beibehalten */
+    .translation-text {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text-main);
+      white-space: pre-wrap;
+    }
 
     .example-text {
       font-size: 0.98rem;
@@ -396,6 +414,7 @@
       padding: 0.65rem 0.85rem;
       border-radius: 10px;
       border-left: 4px solid var(--accent-voc);
+      white-space: pre-wrap;
     }
 
     .row-actions {
@@ -433,6 +452,14 @@
       border: 2px dashed var(--border);
       font-size: 1.05rem;
       font-weight: 500;
+    }
+
+    /* Formular Textarea Styling */
+    .form-textarea {
+      resize: vertical;
+      min-height: 70px;
+      font-family: inherit;
+      line-height: 1.4;
     }
 
     /* Modal Formular */
@@ -575,6 +602,8 @@
       <div class="subpage-header">
         <h2 class="subpage-title">Vokabel-Archiv</h2>
         <div class="header-actions">
+          <button class="action-btn irr-verbs-btn" onclick="openIrregularVerbsModal()">⚡ Irregular Verbs</button>
+          <button class="action-btn practice-btn" onclick="openPracticeModal()">🎯 Practice</button>
           <button class="action-btn toggle-hidden-btn" id="toggleHiddenBtn" onclick="toggleShowHidden()">👁️ Versteckte</button>
           <button class="action-btn add-btn" onclick="openVocModal()">+ Neu</button>
           <button class="back-btn" onclick="navigateTo('home')">← Zurück</button>
@@ -584,51 +613,53 @@
       <div class="search-section">
         <input type="text" id="searchVoc" class="search-bar" placeholder="Vokabel suchen (nur Begriff)..." oninput="filterVocab()">
         
-        <!-- Filter 1: Worttyp -->
+        <!-- Filter 1: Worttyp (Mehrfachauswahl möglich) -->
         <div class="filter-group">
           <span class="filter-label">Worttyp</span>
           <div class="filter-tags">
-            <button class="filter-btn type-filter active" onclick="filterWordType('all', this)">Alle</button>
-            <button class="filter-btn type-filter" onclick="filterWordType('noun', this)">Nouns</button>
-            <button class="filter-btn type-filter" onclick="filterWordType('verb', this)">Verbs</button>
-            <button class="filter-btn type-filter" onclick="filterWordType('adjective', this)">Adjectives</button>
-            <button class="filter-btn type-filter" onclick="filterWordType('adverb', this)">Adverbs</button>
-            <button class="filter-btn type-filter" onclick="filterWordType('preposition', this)">Prepositions</button>
-            <button class="filter-btn type-filter" onclick="filterWordType('conjunction', this)">Conjunctions</button>
-            <button class="filter-btn type-filter" onclick="filterWordType('interjection', this)">Interjections</button>
+            <button class="filter-btn type-filter active" data-type="all" onclick="filterWordType('all', this)">Alle</button>
+            <button class="filter-btn type-filter" data-type="noun" onclick="filterWordType('noun', this)">Nouns</button>
+            <button class="filter-btn type-filter" data-type="verb" onclick="filterWordType('verb', this)">Verbs</button>
+            <button class="filter-btn type-filter" data-type="adjective" onclick="filterWordType('adjective', this)">Adjectives</button>
+            <button class="filter-btn type-filter" data-type="adverb" onclick="filterWordType('adverb', this)">Adverbs</button>
+            <button class="filter-btn type-filter" data-type="preposition" onclick="filterWordType('preposition', this)">Prepositions</button>
+            <button class="filter-btn type-filter" data-type="conjunction" onclick="filterWordType('conjunction', this)">Conjunctions</button>
+            <button class="filter-btn type-filter" data-type="interjection" onclick="filterWordType('interjection', this)">Interjections</button>
           </div>
         </div>
 
-        <!-- Filter 2: Themen-Tags -->
+        <!-- Filter 2: Themen-Tags (Mehrfachauswahl möglich) -->
         <div class="filter-group">
           <span class="filter-label">Thema</span>
           <div class="filter-tags">
-            <button class="filter-btn tag-filter active" onclick="filterTag('all', this)">Alle Themen</button>
-            <button class="filter-btn tag-filter" onclick="filterTag('self', this)">🙋 Self / Ich</button>
-            <button class="filter-btn tag-filter" onclick="filterTag('person', this)">🧑 Person</button>
-            <button class="filter-btn tag-filter" onclick="filterTag('trait', this)">⭐ Trait</button>
-            <button class="filter-btn tag-filter" onclick="filterTag('size', this)">📏 Size</button>
-            <button class="filter-btn tag-filter" onclick="filterTag('quantity', this)">🔢 Quantity</button>
-            <button class="filter-btn tag-filter" onclick="filterTag('feeling', this)">❤️ Feeling</button>
-            <button class="filter-btn tag-filter" onclick="filterTag('language', this)">📝 Language</button>
-            <button class="filter-btn tag-filter" onclick="filterTag('shopping', this)">🛒 Shopping & Money</button>
-            <button class="filter-btn tag-filter" onclick="filterTag('school', this)">📚 School & Education</button>
-            <button class="filter-btn tag-filter" onclick="filterTag('material', this)">🧱 Material</button>
-            <button class="filter-btn tag-filter" onclick="filterTag('mentality', this)">🧠 Mentality</button>
-            <button class="filter-btn tag-filter" onclick="filterTag('plants', this)">🌱 Plants</button>
-            <button class="filter-btn tag-filter" onclick="filterTag('landscape', this)">🏔️ Landscape</button>
-            <button class="filter-btn tag-filter" onclick="filterTag('weather', this)">☀️ Weather</button>
-            <button class="filter-btn tag-filter" onclick="filterTag('animals', this)">🐾 Animals</button>
-            <button class="filter-btn tag-filter" onclick="filterTag('body', this)">🫀 Body</button>
-            <button class="filter-btn tag-filter" onclick="filterTag('activities', this)">🏃 Activities</button>
-            <button class="filter-btn tag-filter" onclick="filterTag('relations', this)">🤝 Relations</button>
-            <button class="filter-btn tag-filter" onclick="filterTag('clothes', this)">👕 Clothes</button>
-            <button class="filter-btn tag-filter" onclick="filterTag('society', this)">🏛️ Society</button>
-            <button class="filter-btn tag-filter" onclick="filterTag('buildings', this)">🏠 Buildings</button>
-            <button class="filter-btn tag-filter" onclick="filterTag('food', this)">🍎 Food</button>
-            <button class="filter-btn tag-filter" onclick="filterTag('travel', this)">🚗 Travel</button>
-            <button class="filter-btn tag-filter" onclick="filterTag('time', this)">⏰ Time</button>
-            <button class="filter-btn tag-filter" onclick="filterTag('work', this)">💼 Work</button>
+            <button class="filter-btn tag-filter active" data-tag="all" onclick="filterTag('all', this)">Alle Themen</button>
+            <button class="filter-btn tag-filter" data-tag="person" onclick="filterTag('person', this)">🧑 Person</button>
+            <button class="filter-btn tag-filter" data-tag="object" onclick="filterTag('object', this)">📦 Object</button>
+            <button class="filter-btn tag-filter" data-tag="concept" onclick="filterTag('concept', this)">💡 Concept</button>
+            <button class="filter-btn tag-filter" data-tag="place" onclick="filterTag('place', this)">📍 Place</button>
+            <button class="filter-btn tag-filter" data-tag="trait" onclick="filterTag('trait', this)">⭐ Trait</button>
+            <button class="filter-btn tag-filter" data-tag="size" onclick="filterTag('size', this)">📏 Size</button>
+            <button class="filter-btn tag-filter" data-tag="quantity" onclick="filterTag('quantity', this)">🔢 Quantity</button>
+            <button class="filter-btn tag-filter" data-tag="feeling" onclick="filterTag('feeling', this)">❤️ Feeling</button>
+            <button class="filter-btn tag-filter" data-tag="language" onclick="filterTag('language', this)">📝 Language</button>
+            <button class="filter-btn tag-filter" data-tag="shopping" onclick="filterTag('shopping', this)">🛒 Shopping & Money</button>
+            <button class="filter-btn tag-filter" data-tag="school" onclick="filterTag('school', this)">📚 School & Education</button>
+            <button class="filter-btn tag-filter" data-tag="material" onclick="filterTag('material', this)">🧱 Material</button>
+            <button class="filter-btn tag-filter" data-tag="mentality" onclick="filterTag('mentality', this)">🧠 Mentality</button>
+            <button class="filter-btn tag-filter" data-tag="plants" onclick="filterTag('plants', this)">🌱 Plants</button>
+            <button class="filter-btn tag-filter" data-tag="landscape" onclick="filterTag('landscape', this)">🏔️ Landscape</button>
+            <button class="filter-btn tag-filter" data-tag="weather" onclick="filterTag('weather', this)">☀️ Weather</button>
+            <button class="filter-btn tag-filter" data-tag="animals" onclick="filterTag('animals', this)">🐾 Animals</button>
+            <button class="filter-btn tag-filter" data-tag="body" onclick="filterTag('body', this)">🫀 Body</button>
+            <button class="filter-btn tag-filter" data-tag="activities" onclick="filterTag('activities', this)">🏃 Activities</button>
+            <button class="filter-btn tag-filter" data-tag="relations" onclick="filterTag('relations', this)">🤝 Relations</button>
+            <button class="filter-btn tag-filter" data-tag="clothes" onclick="filterTag('clothes', this)">👕 Clothes</button>
+            <button class="filter-btn tag-filter" data-tag="society" onclick="filterTag('society', this)">🏛️ Society</button>
+            <button class="filter-btn tag-filter" data-tag="buildings" onclick="filterTag('buildings', this)">🏠 Buildings</button>
+            <button class="filter-btn tag-filter" data-tag="food" onclick="filterTag('food', this)">🍎 Food</button>
+            <button class="filter-btn tag-filter" data-tag="travel" onclick="filterTag('travel', this)">🚗 Travel</button>
+            <button class="filter-btn tag-filter" data-tag="time" onclick="filterTag('time', this)">⏰ Time</button>
+            <button class="filter-btn tag-filter" data-tag="work" onclick="filterTag('work', this)">💼 Work</button>
           </div>
         </div>
       </div>
@@ -734,8 +765,10 @@
         <div class="form-group">
           <label>Themen (Mehrfachauswahl möglich)</label>
           <div class="pill-checkbox-grid">
-            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="self"><span class="pill-checkbox-label">🙋 Self / Ich</span></label>
             <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="person"><span class="pill-checkbox-label">🧑 Person</span></label>
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="object"><span class="pill-checkbox-label">📦 Object</span></label>
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="concept"><span class="pill-checkbox-label">💡 Concept</span></label>
+            <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="place"><span class="pill-checkbox-label">📍 Place</span></label>
             <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="trait"><span class="pill-checkbox-label">⭐ Trait</span></label>
             <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="size"><span class="pill-checkbox-label">📏 Size</span></label>
             <label class="pill-checkbox-item"><input type="checkbox" name="vocTags" value="quantity"><span class="pill-checkbox-label">🔢 Quantity</span></label>
@@ -763,13 +796,13 @@
         </div>
 
         <div class="form-group">
-          <label for="vocTranslation">Deutsche Übersetzung</label>
-          <input type="text" id="vocTranslation" class="form-input" placeholder="z. B. der Satz" required>
+          <label for="vocTranslation">Deutsche Übersetzung (Mehrzeilig möglich)</label>
+          <textarea id="vocTranslation" class="form-input form-textarea" rows="2" placeholder="z. B. der Satz&#10;die Strafe" required></textarea>
         </div>
 
         <div class="form-group">
-          <label for="vocExample">Beispielsatz (optional)</label>
-          <input type="text" id="vocExample" class="form-input" placeholder='z. B. "Every sentence requires a verb."'>
+          <label for="vocExample">Beispielsatz (optional, mehrzeilig möglich)</label>
+          <textarea id="vocExample" class="form-input form-textarea" rows="2" placeholder='z. B. "Every sentence requires a verb."&#10;"Second example line."'></textarea>
         </div>
 
         <!-- Option: Verstecken -->
@@ -786,6 +819,22 @@
     </div>
   </div>
 
+  <!-- MODAL: FEATURE PLACEHOLDERS FOR IRREGULAR VERBS & PRACTICE -->
+  <div class="modal-overlay" id="featureModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="featureModalTitle">Feature Preview</h3>
+        <button class="close-modal-btn" onclick="closeFeatureModal()">✕</button>
+      </div>
+      <div id="featureModalContent" style="font-size: 1.05rem; line-height: 1.5; color: var(--text-main);">
+        <!-- Dynamic Feature Text -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="action-btn add-btn" onclick="closeFeatureModal()">Verstanden</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // Supabase Konfiguration
     const { createClient } = window.supabase || {};
@@ -799,8 +848,10 @@
 
     // Tag Icons Mapping
     const tagIcons = {
-      self: '🙋',
       person: '🧑',
+      object: '📦',
+      concept: '💡',
+      place: '📍',
       trait: '⭐',
       size: '📏',
       quantity: '🔢',
@@ -824,23 +875,26 @@
       travel: '🚗',
       time: '⏰',
       work: '💼',
-      general: '📦'
+      general: '📂'
     };
 
     // Fallback-Vokabeln
     const defaultVocabs = [
-      { id: '1', word: 'Sentence', type: 'noun', tag: 'language', translation: 'der Satz', example: '"Every sentence requires a subject and a verb."', is_hidden: false },
-      { id: '2', word: 'Context', type: 'noun', tag: 'language', translation: 'der Kontext / Zusammenhang', example: '"Learn vocabulary in context for better retention."', is_hidden: false },
+      { id: '1', word: 'Sentence', type: 'noun', tag: 'language,concept', translation: 'der Satz', example: '"Every sentence requires a subject and a verb."', is_hidden: false },
+      { id: '2', word: 'Context', type: 'noun', tag: 'language,concept', translation: 'der Kontext / Zusammenhang', example: '"Learn vocabulary in context for better retention."', is_hidden: false },
       { id: '3', word: 'Today', type: 'adverb,noun', tag: 'time', translation: 'heute', example: '"I am learning English today."', is_hidden: false },
-      { id: '4', word: 'Above', type: 'preposition,adverb', tag: 'landscape,general', translation: 'über / oberhalb', example: '"The plane flew above the clouds."', is_hidden: false },
+      { id: '4', word: 'Above', type: 'preposition,adverb', tag: 'place,landscape', translation: 'über / oberhalb', example: '"The plane flew above the clouds."', is_hidden: false },
       { id: '5', word: 'Memorize', type: 'verb', tag: 'mentality', translation: 'sich merken / einprägen', example: '"Practice daily to memorize new words quickly."', is_hidden: false },
-      { id: '6', word: 'Concise', type: 'adjective', tag: 'language,trait', translation: 'präzise / prägnant', example: '"Keep your explanations clear and concise."', is_hidden: false }
+      { id: '6', word: 'Concise', type: 'adjective', tag: 'language,trait', translation: 'präzise / prägnant', example: '"Keep your explanations clear and concise."', is_hidden: false },
+      { id: '7', word: 'Hidden Gem', type: 'noun,adjective', tag: 'concept,trait', translation: 'versteckter Schatz', example: '"This feature was hidden."', is_hidden: true }
     ];
 
     let vocabs = [];
-    let currentWordType = 'all';
-    let currentTagFilter = 'all';
-    let showHidden = false;
+    
+    // Multi-Select Filter States
+    let selectedWordTypes = new Set(['all']);
+    let selectedTagFilters = new Set(['all']);
+    let hiddenMode = 'none'; // 'none' | 'all' | 'only_hidden'
 
     // Vokabeln aus Supabase laden
     async function loadVocabs() {
@@ -876,7 +930,8 @@
 
       vocabs.forEach(item => {
         const types = parseCommaArray(item.type);
-        const tags = parseCommaArray(item.tag);
+        // Falls alte Vokabeln noch 'self' haben -> zu 'person' mappen
+        const tags = parseCommaArray(item.tag).map(t => t === 'self' ? 'person' : t);
         const isHidden = !!item.is_hidden;
 
         const row = document.createElement('div');
@@ -892,7 +947,7 @@
         const cleanTranslation = item.translation.replace(/^🇩🇪\s*/, '').replace(/^DE:\s*/i, '');
 
         // Icons für alle gewählten Tags generieren
-        let iconsHtml = tags.map(t => tagIcons[t] || '📦').join('');
+        let iconsHtml = tags.map(t => tagIcons[t] || '📂').join('');
         if (isHidden) iconsHtml = '🔒 ' + iconsHtml;
 
         // Type Badges HTML generieren
@@ -954,7 +1009,7 @@
           cb.checked = selectedTypes.includes(cb.value);
         });
 
-        const selectedTags = parseCommaArray(item.tag);
+        const selectedTags = parseCommaArray(item.tag).map(t => t === 'self' ? 'person' : t);
         document.querySelectorAll('input[name="vocTags"]').forEach(cb => {
           cb.checked = selectedTags.includes(cb.value);
         });
@@ -980,7 +1035,7 @@
       let example = document.getElementById('vocExample').value.trim();
       const is_hidden = document.getElementById('vocIsHidden').checked;
 
-      if (example && !example.startsWith('"')) {
+      if (example && !example.startsWith('"') && !example.includes('\n')) {
         example = `"${example}"`;
       }
 
@@ -1036,18 +1091,48 @@
 
     function editVocab(id) { openVocModal(id); }
 
-    // Toggle Button für Versteckte Vokabeln
+    // Toggle Button für Versteckte Vokabeln (3-Stufen Switch)
     function toggleShowHidden() {
-      showHidden = !showHidden;
       const btn = document.getElementById('toggleHiddenBtn');
-      if (showHidden) {
+      if (hiddenMode === 'none') {
+        hiddenMode = 'all';
         btn.classList.add('active');
-        btn.textContent = '👁️ Versteckte an';
+        btn.textContent = '👁️ Alle (incl. 🔒)';
+      } else if (hiddenMode === 'all') {
+        hiddenMode = 'only_hidden';
+        btn.classList.add('active');
+        btn.textContent = '🔒 Nur Versteckte';
       } else {
+        hiddenMode = 'none';
         btn.classList.remove('active');
         btn.textContent = '👁️ Versteckte';
       }
       filterVocab();
+    }
+
+    // Modal für Irregular Verbs & Practice Feature-Vorschau
+    function openIrregularVerbsModal() {
+      const modal = document.getElementById('featureModal');
+      document.getElementById('featureModalTitle').textContent = '⚡ Irregular Verbs Module';
+      document.getElementById('featureModalContent').innerHTML = `
+        <p><strong>Hier entsteht Deine Übersicht für unregelmäßige Verben!</strong></p>
+        <p style="margin-top:0.5rem;">Geplant sind Übersichtstabellen für Infixe, Vokalwechsel (<em>go - went - gone</em>) und schnelle Abfragetests.</p>
+      `;
+      modal.classList.add('active');
+    }
+
+    function openPracticeModal() {
+      const modal = document.getElementById('featureModal');
+      document.getElementById('featureModalTitle').textContent = '🎯 Interactive Practice Mode';
+      document.getElementById('featureModalContent').innerHTML = `
+        <p><strong>Interaktiver Karteikarten- & Abfragemodus</strong></p>
+        <p style="margin-top:0.5rem;">Hier kannst Du bald Deine gefilterten Vokabeln interaktiv üben, Verdecken-Modus nutzen und Deinen Lernfortschritt testen!</p>
+      `;
+      modal.classList.add('active');
+    }
+
+    function closeFeatureModal() {
+      document.getElementById('featureModal').classList.remove('active');
     }
 
     // Seitensteuerung
@@ -1059,12 +1144,19 @@
 
       if (pageId === 'voc') {
         document.getElementById('searchVoc').value = '';
-        currentWordType = 'all';
-        currentTagFilter = 'all';
-        document.querySelectorAll('.type-filter').forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.tag-filter').forEach(btn => btn.classList.remove('active'));
-        document.querySelector('.type-filter').classList.add('active');
-        document.querySelector('.tag-filter').classList.add('active');
+        selectedWordTypes.clear(); selectedWordTypes.add('all');
+        selectedTagFilters.clear(); selectedTagFilters.add('all');
+        hiddenMode = 'none';
+        document.getElementById('toggleHiddenBtn').classList.remove('active');
+        document.getElementById('toggleHiddenBtn').textContent = '👁️ Versteckte';
+        
+        document.querySelectorAll('.type-filter').forEach(btn => {
+          btn.classList.toggle('active', btn.getAttribute('data-type') === 'all');
+        });
+        document.querySelectorAll('.tag-filter').forEach(btn => {
+          btn.classList.toggle('active', btn.getAttribute('data-tag') === 'all');
+        });
+
         filterVocab();
       } else if (pageId === 'gra') {
         document.getElementById('searchGra').value = '';
@@ -1072,21 +1164,65 @@
       }
     }
 
+    // Multi-Select Worttyp Filter
     function filterWordType(type, button) {
-      currentWordType = type;
-      document.querySelectorAll('.type-filter').forEach(btn => btn.classList.remove('active'));
-      button.classList.add('active');
+      if (type === 'all') {
+        selectedWordTypes.clear();
+        selectedWordTypes.add('all');
+      } else {
+        selectedWordTypes.delete('all');
+        if (selectedWordTypes.has(type)) {
+          selectedWordTypes.delete(type);
+        } else {
+          selectedWordTypes.add(type);
+        }
+        if (selectedWordTypes.size === 0) {
+          selectedWordTypes.add('all');
+        }
+      }
+
+      document.querySelectorAll('.type-filter').forEach(btn => {
+        const val = btn.getAttribute('data-type');
+        if (selectedWordTypes.has('all')) {
+          btn.classList.toggle('active', val === 'all');
+        } else {
+          btn.classList.toggle('active', selectedWordTypes.has(val));
+        }
+      });
+
       filterVocab();
     }
 
+    // Multi-Select Themen-Tag Filter
     function filterTag(tag, button) {
-      currentTagFilter = tag;
-      document.querySelectorAll('.tag-filter').forEach(btn => btn.classList.remove('active'));
-      button.classList.add('active');
+      if (tag === 'all') {
+        selectedTagFilters.clear();
+        selectedTagFilters.add('all');
+      } else {
+        selectedTagFilters.delete('all');
+        if (selectedTagFilters.has(tag)) {
+          selectedTagFilters.delete(tag);
+        } else {
+          selectedTagFilters.add(tag);
+        }
+        if (selectedTagFilters.size === 0) {
+          selectedTagFilters.add('all');
+        }
+      }
+
+      document.querySelectorAll('.tag-filter').forEach(btn => {
+        const val = btn.getAttribute('data-tag');
+        if (selectedTagFilters.has('all')) {
+          btn.classList.toggle('active', val === 'all');
+        } else {
+          btn.classList.toggle('active', selectedTagFilters.has(val));
+        }
+      });
+
       filterVocab();
     }
 
-    // Vokabel-Suche & Dual-Filter
+    // Vokabel-Suche & Multi-Filter Logik
     function filterVocab() {
       const searchTerm = document.getElementById('searchVoc').value.toLowerCase().trim();
       const rows = document.querySelectorAll('#vocGrid .list-row');
@@ -1099,9 +1235,23 @@
         const itemTags = parseCommaArray(row.dataset.tags);
         const isHiddenItem = row.dataset.hidden === 'true';
 
-        const hiddenMatch = showHidden || !isHiddenItem;
-        const typeMatch = (currentWordType === 'all' || itemTypes.includes(currentWordType));
-        const tagMatch = (currentTagFilter === 'all' || itemTags.includes(currentTagFilter));
+        // 1. Hidden Mode Filter
+        let hiddenMatch = false;
+        if (hiddenMode === 'none') {
+          hiddenMatch = !isHiddenItem;
+        } else if (hiddenMode === 'all') {
+          hiddenMatch = true;
+        } else if (hiddenMode === 'only_hidden') {
+          hiddenMatch = isHiddenItem;
+        }
+
+        // 2. Type Match (at least one matching type)
+        const typeMatch = selectedWordTypes.has('all') || itemTypes.some(t => selectedWordTypes.has(t));
+
+        // 3. Tag Match (at least one matching tag)
+        const tagMatch = selectedTagFilters.has('all') || itemTags.some(t => selectedTagFilters.has(t));
+
+        // 4. Search Match
         const searchMatch = searchTerm === '' || wordTitle.includes(searchTerm);
 
         if (hiddenMatch && typeMatch && tagMatch && searchMatch) {
