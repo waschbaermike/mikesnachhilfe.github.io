@@ -203,6 +203,19 @@
       font-weight: 700;
     }
 
+    .lang-btn {
+      background: #eff6ff;
+      border-color: #bfdbfe;
+      color: #1d4ed8;
+      font-weight: 700;
+    }
+
+    .lang-btn.active {
+      background: #dbeafe;
+      border-color: #2563eb;
+      color: #1e40af;
+    }
+
     .irr-verbs-btn {
       background: #fffbeb;
       border-color: #fde68a;
@@ -213,6 +226,7 @@
       background: #f0fdf4;
       border-color: #bbf7d0;
       color: #15803d;
+      font-weight: 700;
     }
 
     .subpage-title { font-size: 1.4rem; font-weight: 800; }
@@ -397,7 +411,6 @@
       animation: fadeIn 0.15s ease-in-out;
     }
 
-    /* Zeilenumbrüche in Übersetzung & Beispielsatz beibehalten */
     .translation-text {
       font-weight: 700;
       font-size: 1.1rem;
@@ -462,7 +475,7 @@
       line-height: 1.4;
     }
 
-    /* Modal Formular */
+    /* Modal Formular & Trainer */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0;
@@ -572,6 +585,28 @@
     }
 
     .modal-footer { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 0.5rem; }
+
+    /* Practice Modal Feedback Styling */
+    .feedback-box {
+      padding: 0.85rem 1rem;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 1rem;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    .feedback-correct {
+      background: #f0fdf4;
+      color: #166534;
+      border: 1.5px solid #86efac;
+    }
+
+    .feedback-wrong {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1.5px solid #fca5a5;
+    }
   </style>
 </head>
 <body>
@@ -602,8 +637,9 @@
       <div class="subpage-header">
         <h2 class="subpage-title">Vokabel-Archiv</h2>
         <div class="header-actions">
-          <button class="action-btn irr-verbs-btn" onclick="openIrregularVerbsModal()">⚡ Irregular Verbs</button>
+          <button class="action-btn lang-btn" id="toggleLangBtn" onclick="toggleLanguage()">🇬🇧 EN → DE</button>
           <button class="action-btn practice-btn" onclick="openPracticeModal()">🎯 Practice</button>
+          <button class="action-btn irr-verbs-btn" onclick="openIrregularVerbsModal()">⚡ Irregular Verbs</button>
           <button class="action-btn toggle-hidden-btn" id="toggleHiddenBtn" onclick="toggleShowHidden()">👁️ Versteckte</button>
           <button class="action-btn add-btn" onclick="openVocModal()">+ Neu</button>
           <button class="back-btn" onclick="navigateTo('home')">← Zurück</button>
@@ -611,7 +647,7 @@
       </div>
 
       <div class="search-section">
-        <input type="text" id="searchVoc" class="search-bar" placeholder="Vokabel suchen (nur Begriff)..." oninput="filterVocab()">
+        <input type="text" id="searchVoc" class="search-bar" placeholder="Vokabel suchen (Englisch oder Deutsch)..." oninput="filterVocab()">
         
         <!-- Filter 1: Worttyp (Mehrfachauswahl möglich) -->
         <div class="filter-group">
@@ -819,7 +855,43 @@
     </div>
   </div>
 
-  <!-- MODAL: FEATURE PLACEHOLDERS FOR IRREGULAR VERBS & PRACTICE -->
+  <!-- MODAL: PRACTICE TRAINER -->
+  <div class="modal-overlay" id="practiceModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">🎯 Vokabel-Trainer</h3>
+        <button class="close-modal-btn" onclick="closePracticeModal()">✕</button>
+      </div>
+      
+      <div style="display:flex; flex-direction:column; gap:1.1rem;">
+        <div style="text-align:center; padding: 1.1rem; background: var(--bg-color); border-radius: 14px; border: 1.5px solid var(--border);">
+          <span style="font-size:0.8rem; color:var(--text-muted); font-weight:800; text-transform:uppercase; letter-spacing:0.04em;">Gesuchtes deutsches Wort</span>
+          <div id="practicePrompt" style="font-size: 1.45rem; font-weight: 800; color: var(--text-main); margin-top: 0.35rem; line-height: 1.35; white-space: pre-wrap;">-</div>
+          <div id="practiceMeta" style="font-size: 0.88rem; color: var(--text-muted); margin-top: 0.4rem; font-weight:600;"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="practiceInput">Deine englische Übersetzung:</label>
+          <input type="text" id="practiceInput" class="form-input" placeholder="Englische Vokabel eingeben..." autocomplete="off" onkeydown="handlePracticeKey(event)">
+        </div>
+
+        <div id="practiceFeedback" class="feedback-box" style="display:none;"></div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.92rem; font-weight:800; color:var(--text-muted); padding: 0 0.2rem;">
+          <span>Richtig: <span id="practiceScoreCorrect" style="color:#166534;">0</span> / <span id="practiceScoreTotal">0</span></span>
+          <span id="practiceStreak">🔥 0 Streak</span>
+        </div>
+
+        <div class="modal-footer" style="margin-top:0.2rem;">
+          <button type="button" class="back-btn" onclick="closePracticeModal()">Beenden</button>
+          <button type="button" id="practiceCheckBtn" class="action-btn add-btn" onclick="checkPracticeAnswer()">Überprüfen</button>
+          <button type="button" id="practiceNextBtn" class="action-btn add-btn" style="display:none; background:#166534; border-color:#166534;" onclick="nextPracticeVocab()">Nächste ➔</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: FEATURE PLACEHOLDER FOR IRREGULAR VERBS -->
   <div class="modal-overlay" id="featureModal">
     <div class="modal-card">
       <div class="modal-header">
@@ -895,6 +967,14 @@
     let selectedWordTypes = new Set(['all']);
     let selectedTagFilters = new Set(['all']);
     let hiddenMode = 'none'; // 'none' | 'all' | 'only_hidden'
+    let displayLang = 'en'; // 'en' | 'de'
+
+    // Practice Mode State
+    let practicePool = [];
+    let currentPracticeItem = null;
+    let scoreCorrect = 0;
+    let scoreTotal = 0;
+    let streakCount = 0;
 
     // Vokabeln aus Supabase laden
     async function loadVocabs() {
@@ -923,6 +1003,20 @@
       return String(val).split(',').map(s => s.trim()).filter(Boolean);
     }
 
+    // Sprachen-Switching Toggle
+    function toggleLanguage() {
+      displayLang = (displayLang === 'en') ? 'de' : 'en';
+      const btn = document.getElementById('toggleLangBtn');
+      if (displayLang === 'de') {
+        btn.textContent = '🇩🇪 DE → EN';
+        btn.classList.add('active');
+      } else {
+        btn.textContent = '🇬🇧 EN → DE';
+        btn.classList.remove('active');
+      }
+      renderVocabs();
+    }
+
     // Vokabeln im DOM anzeigen
     function renderVocabs() {
       const container = document.getElementById('vocGrid');
@@ -930,7 +1024,6 @@
 
       vocabs.forEach(item => {
         const types = parseCommaArray(item.type);
-        // Falls alte Vokabeln noch 'self' haben -> zu 'person' mappen
         const tags = parseCommaArray(item.tag).map(t => t === 'self' ? 'person' : t);
         const isHidden = !!item.is_hidden;
 
@@ -939,12 +1032,13 @@
         row.dataset.types = types.join(',');
         row.dataset.tags = tags.join(',');
         row.dataset.word = item.word.toLowerCase();
+        
+        const cleanTranslation = item.translation.replace(/^🇩🇪\s*/, '').replace(/^DE:\s*/i, '');
+        row.dataset.translation = cleanTranslation.toLowerCase();
         row.dataset.id = item.id;
         row.dataset.hidden = isHidden ? 'true' : 'false';
 
         row.onclick = () => toggleRow(row);
-
-        const cleanTranslation = item.translation.replace(/^🇩🇪\s*/, '').replace(/^DE:\s*/i, '');
 
         // Icons für alle gewählten Tags generieren
         let iconsHtml = tags.map(t => tagIcons[t] || '📂').join('');
@@ -953,17 +1047,21 @@
         // Type Badges HTML generieren
         const typeBadgesHtml = types.map(t => `<span class="type-badge ${t}">${t}</span>`).join('');
 
+        // Je nach gewähltem Sprachmodus Haupttitel und Detail tauschen
+        const mainTitleText = (displayLang === 'en') ? item.word : cleanTranslation;
+        const subDetailText = (displayLang === 'en') ? cleanTranslation : item.word;
+
         row.innerHTML = `
           <div class="list-row-header">
             <div class="word-main-info">
               <span class="icons-wrapper">${iconsHtml}</span>
-              <span class="word-title">${escapeHtml(item.word)}</span>
+              <span class="word-title">${escapeHtml(mainTitleText)}</span>
               <div class="type-badges-container">${typeBadgesHtml}</div>
             </div>
             <span class="chevron">▼</span>
           </div>
           <div class="list-row-details" onclick="event.stopPropagation()">
-            <div class="translation-text">${escapeHtml(cleanTranslation)}</div>
+            <div class="translation-text">${escapeHtml(subDetailText)}</div>
             ${item.example ? `<div class="example-text">${escapeHtml(item.example)}</div>` : ''}
             <div class="row-actions">
               <button class="icon-btn" onclick="editVocab('${item.id}')" title="Bearbeiten">✏️ Bearbeiten</button>
@@ -1110,7 +1208,7 @@
       filterVocab();
     }
 
-    // Modal für Irregular Verbs & Practice Feature-Vorschau
+    // Modal für Irregular Verbs Vorschau
     function openIrregularVerbsModal() {
       const modal = document.getElementById('featureModal');
       document.getElementById('featureModalTitle').textContent = '⚡ Irregular Verbs Module';
@@ -1121,18 +1219,120 @@
       modal.classList.add('active');
     }
 
-    function openPracticeModal() {
-      const modal = document.getElementById('featureModal');
-      document.getElementById('featureModalTitle').textContent = '🎯 Interactive Practice Mode';
-      document.getElementById('featureModalContent').innerHTML = `
-        <p><strong>Interaktiver Karteikarten- & Abfragemodus</strong></p>
-        <p style="margin-top:0.5rem;">Hier kannst Du bald Deine gefilterten Vokabeln interaktiv üben, Verdecken-Modus nutzen und Deinen Lernfortschritt testen!</p>
-      `;
-      modal.classList.add('active');
-    }
-
     function closeFeatureModal() {
       document.getElementById('featureModal').classList.remove('active');
+    }
+
+    // --- PRACTICE TRAINER LOGIK ---
+    function openPracticeModal() {
+      // 1. Alle aktuell in der Liste sichtbaren Vokabeln ermitteln
+      const visibleRows = Array.from(document.querySelectorAll('#vocGrid .list-row')).filter(r => r.style.display !== 'none');
+      const visibleIds = visibleRows.map(r => r.dataset.id);
+      practicePool = vocabs.filter(v => visibleIds.includes(String(v.id)));
+
+      if (practicePool.length === 0) {
+        alert("Keine Vokabeln in der aktuellen Auswahl zum Üben vorhanden!");
+        return;
+      }
+
+      // Reset Stats
+      scoreCorrect = 0;
+      scoreTotal = 0;
+      streakCount = 0;
+      updatePracticeScoreDOM();
+
+      // Erste Vokabel ziehen & Modal öffnen
+      nextPracticeVocab();
+      document.getElementById('practiceModal').classList.add('active');
+    }
+
+    function closePracticeModal() {
+      document.getElementById('practiceModal').classList.remove('active');
+    }
+
+    function nextPracticeVocab() {
+      if (practicePool.length === 0) return;
+
+      // Randomizer: Zufällige Vokabel wählen
+      currentPracticeItem = practicePool[Math.floor(Math.random() * practicePool.length)];
+
+      const cleanTranslation = currentPracticeItem.translation.replace(/^🇩🇪\s*/, '').replace(/^DE:\s*/i, '');
+      document.getElementById('practicePrompt').textContent = cleanTranslation;
+
+      // Metadata (Icons & Worttypen) anzeigen
+      const types = parseCommaArray(currentPracticeItem.type);
+      const tags = parseCommaArray(currentPracticeItem.tag).map(t => t === 'self' ? 'person' : t);
+      const iconsHtml = tags.map(t => tagIcons[t] || '📂').join(' ');
+      document.getElementById('practiceMeta').innerHTML = `${iconsHtml} &bull; ${types.join(', ').toUpperCase()}`;
+
+      // Input Reset & Feedback verstecken
+      const input = document.getElementById('practiceInput');
+      input.value = '';
+      input.disabled = false;
+      input.focus();
+
+      const feedback = document.getElementById('practiceFeedback');
+      feedback.style.display = 'none';
+      feedback.className = 'feedback-box';
+
+      document.getElementById('practiceCheckBtn').style.display = 'inline-flex';
+      document.getElementById('practiceNextBtn').style.display = 'none';
+    }
+
+    function checkPracticeAnswer() {
+      if (!currentPracticeItem) return;
+
+      const inputField = document.getElementById('practiceInput');
+      const userAnswer = inputField.value.trim().toLowerCase();
+      const correctAnswer = currentPracticeItem.word.trim().toLowerCase();
+
+      if (!userAnswer) return;
+
+      scoreTotal++;
+      const isCorrect = (userAnswer === correctAnswer);
+
+      const feedback = document.getElementById('practiceFeedback');
+      feedback.style.display = 'block';
+      inputField.disabled = true;
+
+      if (isCorrect) {
+        scoreCorrect++;
+        streakCount++;
+        feedback.className = 'feedback-box feedback-correct';
+        feedback.innerHTML = `✅ Richtig! Perfekt gewusst.`;
+      } else {
+        streakCount = 0;
+        feedback.className = 'feedback-box feedback-wrong';
+        feedback.innerHTML = `❌ Leider falsch!<br>Richtige Lösung: <strong>${escapeHtml(currentPracticeItem.word)}</strong>`;
+      }
+
+      updatePracticeScoreDOM();
+
+      // UI-Buttons wechseln
+      document.getElementById('practiceCheckBtn').style.display = 'none';
+      const nextBtn = document.getElementById('practiceNextBtn');
+      nextBtn.style.display = 'inline-flex';
+      nextBtn.focus();
+    }
+
+    function handlePracticeKey(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const checkBtn = document.getElementById('practiceCheckBtn');
+        const nextBtn = document.getElementById('practiceNextBtn');
+        
+        if (checkBtn.style.display !== 'none') {
+          checkPracticeAnswer();
+        } else if (nextBtn.style.display !== 'none') {
+          nextPracticeVocab();
+        }
+      }
+    }
+
+    function updatePracticeScoreDOM() {
+      document.getElementById('practiceScoreCorrect').textContent = scoreCorrect;
+      document.getElementById('practiceScoreTotal').textContent = scoreTotal;
+      document.getElementById('practiceStreak').textContent = `🔥 ${streakCount} Streak`;
     }
 
     // Seitensteuerung
@@ -1147,6 +1347,11 @@
         selectedWordTypes.clear(); selectedWordTypes.add('all');
         selectedTagFilters.clear(); selectedTagFilters.add('all');
         hiddenMode = 'none';
+        displayLang = 'en';
+        
+        document.getElementById('toggleLangBtn').classList.remove('active');
+        document.getElementById('toggleLangBtn').textContent = '🇬🇧 EN → DE';
+        
         document.getElementById('toggleHiddenBtn').classList.remove('active');
         document.getElementById('toggleHiddenBtn').textContent = '👁️ Versteckte';
         
@@ -1231,6 +1436,7 @@
 
       rows.forEach(row => {
         const wordTitle = row.dataset.word || '';
+        const translationText = row.dataset.translation || '';
         const itemTypes = parseCommaArray(row.dataset.types);
         const itemTags = parseCommaArray(row.dataset.tags);
         const isHiddenItem = row.dataset.hidden === 'true';
@@ -1251,8 +1457,8 @@
         // 3. Tag Match (at least one matching tag)
         const tagMatch = selectedTagFilters.has('all') || itemTags.some(t => selectedTagFilters.has(t));
 
-        // 4. Search Match
-        const searchMatch = searchTerm === '' || wordTitle.includes(searchTerm);
+        // 4. Search Match (sucht sowohl im englischen Begriff als auch in der deutschen Übersetzung!)
+        const searchMatch = searchTerm === '' || wordTitle.includes(searchTerm) || translationText.includes(searchTerm);
 
         if (hiddenMatch && typeMatch && tagMatch && searchMatch) {
           row.style.display = 'block';
