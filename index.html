@@ -758,8 +758,8 @@
         <input type="hidden" id="vocId">
         
         <div class="form-group">
-          <label for="vocWord">Englischer Begriff</label>
-          <input type="text" id="vocWord" class="form-input" placeholder="z. B. Sentence" required>
+          <label for="vocWord">Englischer Begriff (Synonyme mit Komma trennen)</label>
+          <input type="text" id="vocWord" class="form-input" placeholder="z. B. autumn, fall" required>
         </div>
 
         <!-- Multi-Select Worttypen -->
@@ -833,12 +833,12 @@
 
         <div class="form-group">
           <label for="vocTranslation">Deutsche Übersetzung (Mehrzeilig möglich)</label>
-          <textarea id="vocTranslation" class="form-input form-textarea" rows="2" placeholder="z. B. der Satz&#10;die Strafe" required></textarea>
+          <textarea id="vocTranslation" class="form-input form-textarea" rows="2" placeholder="z. B. der Herbst" required></textarea>
         </div>
 
         <div class="form-group">
           <label for="vocExample">Beispielsatz (optional, mehrzeilig möglich)</label>
-          <textarea id="vocExample" class="form-input form-textarea" rows="2" placeholder='z. B. "Every sentence requires a verb."&#10;"Second example line."'></textarea>
+          <textarea id="vocExample" class="form-input form-textarea" rows="2" placeholder='z. B. "Leaves fall in autumn."'></textarea>
         </div>
 
         <!-- Option: Verstecken -->
@@ -865,14 +865,14 @@
       
       <div style="display:flex; flex-direction:column; gap:1.1rem;">
         <div style="text-align:center; padding: 1.1rem; background: var(--bg-color); border-radius: 14px; border: 1.5px solid var(--border);">
-          <span style="font-size:0.8rem; color:var(--text-muted); font-weight:800; text-transform:uppercase; letter-spacing:0.04em;">Gesuchtes deutsches Wort</span>
+          <span id="practicePromptLabel" style="font-size:0.8rem; color:var(--text-muted); font-weight:800; text-transform:uppercase; letter-spacing:0.04em;">Gesuchter Begriff</span>
           <div id="practicePrompt" style="font-size: 1.45rem; font-weight: 800; color: var(--text-main); margin-top: 0.35rem; line-height: 1.35; white-space: pre-wrap;">-</div>
           <div id="practiceMeta" style="font-size: 0.88rem; color: var(--text-muted); margin-top: 0.4rem; font-weight:600;"></div>
         </div>
 
-        <div class="form-group">
-          <label for="practiceInput">Deine englische Übersetzung:</label>
-          <input type="text" id="practiceInput" class="form-input" placeholder="Englische Vokabel eingeben..." autocomplete="off" onkeydown="handlePracticeKey(event)">
+        <!-- Dynamisch generierte Eingabezeilen für Synonyme -->
+        <div id="practiceInputContainer" style="display:flex; flex-direction:column; gap:0.75rem;">
+          <!-- Dynamische Inputs per JavaScript -->
         </div>
 
         <div id="practiceFeedback" class="feedback-box" style="display:none;"></div>
@@ -950,15 +950,15 @@
       general: '📂'
     };
 
-    // Fallback-Vokabeln
+    // Fallback-Vokabeln (inkl. Multi-Synonym Beispiel "Autumn, Fall")
     const defaultVocabs = [
-      { id: '1', word: 'Sentence', type: 'noun', tag: 'language,concept', translation: 'der Satz', example: '"Every sentence requires a subject and a verb."', is_hidden: false },
-      { id: '2', word: 'Context', type: 'noun', tag: 'language,concept', translation: 'der Kontext / Zusammenhang', example: '"Learn vocabulary in context for better retention."', is_hidden: false },
-      { id: '3', word: 'Today', type: 'adverb,noun', tag: 'time', translation: 'heute', example: '"I am learning English today."', is_hidden: false },
-      { id: '4', word: 'Above', type: 'preposition,adverb', tag: 'place,landscape', translation: 'über / oberhalb', example: '"The plane flew above the clouds."', is_hidden: false },
-      { id: '5', word: 'Memorize', type: 'verb', tag: 'mentality', translation: 'sich merken / einprägen', example: '"Practice daily to memorize new words quickly."', is_hidden: false },
-      { id: '6', word: 'Concise', type: 'adjective', tag: 'language,trait', translation: 'präzise / prägnant', example: '"Keep your explanations clear and concise."', is_hidden: false },
-      { id: '7', word: 'Hidden Gem', type: 'noun,adjective', tag: 'concept,trait', translation: 'versteckter Schatz', example: '"This feature was hidden."', is_hidden: true }
+      { id: '1', word: 'Autumn, Fall', type: 'noun', tag: 'weather,landscape,time', translation: 'der Herbst', example: '"Leaves change color in autumn / fall."', is_hidden: false },
+      { id: '2', word: 'Sentence', type: 'noun', tag: 'language,concept', translation: 'der Satz', example: '"Every sentence requires a subject and a verb."', is_hidden: false },
+      { id: '3', word: 'Context', type: 'noun', tag: 'language,concept', translation: 'der Kontext / Zusammenhang', example: '"Learn vocabulary in context for better retention."', is_hidden: false },
+      { id: '4', word: 'Today', type: 'adverb,noun', tag: 'time', translation: 'heute', example: '"I am learning English today."', is_hidden: false },
+      { id: '5', word: 'Above', type: 'preposition,adverb', tag: 'place,landscape', translation: 'über / oberhalb', example: '"The plane flew above the clouds."', is_hidden: false },
+      { id: '6', word: 'Memorize', type: 'verb', tag: 'mentality', translation: 'sich merken / einprägen', example: '"Practice daily to memorize new words quickly."', is_hidden: false },
+      { id: '7', word: 'Concise', type: 'adjective', tag: 'language,trait', translation: 'präzise / prägnant', example: '"Keep your explanations clear and concise."', is_hidden: false }
     ];
 
     let vocabs = [];
@@ -996,11 +996,27 @@
       }
     }
 
-    // Hilfsfunktion: Konvertiert String oder Array zu Array
+    // Hilfsfunktion: Zerlegt Komma-, Slash- oder Zeilenumbruch-getrennte Strings in Arrays
     function parseCommaArray(val) {
       if (!val) return [];
       if (Array.isArray(val)) return val;
-      return String(val).split(',').map(s => s.trim()).filter(Boolean);
+      return String(val).split(/[,/;\n]+/).map(s => s.trim()).filter(Boolean);
+    }
+
+    // Hilfsfunktion: Zerlegt Synonyme sauber
+    function parseSynonyms(str) {
+      if (!str) return [];
+      return String(str)
+        .split(/[,/;\n]+/)
+        .map(s => s.trim().replace(/^["']|["']$/g, ''))
+        .filter(Boolean);
+    }
+
+    // Hilfsfunktion: Formatierte Anzeige für Multi-Synonyme (z. B. "autumn • fall")
+    function formatSynonymsDisplay(str) {
+      const synonyms = parseSynonyms(str);
+      if (synonyms.length <= 1) return escapeHtml(str);
+      return synonyms.map(s => escapeHtml(s)).join(' <span style="color:var(--text-muted); font-weight:400; opacity:0.7;">•</span> ');
     }
 
     // Sprachen-Switching Toggle
@@ -1047,21 +1063,24 @@
         // Type Badges HTML generieren
         const typeBadgesHtml = types.map(t => `<span class="type-badge ${t}">${t}</span>`).join('');
 
-        // Je nach gewähltem Sprachmodus Haupttitel und Detail tauschen
-        const mainTitleText = (displayLang === 'en') ? item.word : cleanTranslation;
-        const subDetailText = (displayLang === 'en') ? cleanTranslation : item.word;
+        // Formatiertes Anzeigen von Synonymen (autumn • fall)
+        const wordDisplay = formatSynonymsDisplay(item.word);
+        const translationDisplay = formatSynonymsDisplay(cleanTranslation);
+
+        const mainTitleText = (displayLang === 'en') ? wordDisplay : translationDisplay;
+        const subDetailText = (displayLang === 'en') ? translationDisplay : wordDisplay;
 
         row.innerHTML = `
           <div class="list-row-header">
             <div class="word-main-info">
               <span class="icons-wrapper">${iconsHtml}</span>
-              <span class="word-title">${escapeHtml(mainTitleText)}</span>
+              <span class="word-title">${mainTitleText}</span>
               <div class="type-badges-container">${typeBadgesHtml}</div>
             </div>
             <span class="chevron">▼</span>
           </div>
           <div class="list-row-details" onclick="event.stopPropagation()">
-            <div class="translation-text">${escapeHtml(subDetailText)}</div>
+            <div class="translation-text">${subDetailText}</div>
             ${item.example ? `<div class="example-text">${escapeHtml(item.example)}</div>` : ''}
             <div class="row-actions">
               <button class="icon-btn" onclick="editVocab('${item.id}')" title="Bearbeiten">✏️ Bearbeiten</button>
@@ -1223,9 +1242,8 @@
       document.getElementById('featureModal').classList.remove('active');
     }
 
-    // --- PRACTICE TRAINER LOGIK ---
+    // --- PRACTICE TRAINER LOGIK (MIT DYNAMISCHEN EINGABEZEILEN FÜR SYNONYME) ---
     function openPracticeModal() {
-      // 1. Alle aktuell in der Liste sichtbaren Vokabeln ermitteln
       const visibleRows = Array.from(document.querySelectorAll('#vocGrid .list-row')).filter(r => r.style.display !== 'none');
       const visibleIds = visibleRows.map(r => r.dataset.id);
       practicePool = vocabs.filter(v => visibleIds.includes(String(v.id)));
@@ -1235,13 +1253,11 @@
         return;
       }
 
-      // Reset Stats
       scoreCorrect = 0;
       scoreTotal = 0;
       streakCount = 0;
       updatePracticeScoreDOM();
 
-      // Erste Vokabel ziehen & Modal öffnen
       nextPracticeVocab();
       document.getElementById('practiceModal').classList.add('active');
     }
@@ -1253,23 +1269,62 @@
     function nextPracticeVocab() {
       if (practicePool.length === 0) return;
 
-      // Randomizer: Zufällige Vokabel wählen
       currentPracticeItem = practicePool[Math.floor(Math.random() * practicePool.length)];
 
-      const cleanTranslation = currentPracticeItem.translation.replace(/^🇩🇪\s*/, '').replace(/^DE:\s*/i, '');
-      document.getElementById('practicePrompt').textContent = cleanTranslation;
+      let promptText = '';
+      let targetSynonyms = [];
 
-      // Metadata (Icons & Worttypen) anzeigen
+      if (displayLang === 'en') {
+        promptText = currentPracticeItem.translation.replace(/^🇩🇪\s*/, '').replace(/^DE:\s*/i, '');
+        targetSynonyms = parseSynonyms(currentPracticeItem.word);
+        document.getElementById('practicePromptLabel').textContent = 'Gesuchtes deutsches Wort';
+      } else {
+        promptText = currentPracticeItem.word;
+        targetSynonyms = parseSynonyms(currentPracticeItem.translation.replace(/^🇩🇪\s*/, '').replace(/^DE:\s*/i, ''));
+        document.getElementById('practicePromptLabel').textContent = 'Gesuchter englischer Begriff';
+      }
+
+      document.getElementById('practicePrompt').textContent = promptText;
+
       const types = parseCommaArray(currentPracticeItem.type);
       const tags = parseCommaArray(currentPracticeItem.tag).map(t => t === 'self' ? 'person' : t);
       const iconsHtml = tags.map(t => tagIcons[t] || '📂').join(' ');
-      document.getElementById('practiceMeta').innerHTML = `${iconsHtml} &bull; ${types.join(', ').toUpperCase()}`;
+      const multiSynNotice = targetSynonyms.length > 1 ? ` &bull; <strong style="color:var(--accent-voc);">${targetSynonyms.length} Synonyme gesucht!</strong>` : '';
+      document.getElementById('practiceMeta').innerHTML = `${iconsHtml} &bull; ${types.join(', ').toUpperCase()}${multiSynNotice}`;
 
-      // Input Reset & Feedback verstecken
-      const input = document.getElementById('practiceInput');
-      input.value = '';
-      input.disabled = false;
-      input.focus();
+      // Dynamische Inputs im Container erzeugen
+      const container = document.getElementById('practiceInputContainer');
+      container.innerHTML = '';
+
+      targetSynonyms.forEach((syn, idx) => {
+        const group = document.createElement('div');
+        group.className = 'form-group';
+
+        const label = document.createElement('label');
+        label.htmlFor = `practiceInput_${idx}`;
+        if (targetSynonyms.length > 1) {
+          label.textContent = `${idx + 1}. ${displayLang === 'en' ? 'Englische Vokabel' : 'Deutsche Übersetzung'} (Synonym ${idx + 1}):`;
+        } else {
+          label.textContent = `${displayLang === 'en' ? 'Deine englische Übersetzung:' : 'Deine deutsche Übersetzung:'}`;
+        }
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = `practiceInput_${idx}`;
+        input.className = 'form-input practice-input-field';
+        input.placeholder = targetSynonyms.length > 1 ? `Vokabel ${idx + 1} eingeben...` : 'Antwort eingeben...';
+        input.autocomplete = 'off';
+        input.onkeydown = (e) => handlePracticeKey(e, idx, targetSynonyms.length);
+
+        group.appendChild(label);
+        group.appendChild(input);
+        container.appendChild(group);
+      });
+
+      setTimeout(() => {
+        const firstInput = document.getElementById('practiceInput_0');
+        if (firstInput) firstInput.focus();
+      }, 50);
 
       const feedback = document.getElementById('practiceFeedback');
       feedback.style.display = 'none';
@@ -1282,46 +1337,84 @@
     function checkPracticeAnswer() {
       if (!currentPracticeItem) return;
 
-      const inputField = document.getElementById('practiceInput');
-      const userAnswer = inputField.value.trim().toLowerCase();
-      const correctAnswer = currentPracticeItem.word.trim().toLowerCase();
+      const targetSynonyms = (displayLang === 'en') 
+        ? parseSynonyms(currentPracticeItem.word) 
+        : parseSynonyms(currentPracticeItem.translation.replace(/^🇩🇪\s*/, '').replace(/^DE:\s*/i, ''));
 
-      if (!userAnswer) return;
+      const inputs = document.querySelectorAll('.practice-input-field');
+      const userAnswers = Array.from(inputs).map(inp => inp.value.trim().toLowerCase());
+
+      if (userAnswers.every(ans => !ans)) return;
 
       scoreTotal++;
-      const isCorrect = (userAnswer === correctAnswer);
+
+      let remainingTargets = targetSynonyms.map(s => s.toLowerCase());
+      let results = [];
+
+      userAnswers.forEach((ans, idx) => {
+        const matchIdx = remainingTargets.indexOf(ans);
+        if (ans && matchIdx !== -1) {
+          const matched = targetSynonyms[matchIdx];
+          remainingTargets.splice(matchIdx, 1);
+          results.push({ inputIdx: idx, answer: ans, isCorrect: true, matchedTarget: matched });
+          inputs[idx].style.borderColor = '#166534';
+          inputs[idx].style.background = '#f0fdf4';
+        } else {
+          results.push({ inputIdx: idx, answer: ans, isCorrect: false, matchedTarget: null });
+          inputs[idx].style.borderColor = '#ef4444';
+          inputs[idx].style.background = '#fef2f2';
+        }
+        inputs[idx].disabled = true;
+      });
+
+      const allCorrect = (results.every(r => r.isCorrect) && remainingTargets.length === 0);
 
       const feedback = document.getElementById('practiceFeedback');
       feedback.style.display = 'block';
-      inputField.disabled = true;
 
-      if (isCorrect) {
+      const fullListText = targetSynonyms.map(s => `<strong>${escapeHtml(s)}</strong>`).join(' • ');
+
+      if (allCorrect) {
         scoreCorrect++;
         streakCount++;
         feedback.className = 'feedback-box feedback-correct';
-        feedback.innerHTML = `✅ Richtig! Perfekt gewusst.`;
+        if (targetSynonyms.length > 1) {
+          feedback.innerHTML = `✅ Perfekt! Alle ${targetSynonyms.length} Synonyme richtig gewusst!`;
+        } else {
+          feedback.innerHTML = `✅ Richtig! Perfekt gewusst.`;
+        }
       } else {
         streakCount = 0;
         feedback.className = 'feedback-box feedback-wrong';
-        feedback.innerHTML = `❌ Leider falsch!<br>Richtige Lösung: <strong>${escapeHtml(currentPracticeItem.word)}</strong>`;
+        if (results.some(r => r.isCorrect)) {
+          feedback.innerHTML = `⚠️ Teilweise richtig!<br>Vollständige Lösung: ${fullListText}`;
+        } else {
+          feedback.innerHTML = `❌ Leider falsch!<br>Richtige Lösung: ${fullListText}`;
+        }
       }
 
       updatePracticeScoreDOM();
 
-      // UI-Buttons wechseln
       document.getElementById('practiceCheckBtn').style.display = 'none';
       const nextBtn = document.getElementById('practiceNextBtn');
       nextBtn.style.display = 'inline-flex';
       nextBtn.focus();
     }
 
-    function handlePracticeKey(e) {
+    function handlePracticeKey(e, index, total) {
       if (e.key === 'Enter') {
         e.preventDefault();
         const checkBtn = document.getElementById('practiceCheckBtn');
         const nextBtn = document.getElementById('practiceNextBtn');
-        
+
         if (checkBtn.style.display !== 'none') {
+          if (index < total - 1) {
+            const nextInput = document.getElementById(`practiceInput_${index + 1}`);
+            if (nextInput && !nextInput.value.trim()) {
+              nextInput.focus();
+              return;
+            }
+          }
           checkPracticeAnswer();
         } else if (nextBtn.style.display !== 'none') {
           nextPracticeVocab();
@@ -1451,13 +1544,13 @@
           hiddenMatch = isHiddenItem;
         }
 
-        // 2. Type Match (at least one matching type)
+        // 2. Type Match
         const typeMatch = selectedWordTypes.has('all') || itemTypes.some(t => selectedWordTypes.has(t));
 
-        // 3. Tag Match (at least one matching tag)
+        // 3. Tag Match
         const tagMatch = selectedTagFilters.has('all') || itemTags.some(t => selectedTagFilters.has(t));
 
-        // 4. Search Match (sucht sowohl im englischen Begriff als auch in der deutschen Übersetzung!)
+        // 4. Search Match
         const searchMatch = searchTerm === '' || wordTitle.includes(searchTerm) || translationText.includes(searchTerm);
 
         if (hiddenMatch && typeMatch && tagMatch && searchMatch) {
